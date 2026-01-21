@@ -73,7 +73,7 @@
 		<div class="box">
 			<div class="imgfit"><img src="/images/img_application_st_sample.jpg" alt=""></div>
 			<div class="txt">
-				<div class="tit"><span class="type c5">세미나</span>2025년 전국대학연구 산학협력관리자 협의회 추계세미나</div>
+				<div class="tit"><span class="type c5">세미나</span>2025년 전국대학연구 산학협력관리자 협회 추계세미나</div>
 				<div class="info">
 					<dl class="i1">
 						<dt>정원</dt>
@@ -121,7 +121,7 @@
 					</dl>
 					<dl class="i2">
 						<dt>교육대상</dt>
-						<dd>본 협의회 회원교 소속 연구․산학협력 업무 담당자 및 관리자</dd>
+						<dd>본 협회 회원교 소속 연구․산학협력 업무 담당자 및 관리자</dd>
 					</dl>
 					<dl class="i3">
 						<dt>신청기간</dt>
@@ -153,7 +153,7 @@
 		<div class="box">
 			<div class="imgfit"><img src="/images/img_application_st_sample.jpg" alt=""></div>
 			<div class="txt">
-				<div class="tit"><span class="type c5">세미나</span>2025년 전국대학연구 산학협력관리자 협의회 추계세미나</div>
+				<div class="tit"><span class="type c5">세미나</span>2025년 전국대학연구 산학협력관리자 협회 추계세미나</div>
 				<div class="info">
 					<dl class="i1">
 						<dt>정원</dt>
@@ -201,7 +201,7 @@
 					</dl>
 					<dl class="i2">
 						<dt>교육대상</dt>
-						<dd>본 협의회 회원교 소속 연구․산학협력 업무 담당자 및 관리자</dd>
+						<dd>본 협회 회원교 소속 연구․산학협력 업무 담당자 및 관리자</dd>
 					</dl>
 					<dl class="i3">
 						<dt>신청기간</dt>
@@ -233,7 +233,7 @@
 		<div class="box">
 			<div class="imgfit"><img src="/images/img_application_st_sample.jpg" alt=""></div>
 			<div class="txt">
-				<div class="tit"><span class="type c5">세미나</span>2025년 전국대학연구 산학협력관리자 협의회 추계세미나</div>
+				<div class="tit"><span class="type c5">세미나</span>2025년 전국대학연구 산학협력관리자 협회 추계세미나</div>
 				<div class="info">
 					<dl class="i1">
 						<dt>정원</dt>
@@ -281,7 +281,7 @@
 					</dl>
 					<dl class="i2">
 						<dt>교육대상</dt>
-						<dd>본 협의회 회원교 소속 연구․산학협력 업무 담당자 및 관리자</dd>
+						<dd>본 협회 회원교 소속 연구․산학협력 업무 담당자 및 관리자</dd>
 					</dl>
 					<dl class="i3">
 						<dt>신청기간</dt>
@@ -313,7 +313,7 @@
 		<div class="box">
 			<div class="imgfit"><img src="/images/img_application_st_sample.jpg" alt=""></div>
 			<div class="txt">
-				<div class="tit"><span class="type c5">세미나</span>2025년 전국대학연구 산학협력관리자 협의회 추계세미나</div>
+				<div class="tit"><span class="type c5">세미나</span>2025년 전국대학연구 산학협력관리자 협회 추계세미나</div>
 				<div class="info">
 					<dl class="i1">
 						<dt>정원</dt>
@@ -361,7 +361,7 @@
 					</dl>
 					<dl class="i2">
 						<dt>교육대상</dt>
-						<dd>본 협의회 회원교 소속 연구․산학협력 업무 담당자 및 관리자</dd>
+						<dd>본 협회 회원교 소속 연구․산학협력 업무 담당자 및 관리자</dd>
 					</dl>
 					<dl class="i3">
 						<dt>신청기간</dt>
@@ -393,7 +393,7 @@
 		<div class="box">
 			<div class="imgfit"><img src="/images/img_application_st_sample.jpg" alt=""></div>
 			<div class="txt">
-				<div class="tit"><span class="type c5">세미나</span>2025년 전국대학연구 산학협력관리자 협의회 추계세미나</div>
+				<div class="tit"><span class="type c5">세미나</span>2025년 전국대학연구 산학협력관리자 협회 추계세미나</div>
 				<div class="info">
 					<dl class="i1">
 						<dt>정원</dt>
@@ -441,7 +441,7 @@
 					</dl>
 					<dl class="i2">
 						<dt>교육대상</dt>
-						<dd>본 협의회 회원교 소속 연구․산학협력 업무 담당자 및 관리자</dd>
+						<dd>본 협회 회원교 소속 연구․산학협력 업무 담당자 및 관리자</dd>
 					</dl>
 					<dl class="i3">
 						<dt>신청기간</dt>

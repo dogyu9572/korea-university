@@ -229,17 +229,17 @@
 		<div class="info">
 			<div class="inner">
 				<ul>
-					<li><strong>회장</strong>박준철</li>
+					<!-- <li><strong>회장</strong>박준철</li> -->
 					<li><strong>주소</strong>서울특별시 관악구 관악로 1 서울대학교 연구공원내 943동 5층(08826)</li>
-					<li><strong>Tel</strong>(02)880-2040</li>
-					<li><strong>E-mail</strong>pjc0302@snu.ac.kr</li>
+					<!-- <li><strong>Tel</strong>(02)880-2040</li> -->
+					<!-- <li><strong>E-mail</strong>pjc0302@snu.ac.kr</li> -->
 				</ul>
-				<ul>
+				<!-- <ul>
 					<li><strong>사무국장</strong>윤대성</li>
 					<li><strong>주소</strong>전라북도 전주시 완산구 천잠로 303, 대학본관 218호(55069)</li>
 					<li><strong>Tel</strong>(063)220-3194</li>
 					<li><strong>E-mail</strong>koreaweb@jj.ac.kr</li>
-				</ul>
+				</ul> -->
 				<p class="copy">Copyright © www.kucra.or.kr All rights reserved.</p>
 			</div>
 		</div>

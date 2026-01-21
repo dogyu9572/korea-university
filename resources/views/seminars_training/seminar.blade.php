@@ -30,17 +30,17 @@
 			<tbody>
 				<tr>
 					<td class="seminar01">상반기</td>
-					<th class="seminar02"><a href="/seminars_training/application_st_view">2025년 전국대학 연구·산학협력관리자 협의회 하계 세미나</a></th>
+					<th class="seminar02"><a href="/seminars_training/application_st_view">2025년 전국대학 연구·산학협력관리자 협회 하계 세미나</a></th>
 					<td class="seminar03">경주 라한셀렉트호텔</td>
 					<td class="seminar04">2025년 6월 중 (2박 3일)</td>
-					<td class="seminar05">전국대학 연구 · 산학협력관리자 협의회</td>
+					<td class="seminar05">전국대학 연구 · 산학협력관리자 협회</td>
 				</tr>
 				<tr>
 					<td class="seminar01">하반기</td>
-					<th class="seminar02"><a href="/seminars_training/application_st_view">2025년 전국대학 연구·산학협력관리자 협의회 추계 세미나</a></th>
+					<th class="seminar02"><a href="/seminars_training/application_st_view">2025년 전국대학 연구·산학협력관리자 협회 추계 세미나</a></th>
 					<td class="seminar03">그랜드 하얏트 제주</td>
 					<td class="seminar04">025년 11월 5일(수) <br class="pc_vw"/>~ 11월 7일(금), 2박 3일</td>
-					<td class="seminar05">전국대학 연구 · 산학협력관리자 협의회</td>
+					<td class="seminar05">전국대학 연구 · 산학협력관리자 협회</td>
 				</tr>
 			</tbody>
 		</table>

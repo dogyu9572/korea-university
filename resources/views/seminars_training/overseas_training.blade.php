@@ -28,15 +28,15 @@
 			<tbody>
 				<tr>
 					<td class="overseas01">상반기</td>
-					<th class="overseas02"><a href="/seminars_training/application_st_view">2025년 전국대학 연구·산학협력관리자 협의회 하계 해외연수</a></th>
+					<th class="overseas02"><a href="/seminars_training/application_st_view">2025년 전국대학 연구·산학협력관리자 협회 하계 해외연수</a></th>
 					<td class="overseas03">스페인 및 이탈리아 일원</td>
-					<td class="overseas04">전국대학 연구 · 산학협력관리자 협의회</td>
+					<td class="overseas04">전국대학 연구 · 산학협력관리자 협회</td>
 				</tr>
 				<tr>
 					<td class="overseas01">하반기</td>
-					<th class="overseas02"><a href="/seminars_training/application_st_view">2025년 전국대학 연구·산학협력관리자 협의회 추계 해외연수</a></th>
+					<th class="overseas02"><a href="/seminars_training/application_st_view">2025년 전국대학 연구·산학협력관리자 협회 추계 해외연수</a></th>
 					<td class="overseas03">스페인 및 이탈리아 일원</td>
-					<td class="overseas04">전국대학 연구 · 산학협력관리자 협의회</td>
+					<td class="overseas04">전국대학 연구 · 산학협력관리자 협회</td>
 				</tr>
 			</tbody>
 		</table>

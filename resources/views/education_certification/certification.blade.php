@@ -13,7 +13,7 @@
 		<div class="btit mb40">대학연구행정전문가 (1급 / 2급)</div>
 		<ul class="expert_info">
 			<li class="i1"><span>자격제정 목적</span><p>대학 연구행정 실무자의 직무 전문성 강화 및 표준화된 역량 인증 제도</p></li>
-			<li class="i2"><span>주관기관</span><p>전국대학 산학협력단 관리자협의회</p></li>
+			<li class="i2"><span>주관기관</span><p>전국대학 산학협력단 관리자협회</p></li>
 			<li class="i3"><span>자격유형</span><p>민간자격 (등록 예정)</p></li>
 			<li class="i4"><span>도입시기</span><p>2026년 예정</p></li>
 			<li class="i5"><span>등급구분</span><p>실무자용 2급 / <br class="pc_vw"/>관리자용 1급</p></li>

@@ -4,14 +4,14 @@
     
 	<div class="establishment_wrap">
 		<div class="inner">
-			<div class="tit">대학의 연구가 사회의 혁신으로 이어지도록<br/><strong>전국대학연구·산학협력 관리자협의회가 함께합니다.</strong></div>
+			<div class="tit">대학의 연구가 사회의 혁신으로 이어지도록<br/><strong>전국대학연구·산학협력 관리자협회가 함께합니다.</strong></div>
 		</div>
 		<div class="establishment_con mt80">
 			<div class="inner">
 				<div class="box">
 					<p>
 						전국 국공립·사립 대학교 연구처와 산학협력단에서 근무하는 직원들로 <br class="pc_vw">
-						구성되어 있는 <strong>전국대학연구·산학협력관리자협의회(이하 전연산협)</strong>는 <br class="pc_vw">
+						구성되어 있는 <strong>전국대학연구·산학협력관리자협회(이하 전연산협)</strong>는 <br class="pc_vw">
 						대학의 연구분위기 조성 및 연구 기능 활성화를 위해 <br class="pc_vw">
 						대학 상호간 업무 협조와 정보 교환 그리고 회원 상호간의 <br class="pc_vw">
 						친목도모를 목적으로 1994년 4월15일 설립되었습니다.
