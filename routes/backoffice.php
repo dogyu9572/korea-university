@@ -17,6 +17,7 @@ use App\Http\Controllers\Backoffice\AdminGroupController;
 use App\Http\Controllers\Backoffice\BannerController;
 use App\Http\Controllers\Backoffice\PopupController;
 use App\Http\Controllers\Backoffice\AccessStatisticsController;
+use App\Http\Controllers\Backoffice\OrganizationalController;
 
 // =============================================================================
 // 백오피스 인증 라우트
@@ -226,6 +227,14 @@ Route::prefix('backoffice')->middleware(['backoffice'])->group(function () {
         'names' => 'backoffice.popups'
     ]);
     Route::post('popups/update-order', [PopupController::class, 'updateOrder'])->name('backoffice.popups.update-order');
+
+    // 조직도 관리
+    Route::get('organizational', [OrganizationalController::class, 'index'])->name('backoffice.organizational.index');
+    Route::post('organizational/chart', [OrganizationalController::class, 'updateChart'])->name('backoffice.organizational.update-chart');
+    Route::post('organizational-members', [OrganizationalController::class, 'storeMember'])->name('backoffice.organizational.store-member');
+    Route::put('organizational-members/{id}', [OrganizationalController::class, 'updateMember'])->name('backoffice.organizational.update-member');
+    Route::delete('organizational-members/{id}', [OrganizationalController::class, 'destroyMember'])->name('backoffice.organizational.destroy-member');
+    Route::post('organizational-members/update-order', [OrganizationalController::class, 'updateOrder'])->name('backoffice.organizational.update-order');
 
     // 세션 연장
     Route::post('session/extend', [App\Http\Controllers\Backoffice\SessionController::class, 'extend'])

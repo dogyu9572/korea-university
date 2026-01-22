@@ -1,0 +1,174 @@
+/* 조직도 관리 페이지 스타일 */
+
+/* 조직도 에디터 헤더 (제목 + 저장 버튼) */
+.organizational-chart-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+    padding-bottom: 15px;
+}
+
+.organizational-chart-header .board-form-label {
+    margin: 0;
+    font-size: 18px;
+    font-weight: 600;
+    color: #495057;
+}
+
+.organizational-members-table-wrapper {
+    margin-top: 40px;
+    padding-top: 30px;
+}
+
+.organizational-members-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+.organizational-members-header .board-form-label {
+    margin: 0;
+    font-size: 18px;
+    font-weight: 600;
+    color: #495057;
+}
+
+.organizational-members-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.organizational-members-table thead th {
+    background-color: #f8f9fa;
+    padding: 12px;
+    text-align: left;
+    font-weight: 600;
+    color: #495057;
+}
+
+.organizational-members-table tbody td {
+    padding: 12px;
+    border-bottom: 1px solid #dee2e6;
+    vertical-align: middle;
+}
+
+.organizational-members-table tbody tr:hover {
+    background-color: #f8f9fa;
+}
+
+.organizational-members-table tbody tr.empty-row td {
+    text-align: center;
+    padding: 40px;
+    color: #6c757d;
+}
+
+.organizational-members-table .form-control-sm {
+    width: 100%;
+    padding: 6px 12px;
+    font-size: 14px;
+}
+
+.organizational-members-table .member-category {
+    min-width: 100px;
+}
+
+.organizational-members-table .member-name {
+    min-width: 120px;
+}
+
+.organizational-members-table .member-position {
+    min-width: 120px;
+}
+
+.organizational-members-table .member-affiliation {
+    min-width: 150px;
+}
+
+.organizational-members-table .member-phone {
+    min-width: 150px;
+}
+
+.organizational-members-table .member-sort-order {
+    width: 80px;
+}
+
+.organizational-members-table .board-btn-group {
+    display: flex;
+    gap: 5px;
+}
+
+.organizational-members-table .board-btn-group .btn {
+    padding: 4px 8px;
+    font-size: 12px;
+}
+
+
+/* 수정 모드 스타일 */
+.organizational-members-table tbody tr input:disabled,
+.organizational-members-table tbody tr select:disabled {
+    background-color: #f8f9fa;
+    cursor: not-allowed;
+}
+
+.organizational-members-table tbody tr input:not(:disabled),
+.organizational-members-table tbody tr select:not(:disabled) {
+    background-color: #fff;
+    border: 1px solid #ced4da;
+    cursor: text;
+}
+
+/* 새로 추가된 행은 항상 편집 가능 */
+.organizational-members-table tbody tr.new-member-row input,
+.organizational-members-table tbody tr.new-member-row select {
+    background-color: #fff !important;
+    border: 1px solid #ced4da !important;
+    cursor: text !important;
+    pointer-events: auto !important;
+}
+
+/* Summernote 에디터 영역 */
+.board-form-group .summernote-editor {
+    min-height: 400px;
+}
+
+/* 모달 스타일 */
+#addMemberModal .modal-body {
+    padding: 20px;
+}
+
+#addMemberModal .board-form-group {
+    margin-bottom: 20px;
+}
+
+#addMemberModal .board-form-label {
+    font-weight: 600;
+    margin-bottom: 8px;
+    color: #495057;
+}
+
+#addMemberModal .required {
+    color: #dc3545;
+}
+
+/* 반응형 스타일 */
+@media (max-width: 768px) {
+    .organizational-members-table {
+        font-size: 12px;
+    }
+    
+    .organizational-members-table thead th,
+    .organizational-members-table tbody td {
+        padding: 8px;
+    }
+    
+    .organizational-members-table .board-btn-group {
+        flex-direction: column;
+    }
+    
+    .organizational-members-table .board-btn-group .btn {
+        width: 100%;
+        margin-bottom: 5px;
+    }
+}

@@ -150,6 +150,18 @@ class AdminMenuSeeder extends Seeder
                 'permission_key' => null,
             ],
             [
+                'id' => 45,
+                'parent_id' => 21,
+                'name' => '조직도 관리',
+                'url' => '/backoffice/organizational',
+                'icon' => null,
+                'order' => 3,
+                'is_active' => 1,
+                'created_at' => now(),
+                'updated_at' => now(),
+                'permission_key' => null,
+            ],
+            [
                 'id' => 19,
                 'parent_id' => null,
                 'name' => '게시판관리',

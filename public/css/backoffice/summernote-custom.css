@@ -51,7 +51,7 @@
     border: 1px solid #dee2e6 !important;
     color: #333 !important;
     padding: 6px 8px !important;
-    transition: all 0.2s ease !important;
+    transition: background-color 0.2s ease, border-color 0.2s ease, color 0.2s ease !important;
     font-size: 14px !important;
     border-radius: 4px !important;
     margin: 0 !important;
@@ -73,11 +73,24 @@
     color: #000 !important;
 }
 
-/* 드롭다운 화살표 색상 */
+/* 드롭다운 화살표 색상 및 안정화 */
 .note-toolbar .note-btn-group .note-btn.dropdown-toggle::after {
-    border-top-color: #333 !important;                
+    border-top-color: #333 !important;
     position: relative !important;
     top: 1px !important;
+    opacity: 1 !important;
+    visibility: visible !important;
+    display: inline-block !important;
+    pointer-events: none !important;
+    transition: none !important; /* 화살표는 transition 제외 */
+}
+
+/* hover 시에도 화살표 유지 */
+.note-toolbar .note-btn.dropdown-toggle:hover::after {
+    opacity: 1 !important;
+    visibility: visible !important;
+    display: inline-block !important;
+    border-top-color: #333 !important;
 }
 
 /* 드롭다운 버튼 영역 넓히기 */

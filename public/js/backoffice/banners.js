@@ -28,25 +28,6 @@ document.addEventListener('DOMContentLoaded', function() {
         initBannerSortable();
     });
     
-    // 게시기간 토글 기능
-    const usePeriodCheckbox = document.getElementById('use_period');
-    const periodFields = document.getElementById('period_fields');
-
-    function togglePeriodFields() {
-        if (usePeriodCheckbox && periodFields) {
-            if (usePeriodCheckbox.checked) {
-                periodFields.style.display = 'block';
-            } else {
-                periodFields.style.display = 'none';
-            }
-        }
-    }
-
-    if (usePeriodCheckbox) {
-        usePeriodCheckbox.addEventListener('change', togglePeriodFields);
-        togglePeriodFields(); // 초기 상태 설정
-    }
-
     // 이미지 미리보기 기능
     function setupImagePreview(inputId, previewId) {
         const input = document.getElementById(inputId);
@@ -111,11 +92,8 @@ document.addEventListener('DOMContentLoaded', function() {
         reader.readAsDataURL(file);
     }
 
-    // 데스크톱 이미지 미리보기 설정
-    setupImagePreview('desktop_image', 'desktopImagePreview');
-    
-    // 모바일 이미지 미리보기 설정
-    setupImagePreview('mobile_image', 'mobileImagePreview');
+    // 배너 이미지 미리보기 설정
+    setupImagePreview('image', 'imagePreview');
 });
 
 // 이미지 미리보기 제거 함수 (전역 함수)
@@ -127,11 +105,8 @@ function removeImagePreview(inputId, previewId) {
     if (preview) preview.innerHTML = '';
     
     // 서버에 이미지 제거 요청을 위한 숨겨진 필드 설정
-    if (inputId === 'desktop_image') {
-        const removeField = document.getElementById('remove_desktop_image');
-        if (removeField) removeField.value = '1';
-    } else if (inputId === 'mobile_image') {
-        const removeField = document.getElementById('remove_mobile_image');
+    if (inputId === 'image') {
+        const removeField = document.getElementById('remove_image');
         if (removeField) removeField.value = '1';
     }
 }

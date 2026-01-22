@@ -152,7 +152,14 @@ class SubController extends Controller
     public function organizational()
     {
         $gNum = "04"; $sNum = "04"; $gName = "협회 소개"; $sName = "조직도";
-        return view('about.organizational', compact('gNum', 'sNum', 'gName', 'sName'));
+        
+        // 조직도 에디터 내용 조회
+        $chartContent = \App\Models\OrganizationalChart::getContent();
+        
+        // 구성원 목록 조회 (카테고리별 그룹화)
+        $membersByCategory = \App\Models\OrganizationalMember::getGroupedByCategory();
+        
+        return view('about.organizational', compact('gNum', 'sNum', 'gName', 'sName', 'chartContent', 'membersByCategory'));
     }
     public function about_institutions()
     {

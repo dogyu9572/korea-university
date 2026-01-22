@@ -65,29 +65,37 @@ class BannerController extends Controller
     {
         $request->validate([
             'title' => 'required|string|max:255',
-            'main_text' => 'nullable|string|max:255',
-            'sub_text' => 'nullable|string|max:255',
             'url' => 'nullable|url',
             'url_target' => 'nullable|in:_self,_blank',
-            'start_date' => 'nullable|date',
-            'end_date' => 'nullable|date|after_or_equal:start_date',
-            'use_period' => 'boolean',
             'is_active' => 'boolean',
-            'desktop_image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
-            'mobile_image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
-            'video_url' => 'nullable|url',
+            'image' => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
             'sort_order' => 'nullable|integer|min:0',
+            'created_at' => 'nullable|date',
         ]);
 
-        $data = $request->all();
-        
-        // 이미지 업로드 처리
-        if ($request->hasFile('desktop_image')) {
-            $data['desktop_image'] = $request->file('desktop_image')->store('banners', 'public');
+        // 정렬 순서 설정: 입력값이 없으면 기존 최대값 + 1
+        $sortOrder = $request->sort_order;
+        if ($sortOrder === null) {
+            $maxSortOrder = Banner::max('sort_order') ?? -1;
+            $sortOrder = $maxSortOrder + 1;
         }
+
+        $data = [
+            'title' => $request->title,
+            'url' => $request->url,
+            'url_target' => $request->url_target ?? '_self',
+            'is_active' => $request->is_active ?? true,
+            'sort_order' => $sortOrder,
+        ];
         
-        if ($request->hasFile('mobile_image')) {
-            $data['mobile_image'] = $request->file('mobile_image')->store('banners', 'public');
+        // 이미지 업로드 처리 (image를 desktop_image로 저장)
+        if ($request->hasFile('image')) {
+            $data['desktop_image'] = $request->file('image')->store('banners', 'public');
+        }
+
+        // 등록일 설정
+        if ($request->filled('created_at')) {
+            $data['created_at'] = $request->created_at;
         }
 
         Banner::create($data);
@@ -119,52 +127,42 @@ class BannerController extends Controller
     {
         $request->validate([
             'title' => 'required|string|max:255',
-            'main_text' => 'nullable|string|max:255',
-            'sub_text' => 'nullable|string|max:255',
             'url' => 'nullable|url',
             'url_target' => 'nullable|in:_self,_blank',
-            'start_date' => 'nullable|date',
-            'end_date' => 'nullable|date|after_or_equal:start_date',
-            'use_period' => 'boolean',
             'is_active' => 'boolean',
-            'desktop_image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
-            'mobile_image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
-            'video_url' => 'nullable|url',
+            'image' => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
             'sort_order' => 'nullable|integer|min:0',
+            'created_at' => 'nullable|date',
         ]);
 
-        $data = $request->all();
+        $data = [
+            'title' => $request->title,
+            'url' => $request->url,
+            'url_target' => $request->url_target ?? '_self',
+            'is_active' => $request->is_active ?? true,
+            'sort_order' => $request->sort_order ?? 0,
+        ];
         
         // 이미지 제거 처리
-        if ($request->input('remove_desktop_image') == '1') {
+        if ($request->input('remove_image') == '1') {
             if ($banner->desktop_image) {
                 Storage::disk('public')->delete($banner->desktop_image);
             }
             $data['desktop_image'] = null;
         }
         
-        if ($request->input('remove_mobile_image') == '1') {
-            if ($banner->mobile_image) {
-                Storage::disk('public')->delete($banner->mobile_image);
-            }
-            $data['mobile_image'] = null;
-        }
-        
-        // 이미지 업로드 처리
-        if ($request->hasFile('desktop_image')) {
+        // 이미지 업로드 처리 (image를 desktop_image로 저장)
+        if ($request->hasFile('image')) {
             // 기존 이미지 삭제
             if ($banner->desktop_image) {
                 Storage::disk('public')->delete($banner->desktop_image);
             }
-            $data['desktop_image'] = $request->file('desktop_image')->store('banners', 'public');
+            $data['desktop_image'] = $request->file('image')->store('banners', 'public');
         }
-        
-        if ($request->hasFile('mobile_image')) {
-            // 기존 이미지 삭제
-            if ($banner->mobile_image) {
-                Storage::disk('public')->delete($banner->mobile_image);
-            }
-            $data['mobile_image'] = $request->file('mobile_image')->store('banners', 'public');
+
+        // 등록일 설정
+        if ($request->filled('created_at')) {
+            $data['created_at'] = $request->created_at;
         }
 
         $banner->update($data);
