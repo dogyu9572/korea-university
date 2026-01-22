@@ -142,7 +142,13 @@ class SubController extends Controller
     public function history()
     {
         $gNum = "04"; $sNum = "03"; $gName = "협회 소개"; $sName = "연혁 및 회칙";
-        return view('about.history', compact('gNum', 'sNum', 'gName', 'sName'));
+        
+        // 연혁 데이터 조회 (노출 항목만, 날짜 기준 내림차순)
+        $histories = \App\Models\History::visible()
+            ->orderedByDate()
+            ->get();
+        
+        return view('about.history', compact('gNum', 'sNum', 'gName', 'sName', 'histories'));
     }
     public function bylaws()
     {

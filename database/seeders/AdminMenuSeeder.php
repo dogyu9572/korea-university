@@ -162,6 +162,18 @@ class AdminMenuSeeder extends Seeder
                 'permission_key' => null,
             ],
             [
+                'id' => 46,
+                'parent_id' => 21,
+                'name' => '연혁 관리',
+                'url' => '/backoffice/history',
+                'icon' => null,
+                'order' => 4,
+                'is_active' => 1,
+                'created_at' => now(),
+                'updated_at' => now(),
+                'permission_key' => null,
+            ],
+            [
                 'id' => 19,
                 'parent_id' => null,
                 'name' => '게시판관리',

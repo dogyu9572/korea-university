@@ -18,6 +18,7 @@ use App\Http\Controllers\Backoffice\BannerController;
 use App\Http\Controllers\Backoffice\PopupController;
 use App\Http\Controllers\Backoffice\AccessStatisticsController;
 use App\Http\Controllers\Backoffice\OrganizationalController;
+use App\Http\Controllers\Backoffice\HistoryController;
 
 // =============================================================================
 // 백오피스 인증 라우트
@@ -235,6 +236,12 @@ Route::prefix('backoffice')->middleware(['backoffice'])->group(function () {
     Route::put('organizational-members/{id}', [OrganizationalController::class, 'updateMember'])->name('backoffice.organizational.update-member');
     Route::delete('organizational-members/{id}', [OrganizationalController::class, 'destroyMember'])->name('backoffice.organizational.destroy-member');
     Route::post('organizational-members/update-order', [OrganizationalController::class, 'updateOrder'])->name('backoffice.organizational.update-order');
+
+    // 연혁 관리
+    Route::get('history', [HistoryController::class, 'index'])->name('backoffice.history.index');
+    Route::post('histories', [HistoryController::class, 'store'])->name('backoffice.history.store');
+    Route::put('histories/{id}', [HistoryController::class, 'update'])->name('backoffice.history.update');
+    Route::delete('histories/{id}', [HistoryController::class, 'destroy'])->name('backoffice.history.destroy');
 
     // 세션 연장
     Route::post('session/extend', [App\Http\Controllers\Backoffice\SessionController::class, 'extend'])

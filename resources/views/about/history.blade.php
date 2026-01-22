@@ -23,137 +23,67 @@
 			<button type="button"><p>1992년</p><strong>1999년</strong><img src="/images/history04.jpg" alt=""></button>
 		</div>
 		<div class="daylist">
+			@php
+				// 10년 단위로 그룹화
+				$groupedHistories = [];
+				foreach ($histories as $history) {
+					$year = $history->year;
+					if ($year >= 2020) {
+						$groupedHistories['2020-current'][] = $history;
+					} elseif ($year >= 2010 && $year <= 2019) {
+						$groupedHistories['2010-2019'][] = $history;
+					} elseif ($year >= 2000 && $year <= 2009) {
+						$groupedHistories['2000-2009'][] = $history;
+					} elseif ($year >= 1992 && $year <= 1999) {
+						$groupedHistories['1992-1999'][] = $history;
+					}
+				}
+			@endphp
+			
+			{{-- 현재 ~ 2020년 --}}
 			<div class="cont_area">
-				<div class="box"><i></i>
-					<div class="day"><strong>2025.08.26</strong><p>2025년도 연구산학협력 벤치마킹 해외연수</p></div>
-					<ul class="gbox dots_list">
-						<li>연수국가 : 스페인, 이탈리아(바르셀로나 바이오메디컬연구단지, 카탈루냐 기술센터, 로마 토르 베리가타 대학)</li>
-						<li>연수기간 : 2025. 8. 26. ~ 9. 5.</li>
-						<li>참석인원 : 대학 회원 담당자 69명 참석</li>
-					</ul>
-				</div>
-				<div class="box"><i></i>
-					<div class="day"><strong>2025.03.26</strong><p>제 60차 세미나 개최</p></div>
-					<ul class="gbox dots_list">
-						<li>일자 : 2025. 3. 26. ~ 3. 28.</li>
-						<li>장소 : 제주신화월드 랜딩관</li>
-						<li>내용 : 산학협력 주요 정책 방향, 대학 산학협력단 기능 고도화 지원 방안, 대학 간접비 고시비율 산출 안내 등</li>
-					</ul>
-				</div>
-				<div class="box"><i></i>
-					<div class="day"><strong>2024.11.13</strong><p>제 59차 세미나 개최</p></div>
-					<ul class="gbox dots_list">
-						<li>일자 : 2024. 11. 13. ~ 11. 15.</li>
-						<li>장소 : 라마다프라자 제주호텔</li>
-						<li>내용 : AI 시대의 연구윤리, 연구관리실무와 부가가치세, 연구지원체계평가에 대한 이해 등</li>
-					</ul>
-				</div>
-				<div class="box"><i></i>
-					<div class="day"><strong>2024.07.09</strong><p>2024년도 연구산학협력 벤치마킹 해외연수</p></div>
-					<ul class="gbox dots_list">
-						<li>연수국가 : 스페인, 독일(바르셀로나 바이오메디컬연구단지, 바르셀로나 대학, 카탈루냐 공과대학, 하이델베르크 대학)</li>
-						<li>연수기간 : 2024. 7. 9. ~ 7. 17.</li>
-						<li>참석인원 : 대학 회원 담당자 72명 참석</li>
-					</ul>
-				</div>
-				<div class="box"><i></i>
-					<div class="day"><strong>2024.03.27</strong><p>제 58차 세미나 개최</p></div>
-					<ul class="gbox dots_list">
-						<li>일자 : 2024. 3. 27. ~ 3. 29.</li>
-						<li>장소 : 라마다프라자 제주호텔</li>
-						<li>내용 : 사단법인 설립 총회, 정부연구비 사용 관련 변화된 제도와 정산 지적 사례, 2024년부터 달라지는 혁신법 개선 사항, 연구비 관리 우수 사례 발표 등</li>
-					</ul>
-				</div>
-				<div class="box"><i></i>
-					<div class="day"><strong>2023.11.22</strong><p>제 57차 세미나 개최</p></div>
-					<ul class="gbox dots_list">
-						<li>일자 : 2023. 11. 22. ~ 11. 24.</li>
-						<li>장소 : 라마다프라자 제주호텔</li>
-						<li>내용 : 산학협력 주요 정책 방향, 산학협력 회계 실태점검 사례 등</li>
-					</ul>
-				</div>
-				<div class="box"><i></i>
-					<div class="day"><strong>2023.06.29</strong><p>2023년도 연구산학협력 벤치마킹 해외연수</p></div>
-					<ul class="gbox dots_list">
-						<li>연수국가: 스페인, 프랑스, 독일(바르셀로나 대학, 소르본 대학, 하이델베르그 테크놀로지파크)</li>
-						<li>연수기간 : 2023. 6. 29. ~ 7. 7.</li>
-						<li>참석인원 : 대학 회원 담당자 72명 참석</li>
-					</ul>
-				</div>
-				<div class="box"><i></i>
-					<div class="day"><strong>2023.03.28</strong><p>제 56차 세미나 개최</p></div>
-					<ul class="gbox dots_list">
-						<li>일자 : 2023. 3. 28. ~ 3. 31.</li>
-						<li>장소 : 라마다프라자 제주호텔</li>
-						<li>내용 : 정부연구비 사용 관련 변화된 제도와 정산 지적 사례, 연구비 관리 우수 사례 발표 등</li>
-					</ul>
-				</div>
-				<div class="box"><i></i>
-					<div class="day"><strong>2022.11.21</strong><p>제16대 회장 서울대학교 박준철</p></div>
-				</div>
-				<div class="box"><i></i>
-					<div class="day"><strong>2022.11.21</strong><p>제 55차 세미나 개최</p></div>
-					<ul class="gbox dots_list">
-						<li>일자 : 2022. 11. 21. ~ 11. 23.</li>
-						<li>장소 : 라마다프라자 제주호텔</li>
-						<li>내용 : 산학협력단 시범패키지 컨설팅 방향, 대학 연구지원 체계평가 등</li>
-					</ul>
-				</div>
-				<div class="box"><i></i>
-					<div class="day"><strong>2022.03.30</strong><p>제 54차 세미나 개최</p></div>
-					<ul class="gbox dots_list">
-						<li>일자 : 2022. 3. 30. ~ 4. 1.</li>
-						<li>장소 : 라마다프라자 제주호텔</li>
-						<li>내용 : 연구비관리스템 발전 방향, 대학 연구지원 체계평가 등</li>
-					</ul>
-				</div>
-				<div class="box"><i></i>
-					<div class="day"><strong>2021.11.29</strong><p>제 53차 세미나 개최</p></div>
-					<ul class="gbox dots_list">
-						<li>일자 : 2021. 11. 29. ~ 12. 1.</li>
-						<li>장소 : 라마다프라자 제주호텔</li>
-						<li>내용 : 산학협력단 간접비 원가계산 등 회계 이슈, 연구비관리 교육 등</li>
-					</ul>
-				</div>
-				<div class="box"><i></i>
-					<div class="day"><strong>2021.04.07</strong><p>제 52차 세미나 개최</p></div>
-					<ul class="gbox dots_list">
-						<li>일자 : 2021. 4. 7. ~ 4. 9.</li>
-						<li>장소 : 라마다프라자 제주호텔</li>
-						<li>내용 : 정부 산학협력 정책, 국가연구개발혁신법 등 연구제도 이슈</li>
-					</ul>
-				</div>
+				@if(isset($groupedHistories['2020-current']))
+					@foreach($groupedHistories['2020-current'] as $history)
+						<div class="box"><i></i>
+							<div class="day"><strong>{{ $history->date->format('Y.m.d') }}</strong><p>{{ $history->content }}</p></div>
+						</div>
+					@endforeach
+				@endif
 			</div>
+			
+			{{-- 2010년 ~ 2019년 --}}
 			<div class="cont_area">
-				<div class="box"><i></i>
-					<div class="day"><strong>2019.01.01</strong><p>sample</p></div>
-				</div>
-				<div class="box"><i></i>
-					<div class="day"><strong>2019.01.01</strong><p>sample</p></div>
-				</div>
-				<div class="box"><i></i>
-					<div class="day"><strong>2019.01.01</strong><p>sample</p></div>
-				</div>
-				<div class="box"><i></i>
-					<div class="day"><strong>2019.01.01</strong><p>sample</p></div>
-				</div>
-				<div class="box"><i></i>
-					<div class="day"><strong>2019.01.01</strong><p>sample</p></div>
-				</div>
-				<div class="box"><i></i>
-					<div class="day"><strong>2019.01.01</strong><p>sample</p></div>
-				</div>
+				@if(isset($groupedHistories['2010-2019']))
+					@foreach($groupedHistories['2010-2019'] as $history)
+						<div class="box"><i></i>
+							<div class="day"><strong>{{ $history->date->format('Y.m.d') }}</strong><p>{{ $history->content }}</p></div>
+						</div>
+					@endforeach
+				@endif
 			</div>
+			
+			{{-- 2000년 ~ 2009년 --}}
 			<div class="cont_area">
-				<div class="box"><i></i>
-					<div class="day"><strong>2009.01.01</strong><p>sample</p></div>
-				</div>
+				@if(isset($groupedHistories['2000-2009']))
+					@foreach($groupedHistories['2000-2009'] as $history)
+						<div class="box"><i></i>
+							<div class="day"><strong>{{ $history->date->format('Y.m.d') }}</strong><p>{{ $history->content }}</p></div>
+						</div>
+					@endforeach
+				@endif
 			</div>
+			
+			{{-- 1992년 ~ 1999년 --}}
 			<div class="cont_area">
-				<div class="box"><i></i>
-					<div class="day"><strong>1999.01.01</strong><p>sample</p></div>
-				</div>
+				@if(isset($groupedHistories['1992-1999']))
+					@foreach($groupedHistories['1992-1999'] as $history)
+						<div class="box"><i></i>
+							<div class="day"><strong>{{ $history->date->format('Y.m.d') }}</strong><p>{{ $history->content }}</p></div>
+						</div>
+					@endforeach
+				@endif
 			</div>
+			
 			<div class="line"><div class="bar"></div></div>
 		</div>
 	</div>
