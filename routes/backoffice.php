@@ -19,6 +19,8 @@ use App\Http\Controllers\Backoffice\PopupController;
 use App\Http\Controllers\Backoffice\AccessStatisticsController;
 use App\Http\Controllers\Backoffice\OrganizationalController;
 use App\Http\Controllers\Backoffice\HistoryController;
+use App\Http\Controllers\Backoffice\MemberController;
+use App\Http\Controllers\Backoffice\SchoolController;
 
 // =============================================================================
 // 백오피스 인증 라우트
@@ -242,6 +244,28 @@ Route::prefix('backoffice')->middleware(['backoffice'])->group(function () {
     Route::post('histories', [HistoryController::class, 'store'])->name('backoffice.history.store');
     Route::put('histories/{id}', [HistoryController::class, 'update'])->name('backoffice.history.update');
     Route::delete('histories/{id}', [HistoryController::class, 'destroy'])->name('backoffice.history.destroy');
+
+    // 탈퇴회원 관리 (members 제외)
+    Route::get('withdrawn', [MemberController::class, 'withdrawn'])->name('backoffice.withdrawn');
+    Route::post('withdrawn/{id}/restore', [MemberController::class, 'restore'])->name('backoffice.withdrawn.restore');
+    Route::delete('withdrawn/{id}/force-delete', [MemberController::class, 'forceDelete'])->name('backoffice.withdrawn.force-delete');
+    Route::post('withdrawn/force-delete-multiple', [MemberController::class, 'forceDeleteMultiple'])->name('backoffice.withdrawn.force-delete-multiple');
+    
+    // 회원 관리
+    
+    Route::resource('members', MemberController::class, [
+        'names' => 'backoffice.members'
+    ]);
+    Route::post('members/check-email', [MemberController::class, 'checkDuplicateEmail'])->name('backoffice.members.check-email');
+    Route::post('members/check-phone', [MemberController::class, 'checkDuplicatePhone'])->name('backoffice.members.check-phone');
+    Route::post('members/delete-multiple', [MemberController::class, 'destroyMultiple'])->name('backoffice.members.delete-multiple');
+    Route::get('members/export', [MemberController::class, 'export'])->name('backoffice.members.export');
+
+    // 학교(회원교) 관리
+    Route::resource('schools', SchoolController::class, [
+        'names' => 'backoffice.schools'
+    ]);
+    Route::get('schools/export', [SchoolController::class, 'export'])->name('backoffice.schools.export');
 
     // 세션 연장
     Route::post('session/extend', [App\Http\Controllers\Backoffice\SessionController::class, 'extend'])

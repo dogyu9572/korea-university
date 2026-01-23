@@ -1,5 +1,5 @@
 <!-- 학교 검색 -->
-<div class="popup" id="searchSchool">
+<div class="popup" id="searchSchool" style="display: none;">
 	<div class="dm" onclick="layerHide('searchSchool')"></div>
 	<div class="inbox">
 		<button type="button" class="btn_close" onclick="layerHide('searchSchool')">닫기</button>

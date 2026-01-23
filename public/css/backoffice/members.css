@@ -1,0 +1,198 @@
+/* 회원 관리 페이지 스타일 */
+/* 공지사항 페이지와 동일한 스타일 사용 (boards.css, backoffice-common.css) */
+/* 추가 스타일만 여기에 정의 */
+
+/* 수신동의 체크박스 그룹 스타일 (필터 내) */
+.board-filter .checkbox-group {
+    display: flex;
+    gap: 15px;
+    align-items: center;
+    padding-top: 5px;
+}
+
+.board-filter .checkbox-label {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    cursor: pointer;
+    margin: 0;
+    font-size: 0.875rem;
+}
+
+/* 회원 정보 폼 div 기반 레이아웃 - 깔끔하고 세련된 디자인 */
+.member-form-list {
+    width: 100%;
+}
+
+.member-form-row {
+    display: flex;
+    align-items: flex-start;
+    padding: 16px 0;
+    border-bottom: 1px solid #f0f0f0;
+    transition: background-color 0.2s ease;
+}
+
+.member-form-row:last-child {
+    border-bottom: none;
+}
+
+.member-form-row:hover {
+    background-color: #fafafa;
+    margin: 0 -20px;
+    padding-left: 20px;
+    padding-right: 20px;
+    border-radius: 4px;
+}
+
+.member-form-label {
+    width: 150px;
+    min-width: 150px;
+    padding: 8px 0;
+    font-weight: 600;
+    color: #495057;
+    text-align: left;
+    flex-shrink: 0;
+}
+
+.member-form-field {
+    flex: 1;
+    min-width: 0;
+}
+
+.member-form-field .board-form-control {
+    width: 100%;
+    max-width: 400px;
+    border: 1px solid #e0e0e0;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.member-form-field .board-form-control:focus {
+    border-color: #4a90e2;
+    box-shadow: 0 0 0 3px rgba(74, 144, 226, 0.1);
+}
+
+.member-form-field .input-with-button {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+}
+
+.member-form-field .input-with-button .board-form-control {
+    flex: 1;
+    max-width: none;
+}
+
+.member-form-field .input-with-button .btn {
+    flex: 0 0 auto;
+    white-space: nowrap;
+}
+
+/* edit 페이지 비밀번호 필드 강제 표시 및 스타일 정리 */
+#passwordGroup,
+#passwordConfirmationGroup {
+    display: flex !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+}
+
+#passwordGroup .member-form-field .board-form-control,
+#passwordConfirmationGroup .member-form-field .board-form-control {
+    width: 100% !important;
+    max-width: 400px !important;
+    padding: 10px 12px !important;
+    border: 1px solid #e0e0e0 !important;
+    border-radius: 6px !important;
+    font-size: 14px !important;
+    min-height: 38px !important;
+    box-sizing: border-box !important;
+}
+
+.member-section-title {
+    font-size: 18px;
+    font-weight: 600;
+    color: #495057;
+    margin-bottom: 24px;
+    padding-bottom: 12px;
+    border-bottom: 1px solid #e8e8e8;
+}
+
+.member-form-section {
+    margin-bottom: 30px;
+}
+
+.member-form-section:last-child {
+    margin-bottom: 0;
+}
+
+/* 입력 필드와 버튼 그룹 */
+.input-with-button {
+    display: flex;
+    gap: 10px;
+}
+
+.input-with-button .board-form-control {
+    flex: 1;
+}
+
+.input-with-button .btn {
+    flex: 0 0 auto;
+}
+
+/* 주소 입력 그룹 */
+.address-group {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+/* 체크박스 그룹 */
+.checkbox-group {
+    display: flex;
+    gap: 15px;
+}
+
+.checkbox-label {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    cursor: pointer;
+}
+
+/* 라디오 버튼 그룹 */
+.board-radio-group {
+    display: flex;
+    gap: 15px;
+}
+
+.board-radio-item {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+
+.board-radio-item input[type="radio"] {
+    margin: 0;
+}
+
+/* 중복 확인 결과 */
+.check-result {
+    margin-top: 5px;
+    font-size: 12px;
+    padding: 5px;
+}
+
+.check-result.success {
+    color: #28a745;
+}
+
+.check-result.error {
+    color: #dc3545;
+}
+
+/* 반응형 스타일은 boards.css에서 처리 */
+/* 추가 반응형 스타일만 여기에 정의 */
+
+/* 학교 검색 팝업 기본 숨김 */
+.popup#searchSchool {
+    display: none !important;
+}
