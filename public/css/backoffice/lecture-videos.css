@@ -1,0 +1,14 @@
+/**
+ * 강의 영상 관리 전용 스타일
+ */
+
+.thumbnail-image {
+    max-width: 200px;
+    max-height: 200px;
+    margin-top: 10px;
+    display: block;
+}
+
+.thumbnail-container {
+    margin-top: 10px;
+}

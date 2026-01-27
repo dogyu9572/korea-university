@@ -26,10 +26,13 @@ class EducationProgram extends Model
         'survey_url',
         'certificate_type',
         'completion_hours',
+        'annual_fee',
         'application_start',
         'application_end',
         'capacity',
         'capacity_unlimited',
+        'capacity_per_school',
+        'capacity_per_school_unlimited',
         'payment_methods',
         'deposit_account',
         'deposit_deadline_days',
@@ -55,6 +58,7 @@ class EducationProgram extends Model
         'is_public' => 'boolean',
         'is_accommodation' => 'boolean',
         'capacity_unlimited' => 'boolean',
+        'capacity_per_school_unlimited' => 'boolean',
         'is_free' => 'boolean',
         'payment_methods' => 'array',
         'period_start' => 'date',
@@ -72,6 +76,7 @@ class EducationProgram extends Model
         'refund_no_stay_fee' => 'decimal:2',
         'refund_same_day_fee' => 'decimal:2',
         'fee' => 'decimal:2',
+        'annual_fee' => 'decimal:2',
     ];
 
     /**

@@ -5,6 +5,7 @@ namespace App\Services\Backoffice;
 use App\Models\EducationProgram;
 use App\Models\EducationAttachment;
 use App\Models\OnlineEducationLecture;
+use App\Models\LectureVideo;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Log;
@@ -316,18 +317,19 @@ class OnlineEducationService
     }
 
     /**
-     * 강의영상을 검색합니다.
+     * 강의영상을 검색합니다. (LectureVideo 모델에서 검색)
      */
     public function searchLectures(Request $request)
     {
-        $query = OnlineEducationLecture::query();
+        $query = LectureVideo::select('id', 'title', 'instructor_name', 'lecture_time', 'created_at')
+            ->where('is_active', true);
 
         // 검색 필터
         if ($request->filled('search_type') && $request->filled('search_term')) {
             $searchTerm = $request->search_term;
             $query->where(function($q) use ($request, $searchTerm) {
-                if ($request->search_type === '전체' || $request->search_type === '강의명') {
-                    $q->where('lecture_name', 'like', '%' . $searchTerm . '%');
+                if ($request->search_type === '전체' || $request->search_type === '강의제목') {
+                    $q->where('title', 'like', '%' . $searchTerm . '%');
                 }
                 if ($request->search_type === '전체' || $request->search_type === '강사명') {
                     $q->orWhere('instructor_name', 'like', '%' . $searchTerm . '%');

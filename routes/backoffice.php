@@ -25,6 +25,9 @@ use App\Http\Controllers\Backoffice\InquiryController;
 use App\Http\Controllers\Backoffice\EducationController;
 use App\Http\Controllers\Backoffice\EducationProgramController;
 use App\Http\Controllers\Backoffice\OnlineEducationController;
+use App\Http\Controllers\Backoffice\CertificationController;
+use App\Http\Controllers\Backoffice\SeminarTrainingController;
+use App\Http\Controllers\Backoffice\LectureVideoController;
 
 // =============================================================================
 // 백오피스 인증 라우트
@@ -264,6 +267,21 @@ Route::prefix('backoffice')->middleware(['backoffice'])->group(function () {
     ]);
     Route::get('online-educations/lectures/search', [OnlineEducationController::class, 'searchLectures'])
         ->name('backoffice.online-educations.lectures.search');
+
+    // 자격증 관리
+    Route::resource('certifications', CertificationController::class, [
+        'names' => 'backoffice.certifications'
+    ]);
+
+    // 세미나/해외연수 관리
+    Route::resource('seminar-trainings', SeminarTrainingController::class, [
+        'names' => 'backoffice.seminar-trainings',
+    ]);
+
+    // 강의 영상 관리
+    Route::resource('lecture-videos', LectureVideoController::class, [
+        'names' => 'backoffice.lecture-videos',
+    ]);
 
     // 탈퇴회원 관리 (members 제외)
     Route::get('withdrawn', [MemberController::class, 'withdrawn'])->name('backoffice.withdrawn');

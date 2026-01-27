@@ -76,7 +76,40 @@ class CategorySeeder extends Seeder
             'is_active' => true,
         ]);
 
+        // ========================================
+        // 시험장 카테고리 그룹
+        // ========================================
+
+        $venueCategory = Category::create([
+            'parent_id' => null,
+            'code' => 'V001',
+            'name' => '시험장',
+            'depth' => 0,
+            'display_order' => 2,
+            'is_active' => true,
+        ]);
+
+        // 1차: 시험장 하위 카테고리 (예시)
+        Category::create([
+            'parent_id' => $venueCategory->id,
+            'code' => 'V002',
+            'name' => '서울대학교 시험센터',
+            'depth' => 1,
+            'display_order' => 1,
+            'is_active' => true,
+        ]);
+
+        Category::create([
+            'parent_id' => $venueCategory->id,
+            'code' => 'V003',
+            'name' => '연세대학교 시험센터',
+            'depth' => 1,
+            'display_order' => 2,
+            'is_active' => true,
+        ]);
+
         $this->command->info('카테고리 시더 실행 완료!');
         $this->command->info('- FAQ 그룹: 1개 그룹, 5개 하위 카테고리 생성');
+        $this->command->info('- 시험장 그룹: 1개 그룹, 2개 하위 카테고리 생성');
     }
 }

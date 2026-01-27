@@ -308,13 +308,10 @@
                                         <td>{{ $lecture->order + 1 }}</td>
                                         <td>{{ $lecture->lecture_name }}</td>
                                         <td>{{ $lecture->instructor_name }}</td>
-                                        <td>{{ $lecture->lecture_time }}시간</td>
+                                        <td>{{ $lecture->lecture_time }}분</td>
                                         <td>{{ $lecture->created_at->format('Y.m.d') }}</td>
                                         <td>
                                             <div class="board-btn-group">
-                                                <button type="button" class="btn btn-primary btn-sm edit-lecture-btn" data-lecture-id="{{ $lecture->id }}">
-                                                    수정
-                                                </button>
                                                 <button type="button" class="btn btn-danger btn-sm delete-lecture-btn" data-lecture-id="{{ $lecture->id }}">
                                                     삭제
                                                 </button>

@@ -17,7 +17,7 @@
                                 <label for="lecture_search_type" class="filter-label">검색</label>
                                 <select id="lecture_search_type" name="search_type" class="filter-select">
                                     <option value="전체">전체</option>
-                                    <option value="강의명">강의명</option>
+                                    <option value="강의제목">강의제목</option>
                                     <option value="강사명">강사명</option>
                                 </select>
                             </div>
@@ -42,7 +42,7 @@
                         <thead>
                             <tr>
                                 <th>No</th>
-                                <th>강의명</th>
+                                <th>강의제목</th>
                                 <th>강사명</th>
                                 <th>강의시간</th>
                                 <th>선택</th>

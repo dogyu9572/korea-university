@@ -14,24 +14,18 @@
         const rows = tableBody.querySelectorAll('tr[data-lecture-index]');
         rows.forEach(function(row) {
             const index = parseInt(row.getAttribute('data-lecture-index'));
-            const editBtn = row.querySelector('.edit-lecture-btn');
+            const deleteBtn = row.querySelector('.delete-lecture-btn');
             const lecture = {
-                id: editBtn?.getAttribute('data-lecture-id') || null,
+                id: deleteBtn?.getAttribute('data-lecture-id') || null,
                 lecture_name: row.cells[2].textContent.trim(),
                 instructor_name: row.cells[3].textContent.trim(),
-                lecture_time: parseInt(row.cells[4].textContent.replace('시간', '').trim()) || 0,
+                lecture_time: parseInt(row.cells[4].textContent.replace('분', '').trim()) || 0,
                 order: index
             };
             lectures.push(lecture);
             lectureIndex = Math.max(lectureIndex, index + 1);
 
-            // 기존 강의 수정/삭제 버튼 이벤트
-            if (editBtn) {
-                editBtn.addEventListener('click', function() {
-                    editLecture(index);
-                });
-            }
-            const deleteBtn = row.querySelector('.delete-lecture-btn');
+            // 기존 강의 삭제 버튼 이벤트
             if (deleteBtn) {
                 deleteBtn.addEventListener('click', function() {
                     removeLecture(index);
@@ -92,16 +86,17 @@
             data.data.forEach(function(lecture, index) {
                 const row = document.createElement('tr');
                 const no = (data.current_page - 1) * data.per_page + index + 1;
+                const title = lecture.title || '';
                 row.innerHTML = `
                     <td>${no}</td>
-                    <td>${lecture.lecture_name}</td>
-                    <td>${lecture.instructor_name}</td>
-                    <td>${lecture.lecture_time || 0}시간</td>
+                    <td>${title}</td>
+                    <td>${lecture.instructor_name || ''}</td>
+                    <td>${lecture.lecture_time || 0}분</td>
                     <td>
                         <button type="button" class="btn btn-primary btn-sm select-lecture-btn" 
                                 data-lecture-id="${lecture.id}"
-                                data-lecture-name="${lecture.lecture_name}"
-                                data-instructor-name="${lecture.instructor_name}"
+                                data-lecture-title="${title}"
+                                data-instructor-name="${lecture.instructor_name || ''}"
                                 data-lecture-time="${lecture.lecture_time || 0}">
                             선택
                         </button>
@@ -172,7 +167,7 @@
     // 강의영상 선택
     function selectLecture(button) {
         const lectureId = button.getAttribute('data-lecture-id');
-        const lectureName = button.getAttribute('data-lecture-name');
+        const title = button.getAttribute('data-lecture-title');
         const instructorName = button.getAttribute('data-instructor-name');
         const lectureTime = button.getAttribute('data-lecture-time');
 
@@ -182,12 +177,12 @@
             return;
         }
 
-        // 강의영상 추가
+        // LectureVideo를 OnlineEducationLecture 형식으로 변환
         const lecture = {
             id: lectureId,
-            lecture_name: lectureName,
+            lecture_name: title, // title → lecture_name
             instructor_name: instructorName,
-            lecture_time: parseInt(lectureTime) || 0,
+            lecture_time: parseInt(lectureTime) || 0, // 분 단위 그대로
             order: lectureIndex++
         };
         lectures.push(lecture);
@@ -210,13 +205,10 @@
             <td>${lecture.order + 1}</td>
             <td>${lecture.lecture_name}</td>
             <td>${lecture.instructor_name}</td>
-            <td>${lecture.lecture_time}시간</td>
+            <td>${lecture.lecture_time}분</td>
             <td>-</td>
             <td>
                 <div class="board-btn-group">
-                    <button type="button" class="btn btn-primary btn-sm edit-lecture-row-btn" data-index="${index}">
-                        수정
-                    </button>
                     <button type="button" class="btn btn-danger btn-sm remove-lecture-btn" data-index="${index}">
                         삭제
                     </button>
@@ -226,9 +218,6 @@
         tbody.appendChild(row);
 
         // 이벤트 리스너 추가
-        row.querySelector('.edit-lecture-row-btn').addEventListener('click', function() {
-            editLecture(index);
-        });
         row.querySelector('.remove-lecture-btn').addEventListener('click', function() {
             removeLecture(index);
         });
@@ -248,7 +237,7 @@
         const instructorName = prompt('강사명:', lecture.instructor_name || '');
         if (instructorName === null) return;
 
-        const lectureTime = prompt('강의시간(시간):', lecture.lecture_time || 0);
+        const lectureTime = prompt('강의시간(분):', lecture.lecture_time || 0);
         if (lectureTime === null) return;
 
         lecture.lecture_name = lectureName;
@@ -287,7 +276,7 @@
         const lecture = lectures[index];
         if (row.cells[2]) row.cells[2].textContent = lecture.lecture_name;
         if (row.cells[3]) row.cells[3].textContent = lecture.instructor_name;
-        if (row.cells[4]) row.cells[4].textContent = lecture.lecture_time + '시간';
+        if (row.cells[4]) row.cells[4].textContent = lecture.lecture_time + '분';
         if (row.cells[1]) row.cells[1].textContent = lecture.order + 1;
     }
 
