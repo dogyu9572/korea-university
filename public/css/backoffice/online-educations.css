@@ -1,0 +1,27 @@
+/* 온라인 교육 관리 페이지 전용 스타일 */
+/* 기본 폼 스타일은 members.css, education-programs.css 참고 */
+
+/* 교육기간 시간 선택 추가 */
+.period-time-row .application-hour-select {
+    width: 90px !important;
+    min-width: 90px !important;
+    max-width: 90px !important;
+    flex-shrink: 0;
+}
+
+/* 강의영상 목록 테이블 */
+#lecturesTable {
+    margin-top: 10px;
+}
+
+#lecturesTableBody tr.empty-row {
+    display: none;
+}
+
+#lecturesTableBody:empty::after {
+    content: "등록된 강의영상이 없습니다.";
+    display: block;
+    text-align: center;
+    padding: 20px;
+    color: #999;
+}

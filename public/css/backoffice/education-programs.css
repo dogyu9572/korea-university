@@ -1,0 +1,204 @@
+/* 교육 프로그램 관리 페이지 전용 스타일 */
+/* 기본 폼 스타일은 members.css 참고 */
+
+/* 한 줄에 항목 2개 배치 (기획서) - 영역 정확히 50:50 분할 */
+.member-form-row-inline {
+    display: flex;
+    flex-wrap: nowrap;
+    align-items: flex-start;
+    gap: 0 32px;
+}
+
+.member-form-row-inline .member-form-inline-item {
+    display: flex;
+    align-items: flex-start;
+    flex: 0 0 calc(50% - 16px);
+    min-width: 0;
+    overflow: hidden;
+}
+
+.member-form-row-inline .member-form-inline-item:only-child {
+    flex: 0 0 100%;
+}
+
+/* 인라인 항목도 단일 행과 동일: 라벨 150px, 인풋 max-width 400px → 시작점·크기 일치 */
+.member-form-row-inline .member-form-inline-item .member-form-label {
+    width: 150px;
+    min-width: 150px;
+    padding: 8px 0;
+    flex-shrink: 0;
+}
+
+.member-form-row-inline .member-form-inline-item .member-form-field {
+    flex: 1;
+    min-width: 0;
+    overflow: hidden;
+}
+
+.member-form-row-inline .member-form-inline-item .member-form-field .board-form-control {
+    width: 100%;
+    max-width: 400px;
+    box-sizing: border-box;
+}
+
+/* 교육기간/교육시간 한 줄 배치 */
+.period-time-row,
+.application-period-row {
+    display: flex;
+    align-items: center;
+    flex-wrap: nowrap;
+    gap: 8px;
+}
+
+.period-time-row input[type="date"],
+.application-period-row input[type="date"] {
+    width: 150px;
+    min-width: 150px;
+    flex-shrink: 0;
+}
+
+.period-sep {
+    margin: 0 4px;
+    white-space: nowrap;
+    flex-shrink: 0;
+}
+
+.period-time-label {
+    margin-left: 8px;
+    white-space: nowrap;
+}
+
+/* 시간 셀렉트 박스 - specificity 높여서 .member-form-field .board-form-control의 width: 100% 오버라이드 */
+.application-period-row .application-hour-select,
+.member-form-field .application-hour-select {
+    width: 90px !important;
+    min-width: 90px !important;
+    max-width: 90px !important;
+    flex-shrink: 0;
+}
+
+/* 정원 입력 행 */
+.capacity-row {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+.capacity-row .input-group-text {
+    border-radius: 4px;
+    padding: 6px 10px;
+}
+
+.capacity-unlimited-check {
+    margin-left: 12px;
+}
+
+/* 인라인 입력 그룹 - 한 줄 배치, 배경 흰색 */
+.input-group.input-group-inline {
+    display: flex;
+    flex-wrap: nowrap;
+    align-items: stretch;
+    width: auto;
+    gap: 0;
+}
+
+.input-group.input-group-inline .board-form-control {
+    width: 100px;
+}
+
+.input-group.input-group-inline .input-group-text {
+    background-color: transparent;
+    border: none;
+    padding: 0.5rem 0.5rem 0.5rem 0.25rem;
+    display: inline-flex;
+    align-items: center;
+    white-space: nowrap;
+    color: #495057;
+    font-size: 14px;
+}
+
+.capacity-row .input-group-text {
+    background-color: transparent;
+    border: none;
+    padding: 0.5rem 0.5rem 0.5rem 0.25rem;
+    display: inline-flex;
+    align-items: center;
+    white-space: nowrap;
+    color: #495057;
+    font-size: 14px;
+}
+
+/* 참가비/환불규정 테이블 - tbody의 th에서 하늘색 하단 라인 제거 */
+.board-table tbody th {
+    border-bottom: none !important;
+    background-color: #f8f9fa;
+}
+
+/* 환불규정 테이블 */
+.refund-table .refund-deadline-prefix,
+.refund-table .refund-deadline-suffix {
+    margin: 0 4px;
+    white-space: nowrap;
+    font-size: 14px;
+}
+
+.refund-table .refund-deadline-days {
+    width: auto;
+    min-width: 90px;
+    height: 38px;
+    line-height: 38px;
+    display: inline-block;
+    vertical-align: middle;
+}
+
+.refund-table td {
+    vertical-align: middle;
+}
+
+/* Summernote 에디터 높이 조정 */
+.member-form-field .summernote-editor {
+    min-height: 400px;
+}
+
+/* 심플한 삭제 버튼 - 색상 통일, 밑줄 유지 */
+.btn-delete-simple {
+    background: none;
+    border: none;
+    color: #495057;
+    font-size: 14px;
+    padding: 4px 8px;
+    cursor: pointer;
+    text-decoration: underline;
+    transition: opacity 0.2s ease;
+}
+
+.btn-delete-simple:hover {
+    opacity: 0.7;
+    text-decoration: underline;
+}
+
+/* 첨부파일 링크 색상 통일 */
+.member-form-field a {
+    color: #495057;
+    text-decoration: underline;
+}
+
+.member-form-field a:hover {
+    color: #495057;
+    opacity: 0.7;
+    text-decoration: underline;
+}
+
+/* 썸네일 컨테이너 - 이미지와 삭제 버튼 옆에 배치 */
+.thumbnail-container {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+}
+
+.thumbnail-image {
+    max-width: 200px;
+    max-height: 200px;
+    display: block;
+}

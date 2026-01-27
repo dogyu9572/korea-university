@@ -1,0 +1,13 @@
+/* 교육 안내 관리 페이지 스타일 */
+
+.board-container .board-form-group .summernote-editor {
+    min-height: 200px;
+}
+
+.board-container #educationForm .board-form-group {
+    margin-bottom: 2rem;
+}
+
+.board-container #educationForm .board-form-group:last-of-type {
+    margin-bottom: 1.5rem;
+}

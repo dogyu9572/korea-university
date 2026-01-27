@@ -21,6 +21,10 @@ use App\Http\Controllers\Backoffice\OrganizationalController;
 use App\Http\Controllers\Backoffice\HistoryController;
 use App\Http\Controllers\Backoffice\MemberController;
 use App\Http\Controllers\Backoffice\SchoolController;
+use App\Http\Controllers\Backoffice\InquiryController;
+use App\Http\Controllers\Backoffice\EducationController;
+use App\Http\Controllers\Backoffice\EducationProgramController;
+use App\Http\Controllers\Backoffice\OnlineEducationController;
 
 // =============================================================================
 // 백오피스 인증 라우트
@@ -245,6 +249,22 @@ Route::prefix('backoffice')->middleware(['backoffice'])->group(function () {
     Route::put('histories/{id}', [HistoryController::class, 'update'])->name('backoffice.history.update');
     Route::delete('histories/{id}', [HistoryController::class, 'destroy'])->name('backoffice.history.destroy');
 
+    // 교육 안내 관리
+    Route::get('education', [EducationController::class, 'index'])->name('backoffice.education.index');
+    Route::post('education', [EducationController::class, 'update'])->name('backoffice.education.update');
+
+    // 교육 프로그램 관리
+    Route::resource('education-programs', EducationProgramController::class, [
+        'names' => 'backoffice.education-programs'
+    ]);
+
+    // 온라인 교육 관리
+    Route::resource('online-educations', OnlineEducationController::class, [
+        'names' => 'backoffice.online-educations'
+    ]);
+    Route::get('online-educations/lectures/search', [OnlineEducationController::class, 'searchLectures'])
+        ->name('backoffice.online-educations.lectures.search');
+
     // 탈퇴회원 관리 (members 제외)
     Route::get('withdrawn', [MemberController::class, 'withdrawn'])->name('backoffice.withdrawn');
     Route::post('withdrawn/{id}/restore', [MemberController::class, 'restore'])->name('backoffice.withdrawn.restore');
@@ -266,6 +286,15 @@ Route::prefix('backoffice')->middleware(['backoffice'])->group(function () {
         'names' => 'backoffice.schools'
     ]);
     Route::get('schools/export', [SchoolController::class, 'export'])->name('backoffice.schools.export');
+
+    // 회원 문의 관리
+    Route::resource('inquiries', InquiryController::class, [
+        'names' => 'backoffice.inquiries'
+    ])->except(['create', 'store', 'edit']);
+    Route::post('inquiries/{id}/reply', [InquiryController::class, 'updateReply'])
+        ->name('backoffice.inquiries.reply');
+    Route::post('inquiries/delete-multiple', [InquiryController::class, 'destroyMultiple'])
+        ->name('backoffice.inquiries.delete-multiple');
 
     // 세션 연장
     Route::post('session/extend', [App\Http\Controllers\Backoffice\SessionController::class, 'extend'])
