@@ -14,17 +14,19 @@ class EducationProgramService
 {
     /**
      * 교육 프로그램 목록을 조회합니다.
+     * 정기교육/수시교육만 조회합니다.
      */
     public function getList(Request $request)
     {
-        $query = EducationProgram::query();
+        $query = EducationProgram::query()
+            ->whereIn('education_type', ['정기교육', '수시교육']);
 
         // 접수상태 검색
         if ($request->filled('application_status')) {
             $query->where('application_status', $request->application_status);
         }
 
-        // 교육유형 검색
+        // 교육유형 검색 (사용자가 선택한 경우)
         if ($request->filled('education_type')) {
             $query->where('education_type', $request->education_type);
         }

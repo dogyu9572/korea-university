@@ -40,7 +40,7 @@
 
     <div class="board-card">
         <div class="board-card-body">
-            @include('backoffice.education-applications._form', ['isEdit' => false, 'application' => null, 'program' => $program])
+            @include('backoffice.education-applications._form', ['isEdit' => false, 'application' => null, 'program' => $program, 'examVenues' => $examVenues ?? []])
         </div>
     </div>
 </div>

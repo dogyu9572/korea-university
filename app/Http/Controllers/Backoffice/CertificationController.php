@@ -96,19 +96,10 @@ class CertificationController extends BaseController
     }
 
     /**
-     * 시험장 그룹의 1차 카테고리를 조회합니다.
+     * 시험장 그룹의 하위 카테고리를 조회합니다. (CategoryService 공통 메서드 사용)
      */
     private function getVenueCategories()
     {
-        $venueGroup = Category::where('name', '시험장')
-            ->where('depth', 0)
-            ->whereNull('parent_id')
-            ->first();
-
-        if (!$venueGroup) {
-            return collect([]);
-        }
-
-        return $this->categoryService->getFirstLevelCategoriesByGroup($venueGroup->id);
+        return $this->categoryService->getExamVenues();
     }
 }

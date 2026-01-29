@@ -49,6 +49,11 @@ class SubController extends Controller
         $gNum = "01"; $sNum = "03"; $gName = "교육 · 자격증"; $sName = "교육ㆍ자격증 신청";
         return view('education_certification.application_ec_receipt_end', compact('gNum', 'sNum', 'gName', 'sName'));
     }
+    public function application_ec_e_learning()
+    {
+        $gNum = "01"; $sNum = "03"; $gName = "교육 · 자격증"; $sName = "교육ㆍ자격증 신청";
+        return view('education_certification.application_ec_e_learning', compact('gNum', 'sNum', 'gName', 'sName'));
+    }
 	
     public function seminar()
     {

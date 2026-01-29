@@ -1,6 +1,6 @@
 @extends('backoffice.layouts.app')
 
-@section('title', '교육 신청내역(개인/상세)')
+@section('title', '온라인 교육 신청내역(상세)')
 
 @section('styles')
 <link rel="stylesheet" href="{{ asset('css/backoffice/members.css') }}">
@@ -21,18 +21,18 @@
     </div>
 @endif
 
-<div class="board-container education-applications" data-program-id="{{ $program->id }}">
+<div class="board-container education-applications" data-program-id="{{ $program->id }}" data-base-path="/backoffice/online-education-applications">
     <div class="board-header">
-        <a href="{{ route('backoffice.education-applications.index') }}" class="btn btn-secondary btn-sm">
+        <a href="{{ route('backoffice.online-education-applications.index') }}" class="btn btn-secondary btn-sm">
             <i class="fas fa-arrow-left"></i> 목록으로
         </a>
     </div>
 
-    <form id="saveForm" method="POST" action="{{ route('backoffice.education-applications.update-status', $program) }}">
+    <form id="saveForm" method="POST" action="{{ route('backoffice.online-education-applications.update-status', $program) }}">
         @csrf
         @method('PUT')
 
-        <!-- 교육 정보 섹션 -->
+        <!-- 교육 정보 섹션 (기획서: 교육구분, 교육명, 교육기간, 참가비, 정원, 수강 인원, 접수상태) -->
         <div class="board-card">
             <div class="board-card-body">
                 <div class="member-form-section">
@@ -44,15 +44,6 @@
                             <div class="member-form-field">
                                 <div class="board-form-control readonly-field-full">
                                     {{ $program->education_class ?? '-' }}
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="member-form-row">
-                            <label class="member-form-label">교육유형</label>
-                            <div class="member-form-field">
-                                <div class="board-form-control readonly-field-full">
-                                    {{ $program->education_type }}
                                 </div>
                             </div>
                         </div>
@@ -82,10 +73,10 @@
                         </div>
 
                         <div class="member-form-row">
-                            <label class="member-form-label">교육장소</label>
+                            <label class="member-form-label">참가비</label>
                             <div class="member-form-field">
                                 <div class="board-form-control readonly-field-full">
-                                    {{ $program->location ?? '자동 입력' }}
+                                    자동 입력
                                 </div>
                             </div>
                         </div>
@@ -128,15 +119,14 @@
             </div>
         </div>
 
-        <!-- 신청 명단 섹션 -->
+        <!-- 신청 명단 섹션 (기획서: 결제상태, 결제일시, 세금계산서, 신청일시, 수강상태, 이수여부, 수강률, 수료증 발급, 영수증 발급, 관리) -->
         <div class="board-card">
             <div class="board-card-body">
                 <div class="member-form-section">
                     <h3 class="member-section-title">신청 명단</h3>
 
-                    <!-- 검색 및 필터 -->
                     <div class="board-filter member-search-modal-filter">
-                        <form method="GET" action="{{ route('backoffice.education-applications.show', $program) }}" class="filter-form">
+                        <form method="GET" action="{{ route('backoffice.online-education-applications.show', $program) }}" class="filter-form">
                             <div class="filter-row">
                                 <div class="filter-group">
                                     <label for="payment_status" class="filter-label">결제상태</label>
@@ -155,7 +145,7 @@
                                         <button type="submit" class="btn btn-primary">
                                             <i class="fas fa-search"></i> 검색
                                         </button>
-                                        <a href="{{ route('backoffice.education-applications.show', $program) }}" class="btn btn-secondary">
+                                        <a href="{{ route('backoffice.online-education-applications.show', $program) }}" class="btn btn-secondary">
                                             <i class="fas fa-undo"></i> 초기화
                                         </a>
                                     </div>
@@ -164,7 +154,6 @@
                         </form>
                     </div>
 
-                    <!-- 일괄 처리 버튼 -->
                     <div class="action-buttons-right">
                         <button type="button" class="btn btn-success btn-sm" data-action="batch-payment-complete">
                             <i class="fas fa-check"></i> 일괄 입금완료
@@ -172,17 +161,32 @@
                         <button type="button" class="btn btn-info btn-sm" data-action="batch-complete">
                             <i class="fas fa-check-circle"></i> 일괄 이수
                         </button>
-                        <button type="button" class="btn btn-warning btn-sm" data-action="export-excel">
-                            <i class="fas fa-file-excel"></i> 엑셀 다운로드
-                        </button>
-                        <a href="{{ route('backoffice.education-applications.create', ['program' => $program->id]) }}" class="btn btn-primary btn-sm">
+                        <a href="{{ route('backoffice.online-education-applications.create', ['program' => $program->id]) }}" class="btn btn-primary btn-sm">
                             <i class="fas fa-plus"></i> 신청 추가
                         </a>
                     </div>
 
-                    <!-- 신청자 목록 테이블 -->
                     <div class="table-responsive">
-                        <table class="board-table">
+                        <table class="board-table online-application-list-table">
+                            <colgroup>
+                                <col style="width: 3%">
+                                <col style="width: 3%">
+                                <col style="width: 8%">
+                                <col style="width: 7%">
+                                <col style="width: 6%">
+                                <col style="width: 6%">
+                                <col style="width: 8%">
+                                <col style="width: 6%">
+                                <col style="width: 8%">
+                                <col style="width: 6%">
+                                <col style="width: 8%">
+                                <col style="width: 6%">
+                                <col style="width: 5%">
+                                <col style="width: 4%">
+                                <col style="width: 5%">
+                                <col style="width: 5%">
+                                <col style="width: 7%">
+                            </colgroup>
                             <thead>
                                 <tr>
                                     <th><input type="checkbox" id="selectAll"></th>
@@ -192,15 +196,14 @@
                                     <th>신청자명</th>
                                     <th>신청자 ID</th>
                                     <th>휴대폰 번호</th>
-                                    @if($program->education_type === '온라인교육')
-                                        <th>수강상태</th>
-                                        <th>수강률</th>
-                                    @endif
                                     <th>결제상태</th>
-                                    <th>신청일시</th>
+                                    <th>결제일시</th>
                                     <th>세금계산서</th>
-                                    <th>이수 여부</th>
-                                    <th>이수증/수료증 발급</th>
+                                    <th>신청일시</th>
+                                    <th>수강상태</th>
+                                    <th>이수여부</th>
+                                    <th>수강률</th>
+                                    <th>수료증 발급</th>
                                     <th>영수증 발급</th>
                                     <th>관리</th>
                                 </tr>
@@ -217,22 +220,26 @@
                                         <td>{{ $application->applicant_name }}</td>
                                         <td>{{ $application->member->login_id ?? '-' }}</td>
                                         <td>{{ $application->phone_number }}</td>
-                                        @if($program->education_type === '온라인교육')
-                                            <td>{{ $application->course_status ?? '-' }}</td>
-                                            <td>{{ $application->attendance_rate !== null ? $application->attendance_rate . '%' : '-' }}</td>
-                                        @endif
                                         <td>
                                             <select name="payment_status[{{ $application->id }}]" class="form-control form-control-sm table-select-sm" data-action="update-payment-status" data-application-id="{{ $application->id }}">
                                                 <option value="미입금" @selected($application->payment_status == '미입금')>미입금</option>
                                                 <option value="입금완료" @selected($application->payment_status == '입금완료')>입금완료</option>
                                             </select>
                                         </td>
-                                        <td>{{ $application->application_date->format('Y.m.d H:i') }}</td>
+                                        <td>{{ $application->payment_date ? $application->payment_date->format('Y.m.d H:i') : '-' }}</td>
                                         <td>
                                             <select name="tax_invoice_status[{{ $application->id }}]" class="form-control form-control-sm table-select-sm">
                                                 <option value="미신청" @selected($application->tax_invoice_status == '미신청')>미신청</option>
                                                 <option value="신청완료" @selected($application->tax_invoice_status == '신청완료')>신청완료</option>
                                                 <option value="발행완료" @selected($application->tax_invoice_status == '발행완료')>발행완료</option>
+                                            </select>
+                                        </td>
+                                        <td>{{ $application->application_date->format('Y.m.d H:i') }}</td>
+                                        <td>
+                                            <select name="course_status[{{ $application->id }}]" class="form-control form-control-sm table-select-sm" data-action="update-course-status" data-application-id="{{ $application->id }}">
+                                                <option value="접수" @selected(($application->course_status ?? '') == '접수')>접수</option>
+                                                <option value="승인" @selected(($application->course_status ?? '') == '승인')>승인</option>
+                                                <option value="만료" @selected(($application->course_status ?? '') == '만료')>만료</option>
                                             </select>
                                         </td>
                                         <td>
@@ -247,6 +254,7 @@
                                                 </div>
                                             </div>
                                         </td>
+                                        <td>{{ $application->attendance_rate !== null ? $application->attendance_rate . '%' : '-' }}</td>
                                         <td>
                                             @if($application->certificate_number)
                                                 <button type="button" class="btn btn-sm btn-success" data-action="issue-certificate" data-application-id="{{ $application->id }}">
@@ -267,10 +275,10 @@
                                         </td>
                                         <td>
                                             <div class="board-btn-group">
-                                                <a href="{{ route('backoffice.education-applications.edit', $application) }}" class="btn btn-primary btn-sm">
+                                                <a href="{{ route('backoffice.online-education-applications.edit', $application) }}" class="btn btn-primary btn-sm">
                                                     <i class="fas fa-edit"></i> 수정
                                                 </a>
-                                                <form action="{{ route('backoffice.education-applications.destroy', $application) }}" method="POST" class="d-inline" data-action="confirm-delete">
+                                                <form action="{{ route('backoffice.online-education-applications.destroy', $application) }}" method="POST" class="d-inline" data-action="confirm-delete">
                                                     @csrf
                                                     @method('DELETE')
                                                     <button type="submit" class="btn btn-danger btn-sm">
@@ -282,7 +290,7 @@
                                     </tr>
                                 @empty
                                     <tr>
-                                        <td colspan="{{ $program->education_type === '온라인교육' ? 16 : 14 }}" class="text-center">등록된 신청 내역이 없습니다.</td>
+                                        <td colspan="17" class="text-center">등록된 신청 내역이 없습니다.</td>
                                     </tr>
                                 @endforelse
                             </tbody>
@@ -298,7 +306,7 @@
             <button type="submit" class="btn btn-primary">
                 <i class="fas fa-save"></i> 저장
             </button>
-            <a href="{{ route('backoffice.education-applications.index') }}" class="btn btn-secondary">취소</a>
+            <a href="{{ route('backoffice.online-education-applications.index') }}" class="btn btn-secondary">목록</a>
         </div>
     </form>
 </div>

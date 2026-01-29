@@ -41,6 +41,23 @@ class CategoryService
     }
 
     /**
+     * 시험장 그룹의 하위 카테고리만 조회 (코드관리 > 시험장 탭에 등록된 항목만, 활성만)
+     * 자격증 목록/신청내역 시험장 드롭다운 등에서 공통 사용
+     */
+    public function getExamVenues()
+    {
+        $venueGroup = Category::groups()->where('name', '시험장')->first();
+        if (!$venueGroup) {
+            return collect();
+        }
+        return Category::where('parent_id', $venueGroup->id)
+            ->active()
+            ->orderBy('display_order')
+            ->orderBy('name')
+            ->get();
+    }
+
+    /**
      * 특정 그룹의 1차 카테고리만 조회
      */
     public function getFirstLevelCategoriesByGroup(int $groupId)

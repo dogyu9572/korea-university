@@ -14,18 +14,116 @@ class EducationApplicationService
     /**
      * 교육 신청내역 목록을 조회합니다.
      * 교육 프로그램별로 신청 인원 수를 집계하여 반환합니다.
+     * 정기교육/수시교육만 조회합니다.
      */
     public function getList(Request $request)
     {
         $query = EducationProgram::query()
+            ->whereIn('education_type', ['정기교육', '수시교육'])
             ->withCount('applications as enrolled_count');
+
+        return $this->buildListQuery($query, $request);
+    }
+
+    /**
+     * 온라인 교육 신청내역 목록을 조회합니다.
+     * 교육 프로그램별로 신청 인원 수를 집계하여 반환합니다.
+     * 온라인교육만 조회합니다.
+     */
+    public function getOnlineList(Request $request)
+    {
+        $query = EducationProgram::query()
+            ->where('education_type', '온라인교육')
+            ->withCount('applications as enrolled_count');
+
+        return $this->buildListQuery($query, $request);
+    }
+
+    /**
+     * 세미나/해외연수 신청내역 목록을 조회합니다.
+     * 교육 프로그램별로 신청 인원 수를 집계하여 반환합니다.
+     * education_type = '세미나', '해외연수'만 조회합니다.
+     */
+    public function getSeminarTrainingList(Request $request)
+    {
+        $query = EducationProgram::query()
+            ->whereIn('education_type', ['세미나', '해외연수'])
+            ->withCount('applications as enrolled_count');
+
+        return $this->buildListQuery($query, $request);
+    }
+
+    /**
+     * 자격증 신청내역 목록을 조회합니다.
+     * 교육 프로그램별로 신청 인원 수를 집계하여 반환합니다.
+     * education_type = '자격증'만 조회합니다.
+     */
+    public function getCertificationList(Request $request)
+    {
+        $query = EducationProgram::query()
+            ->where('education_type', '자격증')
+            ->withCount('applications as enrolled_count');
+
+        if ($request->filled('application_status')) {
+            $query->where('application_status', $request->application_status);
+        }
+        if ($request->filled('education_class')) {
+            $query->where('education_class', $request->education_class);
+        }
+        if ($request->filled('period_start')) {
+            $query->where('period_start', '>=', $request->period_start);
+        }
+        if ($request->filled('period_end')) {
+            $query->where('period_end', '<=', $request->period_end);
+        }
+        if ($request->filled('name')) {
+            $query->where('name', 'like', '%' . $request->name . '%');
+        }
+
+        $query->orderBy('created_at', 'desc');
+
+        $perPage = $request->get('per_page', 20);
+        $perPage = in_array($perPage, [10, 20, 50, 100]) ? $perPage : 20;
+
+        return $query->paginate($perPage)->withQueryString();
+    }
+
+    /**
+     * 자격증 신청 명단의 성적을 일괄 저장합니다.
+     *
+     * @param  array<int, int|null>  $scores  [ application_id => score ]
+     */
+    public function batchUpdateScores(int $programId, array $scores): int
+    {
+        if (empty($scores)) {
+            return 0;
+        }
+
+        $count = 0;
+        $applications = EducationApplication::query()
+            ->where('education_program_id', $programId)
+            ->whereIn('id', array_keys($scores))
+            ->get();
+
+        foreach ($applications as $application) {
+            $score = $scores[$application->id] ?? null;
+            if ($score !== null && $score !== '') {
+                $application->update(['score' => (int) $score]);
+                $count++;
+            }
+        }
+
+        return $count;
+    }
+    private function buildListQuery($query, Request $request)
+    {
 
         // 접수상태 검색
         if ($request->filled('application_status')) {
             $query->where('application_status', $request->application_status);
         }
 
-        // 교육유형 검색
+        // 교육유형 검색 (사용자가 선택한 경우)
         if ($request->filled('education_type')) {
             $query->where('education_type', $request->education_type);
         }
@@ -239,6 +337,72 @@ class EducationApplicationService
     }
 
     /**
+     * 자격확인서 번호 생성 (KUCRA-ELG-연도-일련번호)
+     */
+    private function generateQualificationCertificateNumber(\Carbon\Carbon $date): string
+    {
+        $year = $date->format('Y');
+        $lastNumber = EducationApplication::whereYear('created_at', $year)
+            ->whereNotNull('qualification_certificate_number')
+            ->where('qualification_certificate_number', 'like', 'KUCRA-ELG-' . $year . '-%')
+            ->orderBy('id', 'desc')
+            ->value('qualification_certificate_number');
+        
+        $sequence = 1;
+        if ($lastNumber && preg_match('/KUCRA-ELG-\d{4}-(\d{4})/', $lastNumber, $matches)) {
+            $sequence = (int)$matches[1] + 1;
+        }
+        
+        return 'KUCRA-ELG-' . $year . '-' . str_pad($sequence, 4, '0', STR_PAD_LEFT);
+    }
+
+    /**
+     * 합격확인서 번호 생성 (KUCRA-PAS-연도-일련번호)
+     */
+    private function generatePassConfirmationNumber(\Carbon\Carbon $date): string
+    {
+        $year = $date->format('Y');
+        $lastNumber = EducationApplication::whereYear('created_at', $year)
+            ->whereNotNull('pass_confirmation_number')
+            ->where('pass_confirmation_number', 'like', 'KUCRA-PAS-' . $year . '-%')
+            ->orderBy('id', 'desc')
+            ->value('pass_confirmation_number');
+        
+        $sequence = 1;
+        if ($lastNumber && preg_match('/KUCRA-PAS-\d{4}-(\d{4})/', $lastNumber, $matches)) {
+            $sequence = (int)$matches[1] + 1;
+        }
+        
+        return 'KUCRA-PAS-' . $year . '-' . str_pad($sequence, 4, '0', STR_PAD_LEFT);
+    }
+
+    /**
+     * 수험표 번호 생성 (KUCRA-EXM-연도-자격코드-회차-일련번호)
+     * 자격코드와 회차는 프로그램 정보에서 가져옴
+     */
+    private function generateExamTicketNumber(\Carbon\Carbon $date, ?EducationProgram $program = null): string
+    {
+        $year = $date->format('Y');
+        
+        // 자격코드와 회차는 프로그램 정보에서 가져와야 함 (임시로 기본값 사용)
+        $qualificationCode = '0000'; // TODO: 프로그램에서 자격코드 가져오기
+        $round = '01'; // TODO: 프로그램에서 회차 가져오기
+        
+        $lastNumber = EducationApplication::whereYear('created_at', $year)
+            ->whereNotNull('exam_ticket_number')
+            ->where('exam_ticket_number', 'like', 'KUCRA-EXM-' . $year . '-' . $qualificationCode . '-' . $round . '-%')
+            ->orderBy('id', 'desc')
+            ->value('exam_ticket_number');
+        
+        $sequence = 1;
+        if ($lastNumber && preg_match('/KUCRA-EXM-\d{4}-\d{4}-\d{2}-(\d{4})/', $lastNumber, $matches)) {
+            $sequence = (int)$matches[1] + 1;
+        }
+        
+        return 'KUCRA-EXM-' . $year . '-' . $qualificationCode . '-' . $round . '-' . str_pad($sequence, 4, '0', STR_PAD_LEFT);
+    }
+
+    /**
      * 교육 신청을 생성합니다.
      */
     public function createApplication(Request $request): EducationApplication
@@ -273,6 +437,22 @@ class EducationApplicationService
                 'refund_account_holder',
                 'refund_bank_name',
                 'refund_account_number',
+                // 온라인교육 전용
+                'course_status',
+                'attendance_rate',
+                // 자격증 전용
+                'score',
+                'pass_status',
+                'exam_venue_id',
+                'exam_ticket_number',
+                'qualification_certificate_number',
+                'pass_confirmation_number',
+                'id_photo_path',
+                'birth_date',
+                // 세미나/해외연수 전용
+                'roommate_member_id',
+                'roommate_name',
+                'roommate_phone',
             ]);
 
             // 신청번호 자동 생성
@@ -301,6 +481,37 @@ class EducationApplicationService
             // 교육 프로그램 조회 (수료증 번호 생성 시 필요)
             $program = EducationProgram::find($data['education_program_id']);
 
+            // 교육 유형별 필드 처리
+            if ($program) {
+                $educationType = $program->education_type;
+
+                // 온라인교육 전용 필드 처리
+                if ($educationType === '온라인교육') {
+                    // 수강상태 기본값 설정
+                    if (!isset($data['course_status']) || empty($data['course_status'])) {
+                        $data['course_status'] = '접수';
+                    }
+                    // 수강률은 계산되거나 별도 업데이트로 처리
+                }
+
+                // 자격증 전용 필드 처리
+                if ($educationType === '자격증') {
+                    // 합격여부가 "합격"이고 자격확인서/합격확인서 번호가 없으면 자동 생성
+                    if (isset($data['pass_status']) && $data['pass_status'] === '합격') {
+                        if (!isset($data['qualification_certificate_number']) || empty($data['qualification_certificate_number'])) {
+                            $data['qualification_certificate_number'] = $this->generateQualificationCertificateNumber(now());
+                        }
+                        if (!isset($data['pass_confirmation_number']) || empty($data['pass_confirmation_number'])) {
+                            $data['pass_confirmation_number'] = $this->generatePassConfirmationNumber(now());
+                        }
+                    }
+                    // 입금완료 시 수험표 번호 자동 생성
+                    if ($data['payment_status'] === '입금완료' && (!isset($data['exam_ticket_number']) || empty($data['exam_ticket_number']))) {
+                        $data['exam_ticket_number'] = $this->generateExamTicketNumber(now(), $program);
+                    }
+                }
+            }
+
             // 이수 완료 시 수료증 번호 자동 생성
             if ($data['is_completed'] && !$request->has('certificate_number')) {
                 $data['certificate_number'] = $this->generateCertificateNumber(now(), $program);
@@ -308,6 +519,12 @@ class EducationApplicationService
 
             // 교육 신청 생성
             $application = EducationApplication::create($data);
+
+            // 자격증 증명사진 저장
+            if ($request->hasFile('id_photo')) {
+                $path = $request->file('id_photo')->store('education_applications/id_photos', 'public');
+                $application->update(['id_photo_path' => Storage::url($path)]);
+            }
 
             // 첨부파일 저장
             if ($request->hasFile('attachments')) {
@@ -365,6 +582,22 @@ class EducationApplicationService
                 'refund_account_holder',
                 'refund_bank_name',
                 'refund_account_number',
+                // 온라인교육 전용
+                'course_status',
+                'attendance_rate',
+                // 자격증 전용
+                'score',
+                'pass_status',
+                'exam_venue_id',
+                'exam_ticket_number',
+                'qualification_certificate_number',
+                'pass_confirmation_number',
+                'id_photo_path',
+                'birth_date',
+                // 세미나/해외연수 전용
+                'roommate_member_id',
+                'roommate_name',
+                'roommate_phone',
             ]);
 
             // boolean 처리
@@ -390,6 +623,51 @@ class EducationApplicationService
             if ($data['is_completed'] && !$application->certificate_number) {
                 $program = $application->educationProgram;
                 $data['certificate_number'] = $this->generateCertificateNumber(now(), $program);
+            }
+
+            // 교육 유형별 필드 처리
+            $program = $application->educationProgram;
+            if ($program) {
+                $educationType = $program->education_type;
+
+                // 온라인교육 전용 필드 처리
+                if ($educationType === '온라인교육') {
+                    // 수강상태가 없으면 기본값 설정
+                    if (!isset($data['course_status']) || empty($data['course_status'])) {
+                        $data['course_status'] = $application->course_status ?? '접수';
+                    }
+                }
+
+                // 자격증 전용 필드 처리
+                if ($educationType === '자격증') {
+                    // 합격여부가 "합격"으로 변경되고 자격확인서/합격확인서 번호가 없으면 자동 생성
+                    if (isset($data['pass_status']) && $data['pass_status'] === '합격' && $application->pass_status !== '합격') {
+                        if (!isset($data['qualification_certificate_number']) || empty($data['qualification_certificate_number'])) {
+                            $data['qualification_certificate_number'] = $this->generateQualificationCertificateNumber(now());
+                        }
+                        if (!isset($data['pass_confirmation_number']) || empty($data['pass_confirmation_number'])) {
+                            $data['pass_confirmation_number'] = $this->generatePassConfirmationNumber(now());
+                        }
+                    }
+                    // 입금완료로 변경 시 수험표 번호 자동 생성
+                    if ($data['payment_status'] === '입금완료' && !$application->exam_ticket_number) {
+                        $data['exam_ticket_number'] = $this->generateExamTicketNumber(now(), $program);
+                    }
+                }
+            }
+
+            // 자격증 증명사진 처리
+            if ($request->hasFile('id_photo')) {
+                if ($application->id_photo_path) {
+                    $oldPath = str_replace('/storage/', '', parse_url($application->id_photo_path, PHP_URL_PATH));
+                    Storage::disk('public')->delete($oldPath);
+                }
+                $path = $request->file('id_photo')->store('education_applications/id_photos', 'public');
+                $data['id_photo_path'] = Storage::url($path);
+            } elseif ($request->boolean('delete_id_photo') && $application->id_photo_path) {
+                $oldPath = str_replace('/storage/', '', parse_url($application->id_photo_path, PHP_URL_PATH));
+                Storage::disk('public')->delete($oldPath);
+                $data['id_photo_path'] = null;
             }
 
             // 교육 신청 수정
@@ -437,7 +715,7 @@ class EducationApplicationService
      */
     public function getApplication(int $id): EducationApplication
     {
-        return EducationApplication::with(['educationProgram', 'member', 'attachments'])
+        return EducationApplication::with(['educationProgram', 'member', 'attachments', 'roommate', 'examVenue'])
             ->findOrFail($id);
     }
 }

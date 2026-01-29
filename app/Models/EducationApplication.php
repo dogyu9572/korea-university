@@ -41,6 +41,22 @@ class EducationApplication extends Model
         'contact_person_name',
         'contact_person_email',
         'contact_person_phone',
+        // 온라인교육 전용
+        'course_status',
+        'attendance_rate',
+        // 자격증 전용
+        'score',
+        'pass_status',
+        'exam_venue_id',
+        'exam_ticket_number',
+        'qualification_certificate_number',
+        'pass_confirmation_number',
+        'id_photo_path',
+        'birth_date',
+        // 세미나/해외연수 전용
+        'roommate_member_id',
+        'roommate_name',
+        'roommate_phone',
     ];
 
     protected $casts = [
@@ -52,6 +68,9 @@ class EducationApplication extends Model
         'payment_date' => 'datetime',
         'participation_fee' => 'decimal:2',
         'payment_method' => 'array',
+        'attendance_rate' => 'decimal:2',
+        'score' => 'integer',
+        'birth_date' => 'date',
     ];
 
     /**
@@ -76,5 +95,21 @@ class EducationApplication extends Model
     public function attachments(): HasMany
     {
         return $this->hasMany(EducationApplicationAttachment::class, 'education_application_id')->orderBy('order', 'asc');
+    }
+
+    /**
+     * 룸메이트 회원 관계 (세미나/해외연수 전용)
+     */
+    public function roommate(): BelongsTo
+    {
+        return $this->belongsTo(Member::class, 'roommate_member_id');
+    }
+
+    /**
+     * 시험장 관계 (자격증 전용)
+     */
+    public function examVenue(): BelongsTo
+    {
+        return $this->belongsTo(Category::class, 'exam_venue_id');
     }
 }

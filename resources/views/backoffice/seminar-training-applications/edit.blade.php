@@ -1,6 +1,6 @@
 @extends('backoffice.layouts.app')
 
-@section('title', '교육 신청 수정')
+@section('title', '세미나/해외연수 신청내역 (수정)')
 
 @section('styles')
 <link rel="stylesheet" href="{{ asset('css/backoffice/members.css') }}">
@@ -33,14 +33,14 @@
 
 <div class="board-container education-applications">
     <div class="board-header">
-        <a href="{{ route('backoffice.education-applications.show', $application->education_program_id) }}" class="btn btn-secondary btn-sm">
+        <a href="{{ $application->educationProgram ? route('backoffice.seminar-training-applications.show', $application->education_program_id) : route('backoffice.seminar-training-applications.index') }}" class="btn btn-secondary btn-sm">
             <i class="fas fa-arrow-left"></i> 목록으로
         </a>
     </div>
 
     <div class="board-card">
         <div class="board-card-body">
-            @include('backoffice.education-applications._form', ['isEdit' => true, 'application' => $application, 'program' => $application->educationProgram, 'examVenues' => $examVenues ?? []])
+            @include('backoffice.seminar-training-applications._form', ['isEdit' => true, 'application' => $application, 'program' => null, 'programs' => $programs ?? collect()])
         </div>
     </div>
 </div>

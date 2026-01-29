@@ -290,6 +290,84 @@ Route::prefix('backoffice')->middleware(['backoffice'])->group(function () {
     Route::get('education-applications/{program}', [EducationApplicationController::class, 'show'])
         ->name('backoffice.education-applications.show');
 
+    // 온라인 교육 신청내역 관리
+    Route::get('online-education-applications', [EducationApplicationController::class, 'onlineIndex'])
+        ->name('backoffice.online-education-applications.index');
+    Route::get('online-education-applications/create', [EducationApplicationController::class, 'onlineCreate'])
+        ->name('backoffice.online-education-applications.create');
+    Route::post('online-education-applications', [EducationApplicationController::class, 'store'])
+        ->name('backoffice.online-education-applications.store');
+    Route::post('online-education-applications/batch-payment-complete', [EducationApplicationController::class, 'batchPaymentComplete'])
+        ->name('backoffice.online-education-applications.batch-payment-complete');
+    Route::post('online-education-applications/batch-complete', [EducationApplicationController::class, 'batchComplete'])
+        ->name('backoffice.online-education-applications.batch-complete');
+    Route::get('online-education-applications/{education_application}/edit', [EducationApplicationController::class, 'edit'])
+        ->name('backoffice.online-education-applications.edit');
+    Route::put('online-education-applications/{education_application}', [EducationApplicationController::class, 'update'])
+        ->name('backoffice.online-education-applications.update');
+    Route::delete('online-education-applications/{education_application}', [EducationApplicationController::class, 'destroy'])
+        ->name('backoffice.online-education-applications.destroy');
+    Route::put('online-education-applications/{program}/status', [EducationApplicationController::class, 'updateStatus'])
+        ->name('backoffice.online-education-applications.update-status');
+    Route::post('online-education-applications/{program}/export', [EducationApplicationController::class, 'export'])
+        ->name('backoffice.online-education-applications.export');
+    Route::get('online-education-applications/{program}/export', [EducationApplicationController::class, 'export'])
+        ->name('backoffice.online-education-applications.export.get');
+    Route::get('online-education-applications/{program}', [EducationApplicationController::class, 'onlineShow'])
+        ->name('backoffice.online-education-applications.show');
+
+    // 자격증 신청내역 관리
+    Route::get('certification-applications', [EducationApplicationController::class, 'certificationIndex'])
+        ->name('backoffice.certification-applications.index');
+    Route::get('certification-applications/create', [EducationApplicationController::class, 'certificationCreate'])
+        ->name('backoffice.certification-applications.create');
+    Route::post('certification-applications', [EducationApplicationController::class, 'store'])
+        ->name('backoffice.certification-applications.store');
+    Route::post('certification-applications/batch-payment-complete', [EducationApplicationController::class, 'batchPaymentComplete'])
+        ->name('backoffice.certification-applications.batch-payment-complete');
+    Route::post('certification-applications/{program}/scores', [EducationApplicationController::class, 'batchScores'])
+        ->name('backoffice.certification-applications.batch-scores');
+    Route::get('certification-applications/{education_application}/edit', [EducationApplicationController::class, 'edit'])
+        ->name('backoffice.certification-applications.edit');
+    Route::put('certification-applications/{education_application}', [EducationApplicationController::class, 'update'])
+        ->name('backoffice.certification-applications.update');
+    Route::delete('certification-applications/{education_application}', [EducationApplicationController::class, 'destroy'])
+        ->name('backoffice.certification-applications.destroy');
+    Route::put('certification-applications/{program}/status', [EducationApplicationController::class, 'updateStatus'])
+        ->name('backoffice.certification-applications.update-status');
+    Route::post('certification-applications/{program}/export', [EducationApplicationController::class, 'export'])
+        ->name('backoffice.certification-applications.export');
+    Route::get('certification-applications/{program}/export', [EducationApplicationController::class, 'export'])
+        ->name('backoffice.certification-applications.export.get');
+    Route::get('certification-applications/{program}', [EducationApplicationController::class, 'certificationShow'])
+        ->name('backoffice.certification-applications.show');
+
+    // 세미나/해외연수 신청내역 관리
+    Route::get('seminar-training-applications', [EducationApplicationController::class, 'seminarTrainingIndex'])
+        ->name('backoffice.seminar-training-applications.index');
+    Route::get('seminar-training-applications/create', [EducationApplicationController::class, 'seminarTrainingCreate'])
+        ->name('backoffice.seminar-training-applications.create');
+    Route::post('seminar-training-applications', [EducationApplicationController::class, 'store'])
+        ->name('backoffice.seminar-training-applications.store');
+    Route::post('seminar-training-applications/batch-payment-complete', [EducationApplicationController::class, 'batchPaymentComplete'])
+        ->name('backoffice.seminar-training-applications.batch-payment-complete');
+    Route::post('seminar-training-applications/batch-complete', [EducationApplicationController::class, 'batchComplete'])
+        ->name('backoffice.seminar-training-applications.batch-complete');
+    Route::get('seminar-training-applications/{education_application}/edit', [EducationApplicationController::class, 'edit'])
+        ->name('backoffice.seminar-training-applications.edit');
+    Route::put('seminar-training-applications/{education_application}', [EducationApplicationController::class, 'update'])
+        ->name('backoffice.seminar-training-applications.update');
+    Route::delete('seminar-training-applications/{education_application}', [EducationApplicationController::class, 'destroy'])
+        ->name('backoffice.seminar-training-applications.destroy');
+    Route::put('seminar-training-applications/{program}/status', [EducationApplicationController::class, 'updateStatus'])
+        ->name('backoffice.seminar-training-applications.update-status');
+    Route::post('seminar-training-applications/{program}/export', [EducationApplicationController::class, 'export'])
+        ->name('backoffice.seminar-training-applications.export');
+    Route::get('seminar-training-applications/{program}/export', [EducationApplicationController::class, 'export'])
+        ->name('backoffice.seminar-training-applications.export.get');
+    Route::get('seminar-training-applications/{program}', [EducationApplicationController::class, 'seminarTrainingShow'])
+        ->name('backoffice.seminar-training-applications.show');
+
     // 온라인 교육 관리
     Route::resource('online-educations', OnlineEducationController::class, [
         'names' => 'backoffice.online-educations'

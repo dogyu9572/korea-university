@@ -1,5 +1,11 @@
 // 교육 신청내역 관리 JavaScript
 
+// show 페이지 기준 경로 (온라인 교육 신청내역일 때 data-base-path로 덮어씀)
+function getApplicationsBasePath() {
+    const container = document.querySelector('.education-applications');
+    return container?.getAttribute('data-base-path') || '/backoffice/education-applications';
+}
+
 // 일괄 입금완료
 function batchPaymentComplete() {
     const selected = getSelectedApplications();
@@ -10,7 +16,7 @@ function batchPaymentComplete() {
     
     if (confirm('선택된 ' + selected.length + '건을 입금완료로 변경하시겠습니까?')) {
         const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content');
-        const route = '/backoffice/education-applications/batch-payment-complete';
+        const route = getApplicationsBasePath() + '/batch-payment-complete';
         
         fetch(route, {
             method: 'POST',
@@ -49,7 +55,7 @@ function batchComplete() {
     
     if (confirm('선택된 ' + selected.length + '건을 이수 처리하시겠습니까?')) {
         const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content');
-        const route = '/backoffice/education-applications/batch-complete';
+        const route = getApplicationsBasePath() + '/batch-complete';
         
         fetch(route, {
             method: 'POST',
@@ -95,13 +101,14 @@ function exportExcel() {
     const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content');
     const container = document.querySelector('.education-applications');
     const programId = container?.getAttribute('data-program-id');
+    const basePath = getApplicationsBasePath();
     
     if (!programId) {
         alert('프로그램 정보를 찾을 수 없습니다.');
         return;
     }
 
-    const route = '/backoffice/education-applications/' + programId + '/export';
+    const route = basePath + '/' + programId + '/export';
 
     fetch(route, {
         method: 'POST',
@@ -173,8 +180,9 @@ function getMemberSearchBaseUrl() {
     return modal?.getAttribute('data-member-search-url') || '/backoffice/members';
 }
 
-// 전역으로 노출: Blade의 onclick 핸들러에서 사용
-window.openMemberSearch = function () {
+// 전역으로 노출: Blade의 onclick 핸들러에서 사용 (applicant 검색)
+window.openMemberSearch = function (target) {
+    window.memberSearchTarget = target || 'applicant';
     if (typeof $ === 'function' && $('#memberSearchModal').length) {
         $('#memberSearchModal').modal('show');
     }
@@ -186,6 +194,11 @@ window.openMemberSearch = function () {
 
     // 처음 열릴 때는 전체 회원 리스트 바로 조회
     window.searchMembers(1);
+};
+
+// 세미나/해외연수: 룸메이트 회원 검색
+window.openRoommateSearch = function () {
+    window.openMemberSearch('roommate');
 };
 
 window.searchMembers = function (page = 1) {
@@ -304,19 +317,31 @@ window.searchMembers = function (page = 1) {
 };
 
 window.selectMember = function (memberId, loginId, name, phone, email, school) {
-    const idEl = document.getElementById('member_id');
-    const loginIdEl = document.getElementById('member_login_id');
-    const nameEl = document.getElementById('applicant_name');
-    const phoneEl = document.getElementById('phone_number');
-    const emailEl = document.getElementById('email');
-    const affEl = document.getElementById('affiliation');
+    if (window.memberSearchTarget === 'roommate') {
+        const roommateIdEl = document.getElementById('roommate_member_id');
+        const roommateNameEl = document.getElementById('roommate_name');
+        const roommatePhoneEl = document.getElementById('roommate_phone');
+        const roommateDisplayEl = document.getElementById('roommate_display');
+        if (roommateIdEl) roommateIdEl.value = memberId || '';
+        if (roommateNameEl) roommateNameEl.value = name || '';
+        if (roommatePhoneEl) roommatePhoneEl.value = phone || '';
+        if (roommateDisplayEl) roommateDisplayEl.value = (name && phone) ? name + ' / ' + phone : (name || phone || '');
+        window.memberSearchTarget = 'applicant';
+    } else {
+        const idEl = document.getElementById('member_id');
+        const loginIdEl = document.getElementById('member_login_id');
+        const nameEl = document.getElementById('applicant_name');
+        const phoneEl = document.getElementById('phone_number');
+        const emailEl = document.getElementById('email');
+        const affEl = document.getElementById('affiliation');
 
-    if (idEl) idEl.value = memberId || '';
-    if (loginIdEl) loginIdEl.value = loginId || '';
-    if (nameEl) nameEl.value = name || '';
-    if (phoneEl) phoneEl.value = phone || '';
-    if (emailEl) emailEl.value = email || '';
-    if (affEl) affEl.value = school || '';
+        if (idEl) idEl.value = memberId || '';
+        if (loginIdEl) loginIdEl.value = loginId || '';
+        if (nameEl) nameEl.value = name || '';
+        if (phoneEl) phoneEl.value = phone || '';
+        if (emailEl) emailEl.value = email || '';
+        if (affEl) affEl.value = school || '';
+    }
 
     if (typeof $ === 'function') {
         $('#memberSearchModal').modal('hide');
@@ -383,9 +408,53 @@ function initCreateEditPageHandlers() {
     const openSearchBtn = document.querySelector('[data-action="open-member-search"]');
     if (openSearchBtn) {
         openSearchBtn.addEventListener('click', function () {
-            window.openMemberSearch();
+            window.openMemberSearch('applicant');
         });
     }
+    const openRoommateSearchBtn = document.querySelector('[data-action="open-roommate-search"]');
+    if (openRoommateSearchBtn) {
+        openRoommateSearchBtn.addEventListener('click', function () {
+            window.openRoommateSearch();
+        });
+    }
+    const openRoommateRequestsBtn = document.querySelector('[data-action="open-roommate-requests"]');
+    if (openRoommateRequestsBtn) {
+        openRoommateRequestsBtn.addEventListener('click', function () {
+            alert('룸메이트 요청 내역 기능은 준비 중입니다.');
+        });
+    }
+    // 세미나/해외연수: 참가비 타입 동기화 (회원교/비회원교 + 2인1실/1인실/비숙박 -> fee_type)
+    const feeTypeEl = document.getElementById('fee_type');
+    const feeSchoolRadios = document.querySelectorAll('input[name="fee_school_type"]');
+    const feeAccomRadios = document.querySelectorAll('input[name="fee_accommodation"]');
+    if (feeTypeEl && (feeSchoolRadios.length || feeAccomRadios.length)) {
+        function updateFeeType() {
+            var school = document.querySelector('input[name="fee_school_type"]:checked');
+            var accom = document.querySelector('input[name="fee_accommodation"]:checked');
+            var schoolVal = school ? school.value : '';
+            var accomVal = accom ? accom.value : '';
+            var prefix = (schoolVal === '비회원교') ? 'guest' : 'member';
+            var suffix = (accomVal === '1인실') ? 'single' : ((accomVal === '비숙박') ? 'no_stay' : 'twin');
+            feeTypeEl.value = prefix + '_' + suffix;
+        }
+        feeSchoolRadios.forEach(function (r) { r.addEventListener('change', updateFeeType); });
+        feeAccomRadios.forEach(function (r) { r.addEventListener('change', updateFeeType); });
+        updateFeeType();
+    }
+}
+
+// 자격증 증명사진 삭제 버튼
+function initIdPhotoDeleteButton() {
+    const btn = document.getElementById('btnDeleteIdPhoto');
+    if (!btn) return;
+    btn.addEventListener('click', function () {
+        const deleteInput = document.getElementById('delete_id_photo');
+        const wrapper = this.closest('.mt-2');
+        if (confirm('증명사진을 삭제하시겠습니까?')) {
+            if (deleteInput) deleteInput.value = '1';
+            if (wrapper) wrapper.style.display = 'none';
+        }
+    });
 }
 
 // show 페이지: 전체 선택 체크박스
@@ -483,6 +552,7 @@ function initIndexPageHandlers() {
 
 document.addEventListener('DOMContentLoaded', function () {
     initApplicationAttachmentDeleteButtons();
+    initIdPhotoDeleteButton();
     initMemberSearchForm();
     initCreateEditPageHandlers();
     initSelectAllApplicationCheckboxes();

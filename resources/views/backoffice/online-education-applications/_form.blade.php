@@ -2,18 +2,38 @@
     $app = $application ?? null;
     $isEdit = $isEdit ?? false;
 @endphp
-<form action="{{ $isEdit ? route('backoffice.education-applications.update', $app) : route('backoffice.education-applications.store') }}" method="POST" enctype="multipart/form-data" id="applicationForm">
+<form action="{{ $isEdit ? route('backoffice.online-education-applications.update', $app) : route('backoffice.online-education-applications.store') }}" method="POST" enctype="multipart/form-data" id="applicationForm">
     @csrf
     @if($isEdit)
         @method('PUT')
     @else
-        <input type="hidden" name="education_program_id" value="{{ old('education_program_id', $program?->id) }}" required>
+        @if($program)
+            <input type="hidden" name="education_program_id" value="{{ old('education_program_id', $program->id) }}" required>
+        @else
+            <div class="member-form-section">
+                <div class="member-form-list">
+                    <div class="member-form-row">
+                        <label class="member-form-label">교육 프로그램 <span class="required">*</span></label>
+                        <div class="member-form-field">
+                            <select name="education_program_id" class="board-form-control @error('education_program_id') is-invalid @enderror" required>
+                                <option value="">선택해주세요</option>
+                                @foreach($programs ?? [] as $p)
+                                    <option value="{{ $p->id }}" @selected(old('education_program_id') == $p->id)>{{ $p->name }}</option>
+                                @endforeach
+                            </select>
+                            @error('education_program_id')
+                                <div class="invalid-feedback">{{ $message }}</div>
+                            @enderror
+                        </div>
+                    </div>
+                </div>
+            </div>
+        @endif
     @endif
 
-    <!-- 신청자 정보 (정기/수시/자격증/세미나) -->
+    <!-- 신청 정보 (기획서) -->
     <div class="member-form-section">
-        <h3 class="member-section-title">신청자 정보</h3>
-
+        <h3 class="member-section-title">신청 정보</h3>
         <div class="member-form-list">
             <div class="member-form-row">
                 <label class="member-form-label">신청번호</label>
@@ -23,7 +43,6 @@
                     </div>
                 </div>
             </div>
-
             <div class="member-form-row">
                 <label class="member-form-label">신청자 ID</label>
                 <div class="member-form-field">
@@ -40,7 +59,6 @@
                     @enderror
                 </div>
             </div>
-
             <div class="member-form-row">
                 <label class="member-form-label">신청자명 <span class="required">*</span></label>
                 <div class="member-form-field">
@@ -51,7 +69,6 @@
                     @enderror
                 </div>
             </div>
-
             <div class="member-form-row">
                 <label class="member-form-label">소속기관</label>
                 <div class="member-form-field">
@@ -62,7 +79,6 @@
                     @enderror
                 </div>
             </div>
-
             <div class="member-form-row">
                 <label class="member-form-label">휴대폰 번호 <span class="required">*</span></label>
                 <div class="member-form-field">
@@ -73,7 +89,6 @@
                     @enderror
                 </div>
             </div>
-
             <div class="member-form-row">
                 <label class="member-form-label">이메일</label>
                 <div class="member-form-field">
@@ -84,7 +99,6 @@
                     @enderror
                 </div>
             </div>
-
             <div class="member-form-row">
                 <label class="member-form-label">신청일시 <span class="required">*</span></label>
                 <div class="member-form-field">
@@ -95,7 +109,29 @@
                     @enderror
                 </div>
             </div>
-
+            <div class="member-form-row">
+                <label class="member-form-label">수강상태</label>
+                <div class="member-form-field">
+                    <select name="course_status" class="board-form-control @error('course_status') is-invalid @enderror">
+                        <option value="접수" @selected(old('course_status', $app?->course_status ?? '접수') == '접수')>접수</option>
+                        <option value="승인" @selected(old('course_status', $app?->course_status ?? '') == '승인')>승인</option>
+                        <option value="만료" @selected(old('course_status', $app?->course_status ?? '') == '만료')>만료</option>
+                    </select>
+                    @error('course_status')
+                        <div class="invalid-feedback">{{ $message }}</div>
+                    @enderror
+                </div>
+            </div>
+            <div class="member-form-row">
+                <label class="member-form-label">수강률 (%)</label>
+                <div class="member-form-field">
+                    <input type="number" class="board-form-control @error('attendance_rate') is-invalid @enderror"
+                           name="attendance_rate" value="{{ old('attendance_rate', $app?->attendance_rate ?? '') }}" min="0" max="100" step="0.01" placeholder="0–100">
+                    @error('attendance_rate')
+                        <div class="invalid-feedback">{{ $message }}</div>
+                    @enderror
+                </div>
+            </div>
             <div class="member-form-row">
                 <label class="member-form-label">이수 여부</label>
                 <div class="member-form-field">
@@ -111,7 +147,6 @@
                     </div>
                 </div>
             </div>
-
             <div class="member-form-row">
                 <label class="member-form-label">설문조사 여부</label>
                 <div class="member-form-field">
@@ -127,150 +162,6 @@
                     </div>
                 </div>
             </div>
-
-            @if($program && $program->education_type === '자격증')
-            <div class="member-form-section">
-                <h3 class="member-section-title">자격증 전용</h3>
-                <div class="member-form-list">
-                    <div class="member-form-row">
-                        <label class="member-form-label">성적</label>
-                        <div class="member-form-field">
-                            <input type="number" class="board-form-control @error('score') is-invalid @enderror"
-                                   name="score" value="{{ old('score', $app?->score ?? '') }}" min="0">
-                            @error('score')
-                                <div class="invalid-feedback">{{ $message }}</div>
-                            @enderror
-                        </div>
-                    </div>
-                    <div class="member-form-row">
-                        <label class="member-form-label">합격여부</label>
-                        <div class="member-form-field">
-                            <select name="pass_status" class="board-form-control @error('pass_status') is-invalid @enderror">
-                                <option value="">선택</option>
-                                <option value="합격" @selected(old('pass_status', $app?->pass_status ?? '') == '합격')>합격</option>
-                                <option value="불합격" @selected(old('pass_status', $app?->pass_status ?? '') == '불합격')>불합격</option>
-                                <option value="미정" @selected(old('pass_status', $app?->pass_status ?? '') == '미정')>미정</option>
-                            </select>
-                            @error('pass_status')
-                                <div class="invalid-feedback">{{ $message }}</div>
-                            @enderror
-                        </div>
-                    </div>
-                    <div class="member-form-row">
-                        <label class="member-form-label">시험장</label>
-                        <div class="member-form-field">
-                            <select name="exam_venue_id" class="board-form-control @error('exam_venue_id') is-invalid @enderror">
-                                <option value="">선택</option>
-                                @foreach($examVenues ?? [] as $venue)
-                                    <option value="{{ $venue->id }}" @selected(old('exam_venue_id', $app?->exam_venue_id ?? '') == $venue->id)>{{ $venue->name }}</option>
-                                @endforeach
-                            </select>
-                            @error('exam_venue_id')
-                                <div class="invalid-feedback">{{ $message }}</div>
-                            @enderror
-                        </div>
-                    </div>
-                    <div class="member-form-row">
-                        <label class="member-form-label">수험표 번호</label>
-                        <div class="member-form-field">
-                            <div class="board-form-control readonly-field">
-                                {{ $isEdit ? ($app?->exam_ticket_number ?? '-') : '자동 생성' }}
-                            </div>
-                        </div>
-                    </div>
-                    <div class="member-form-row">
-                        <label class="member-form-label">자격확인서 번호</label>
-                        <div class="member-form-field">
-                            <div class="board-form-control readonly-field">
-                                {{ $isEdit ? ($app?->qualification_certificate_number ?? '-') : '자동 생성' }}
-                            </div>
-                        </div>
-                    </div>
-                    <div class="member-form-row">
-                        <label class="member-form-label">합격확인서 번호</label>
-                        <div class="member-form-field">
-                            <div class="board-form-control readonly-field">
-                                {{ $isEdit ? ($app?->pass_confirmation_number ?? '-') : '자동 생성' }}
-                            </div>
-                        </div>
-                    </div>
-                    <div class="member-form-row">
-                        <label class="member-form-label">증명사진 경로</label>
-                        <div class="member-form-field">
-                            <input type="text" class="board-form-control @error('id_photo_path') is-invalid @enderror"
-                                   name="id_photo_path" value="{{ old('id_photo_path', $app?->id_photo_path ?? '') }}" maxlength="255">
-                            @error('id_photo_path')
-                                <div class="invalid-feedback">{{ $message }}</div>
-                            @enderror
-                        </div>
-                    </div>
-                    <div class="member-form-row">
-                        <label class="member-form-label">생년월일</label>
-                        <div class="member-form-field">
-                            <input type="date" class="board-form-control @error('birth_date') is-invalid @enderror"
-                                   name="birth_date" value="{{ old('birth_date', $app?->birth_date ? $app?->birth_date->format('Y-m-d') : '') }}">
-                            @error('birth_date')
-                                <div class="invalid-feedback">{{ $message }}</div>
-                            @enderror
-                        </div>
-                    </div>
-                </div>
-            </div>
-            @endif
-
-            @if($program && $program->education_type === '세미나/해외연수')
-            <div class="member-form-section">
-                <h3 class="member-section-title">세미나/해외연수 전용</h3>
-                <div class="member-form-list">
-                    <div class="member-form-row">
-                        <label class="member-form-label">룸메이트 회원 ID</label>
-                        <div class="member-form-field">
-                            <div class="input-with-button">
-                                <input type="text" class="board-form-control @error('roommate_member_id') is-invalid @enderror"
-                                       id="roommate_login_id" value="{{ old('roommate_login_id', $app?->roommate?->login_id ?? '') }}" readonly>
-                                <input type="hidden" id="roommate_member_id" name="roommate_member_id" value="{{ old('roommate_member_id', $app?->roommate_member_id ?? '') }}">
-                                <button type="button" class="btn btn-secondary btn-sm" data-action="open-roommate-search">
-                                    회원 검색
-                                </button>
-                            </div>
-                            @error('roommate_member_id')
-                                <div class="invalid-feedback">{{ $message }}</div>
-                            @enderror
-                        </div>
-                    </div>
-                    <div class="member-form-row">
-                        <label class="member-form-label">룸메이트 이름</label>
-                        <div class="member-form-field">
-                            <input type="text" class="board-form-control @error('roommate_name') is-invalid @enderror"
-                                   name="roommate_name" value="{{ old('roommate_name', $app?->roommate_name ?? '') }}" maxlength="100">
-                            @error('roommate_name')
-                                <div class="invalid-feedback">{{ $message }}</div>
-                            @enderror
-                        </div>
-                    </div>
-                    <div class="member-form-row">
-                        <label class="member-form-label">룸메이트 휴대폰</label>
-                        <div class="member-form-field">
-                            <input type="text" class="board-form-control @error('roommate_phone') is-invalid @enderror"
-                                   name="roommate_phone" value="{{ old('roommate_phone', $app?->roommate_phone ?? '') }}" maxlength="20">
-                            @error('roommate_phone')
-                                <div class="invalid-feedback">{{ $message }}</div>
-                            @enderror
-                        </div>
-                    </div>
-                </div>
-            </div>
-            @endif
-
-            <div class="member-form-row">
-                <label class="member-form-label">이수증/수료증 번호</label>
-                <div class="member-form-field">
-                    <div class="board-form-control readonly-field">
-                        {{ $isEdit ? ($app?->certificate_number ?? '-') : '자동 생성' }}
-                    </div>
-                </div>
-            </div>
-
             <div class="member-form-row">
                 <label class="member-form-label">영수증 번호</label>
                 <div class="member-form-field">
@@ -279,7 +170,6 @@
                     </div>
                 </div>
             </div>
-
             <div class="member-form-row">
                 <label class="member-form-label">환불계좌정보</label>
                 <div class="member-form-field">
@@ -329,60 +219,20 @@
         </div>
     </div>
 
-    <!-- 결제 정보 -->
+    <!-- 결제 정보 (기획서: 참가비 자동입력, 결제방법, 결제상태, 입금일시, 현금영수증, 세금계산서) -->
     <div class="member-form-section">
         <h3 class="member-section-title">결제 정보</h3>
-
         <div class="member-form-list">
             <div class="member-form-row">
                 <label class="member-form-label">참가비</label>
                 <div class="member-form-field">
-                    <div class="form-row-group">
-                        <div class="form-row-inline">
-                            <span class="sub-label" style="margin-bottom:0;">자동 입력</span>
-                            <div class="board-form-control readonly-field form-field-flex-200">
-                                자동 입력
-                            </div>
-                        </div>
-                        <div class="form-row-inline">
-                            <span class="sub-label" style="margin-bottom:0;">회원교/비회원교</span>
-                            <div class="board-radio-group">
-                                <div class="board-radio-item">
-                                    <input type="radio" id="member_type_member" name="member_type" value="회원교" class="board-radio-input" @checked(old('member_type', (strpos($app?->fee_type ?? '', '회원교') !== false ? '회원교' : '비회원교')) == '회원교')>
-                                    <label for="member_type_member">회원교</label>
-                                </div>
-                                <div class="board-radio-item">
-                                    <input type="radio" id="member_type_nonmember" name="member_type" value="비회원교" class="board-radio-input" @checked(old('member_type', (strpos($app?->fee_type ?? '', '회원교') !== false ? '회원교' : '비회원교')) == '비회원교')>
-                                    <label for="member_type_nonmember">비회원교</label>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="form-row-inline">
-                            <span class="sub-label" style="margin-bottom:0;">숙박 옵션</span>
-                            <div class="board-radio-group">
-                                <div class="board-radio-item">
-                                    <input type="radio" id="accommodation_2in1" name="accommodation_type" value="2인1실" class="board-radio-input" @checked(old('accommodation_type', (strpos($app?->fee_type ?? '', '2인1실') !== false ? '2인1실' : (strpos($app?->fee_type ?? '', '1인실') !== false ? '1인실' : '비숙박'))) == '2인1실')>
-                                    <label for="accommodation_2in1">2인 1실</label>
-                                </div>
-                                <div class="board-radio-item">
-                                    <input type="radio" id="accommodation_1in1" name="accommodation_type" value="1인실" class="board-radio-input" @checked(old('accommodation_type', (strpos($app?->fee_type ?? '', '2인1실') !== false ? '2인1실' : (strpos($app?->fee_type ?? '', '1인실') !== false ? '1인실' : '비숙박'))) == '1인실')>
-                                    <label for="accommodation_1in1">1인실</label>
-                                </div>
-                                <div class="board-radio-item">
-                                    <input type="radio" id="accommodation_none" name="accommodation_type" value="비숙박" class="board-radio-input" @checked(old('accommodation_type', (strpos($app?->fee_type ?? '', '2인1실') !== false ? '2인1실' : (strpos($app?->fee_type ?? '', '1인실') !== false ? '1인실' : '비숙박'))) == '비숙박')>
-                                    <label for="accommodation_none">비숙박</label>
-                                </div>
-                            </div>
-                        </div>
-                        <input type="hidden" id="participation_fee" name="participation_fee" value="{{ old('participation_fee', $app?->participation_fee ?? '') }}">
-                        <input type="hidden" id="fee_type" name="fee_type" value="{{ old('fee_type', $app?->fee_type ?? '') }}">
+                    <div class="board-form-control readonly-field form-field-flex-200">
+                        자동 입력
                     </div>
-                    @error('participation_fee')
-                        <div class="invalid-feedback">{{ $message }}</div>
-                    @enderror
+                    <input type="hidden" id="participation_fee" name="participation_fee" value="{{ old('participation_fee', $app?->participation_fee ?? '') }}">
+                    <input type="hidden" id="fee_type" name="fee_type" value="{{ old('fee_type', $app?->fee_type ?? '') }}">
                 </div>
             </div>
-
             <div class="member-form-row">
                 <label class="member-form-label">결제방법</label>
                 <div class="member-form-field">
@@ -411,7 +261,6 @@
                     @enderror
                 </div>
             </div>
-
             <div class="member-form-row">
                 <label class="member-form-label">결제상태 <span class="required">*</span></label>
                 <div class="member-form-field">
@@ -443,7 +292,6 @@
                     @enderror
                 </div>
             </div>
-
             <div class="member-form-row">
                 <label class="member-form-label">세금계산서 발행여부</label>
                 <div class="member-form-field">
@@ -457,7 +305,6 @@
                     @enderror
                 </div>
             </div>
-
             <div class="member-form-row">
                 <label class="member-form-label">현금영수증</label>
                 <div class="member-form-field">
@@ -499,7 +346,6 @@
                     </div>
                 </div>
             </div>
-
             <div class="member-form-row">
                 <label class="member-form-label">세금계산서</label>
                 <div class="member-form-field">
@@ -583,6 +429,6 @@
         <button type="submit" class="btn btn-primary">
             <i class="fas fa-save"></i> 저장
         </button>
-        <a href="{{ $isEdit ? route('backoffice.education-applications.show', $app?->education_program_id) : ($program ? route('backoffice.education-applications.show', $program->id) : route('backoffice.education-applications.index')) }}" class="btn btn-secondary">취소</a>
+        <a href="{{ $isEdit ? route('backoffice.online-education-applications.show', $app?->education_program_id) : ($program ? route('backoffice.online-education-applications.show', $program->id) : route('backoffice.online-education-applications.index')) }}" class="btn btn-secondary">목록</a>
     </div>
 </form>

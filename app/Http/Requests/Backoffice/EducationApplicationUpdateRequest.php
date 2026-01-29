@@ -47,6 +47,24 @@ class EducationApplicationUpdateRequest extends FormRequest
             'refund_bank_name' => 'nullable|string|max:50',
             'refund_account_number' => 'nullable|string|max:50',
             'attachments.*' => 'nullable|file|max:10240',
+            // 온라인교육 전용
+            'course_status' => 'nullable|string|in:접수,승인,만료',
+            'attendance_rate' => 'nullable|numeric|min:0|max:100',
+            // 자격증 전용
+            'score' => 'nullable|integer|min:0',
+            'pass_status' => 'nullable|string|in:합격,불합격,미정',
+            'exam_venue_id' => 'nullable|exists:categories,id',
+            'exam_ticket_number' => 'nullable|string|max:50',
+            'qualification_certificate_number' => 'nullable|string|max:50',
+            'pass_confirmation_number' => 'nullable|string|max:50',
+            'id_photo_path' => 'nullable|string|max:255',
+            'id_photo' => 'nullable|file|image|mimes:jpg,jpeg,png|max:5120',
+            'delete_id_photo' => 'nullable|boolean',
+            'birth_date' => 'nullable|date',
+            // 세미나/해외연수 전용
+            'roommate_member_id' => 'nullable|exists:members,id',
+            'roommate_name' => 'nullable|string|max:100',
+            'roommate_phone' => 'nullable|string|max:20',
         ];
     }
 
@@ -72,6 +90,14 @@ class EducationApplicationUpdateRequest extends FormRequest
             'tax_invoice_status.in' => '올바른 세금계산서 상태를 선택해주세요.',
             'attachments.*.file' => '올바른 파일을 업로드해주세요.',
             'attachments.*.max' => '첨부파일 크기는 10MB를 초과할 수 없습니다.',
+            'course_status.in' => '올바른 수강상태를 선택해주세요.',
+            'attendance_rate.numeric' => '수강률은 숫자로 입력해주세요.',
+            'attendance_rate.min' => '수강률은 0 이상이어야 합니다.',
+            'attendance_rate.max' => '수강률은 100 이하여야 합니다.',
+            'pass_status.in' => '올바른 합격여부를 선택해주세요.',
+            'exam_venue_id.exists' => '존재하지 않는 시험장입니다.',
+            'birth_date.date' => '올바른 생년월일 형식이 아닙니다.',
+            'roommate_member_id.exists' => '존재하지 않는 룸메이트 회원입니다.',
         ];
     }
 }
