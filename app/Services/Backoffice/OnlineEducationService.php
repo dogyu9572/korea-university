@@ -360,6 +360,31 @@ class OnlineEducationService
     }
 
     /**
+     * 온라인 교육 폼에 넘길 데이터를 반환합니다. (MVC: 뷰 로직 제거용)
+     */
+    public function getFormData(?EducationProgram $program): array
+    {
+        $isEdit = $program && $program->exists;
+        $program = $program ?? new EducationProgram();
+        $attachments = $isEdit ? $program->attachments : collect([]);
+        $lectures = $isEdit ? $program->lectures : collect([]);
+
+        $appStart = $program->application_start;
+        $appEnd = $program->application_end;
+
+        return [
+            'program' => $program,
+            'isEdit' => $isEdit,
+            'attachments' => $attachments,
+            'lectures' => $lectures,
+            'application_start_date' => old('application_start_date', $appStart ? $appStart->format('Y-m-d') : ''),
+            'application_start_hour' => (int) old('application_start_hour', $appStart ? (int) $appStart->format('H') : 0),
+            'application_end_date' => old('application_end_date', $appEnd ? $appEnd->format('Y-m-d') : ''),
+            'application_end_hour' => (int) old('application_end_hour', $appEnd ? (int) $appEnd->format('H') : 23),
+        ];
+    }
+
+    /**
      * 파일을 삭제합니다.
      */
     private function deleteFile(string $filePath): void

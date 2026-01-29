@@ -39,8 +39,15 @@
 
     // 강의영상 검색 모달 열기
     function openLectureSearchModal() {
+        // 검색 조건 초기화
+        const typeEl = document.getElementById('lecture_search_type');
+        const termEl = document.getElementById('lecture_search_term');
+        if (typeEl) typeEl.value = '전체';
+        if (termEl) termEl.value = '';
+
+        // 모달 표시 후 1페이지부터 조회
         $('#lectureSearchModal').modal('show');
-        searchLectures();
+        searchLectures(1);
     }
 
     // 강의영상 검색
@@ -119,49 +126,92 @@
         });
     }
 
-    // 페이지네이션 표시
+    // 페이지네이션 표시 (회원 검색 모달과 동일 구조: board-pagination, « ‹ 번호 › »)
     function displayLecturePagination(data) {
         const paginationDiv = document.getElementById('lectureSearchPagination');
         if (!paginationDiv) return;
 
-        if (data.last_page <= 1) {
-            paginationDiv.innerHTML = '';
-            return;
+        const cur = data.current_page;
+        const last = data.last_page || 1;
+
+        let html = '<div class="board-pagination"><nav aria-label="페이지 네비게이션"><ul class="pagination">';
+
+        // 첫 페이지 «
+        if (cur <= 1) {
+            html += '<li class="page-item disabled"><span class="page-link"><i class="fas fa-angle-double-left"></i></span></li>';
+        } else {
+            html += `<li class="page-item"><a class="page-link" href="#" data-page="1" title="첫 페이지로"><i class="fas fa-angle-double-left"></i></a></li>`;
         }
 
-        let html = '<nav><ul class="pagination justify-content-center">';
-        
-        // 이전 페이지
-        if (data.current_page > 1) {
-            html += `<li class="page-item"><a class="page-link" href="#" data-page="${data.current_page - 1}">&lt;</a></li>`;
+        // 이전 페이지 ‹
+        if (cur <= 1) {
+            html += '<li class="page-item disabled"><span class="page-link"><i class="fas fa-chevron-left"></i></span></li>';
+        } else {
+            html += `<li class="page-item"><a class="page-link" href="#" data-page="${cur - 1}" title="이전 페이지"><i class="fas fa-chevron-left"></i></a></li>`;
         }
 
         // 페이지 번호
-        for (let i = 1; i <= data.last_page; i++) {
-            if (i === 1 || i === data.last_page || (i >= data.current_page - 2 && i <= data.current_page + 2)) {
-                const active = i === data.current_page ? 'active' : '';
-                html += `<li class="page-item ${active}"><a class="page-link" href="#" data-page="${i}">${i}</a></li>`;
-            } else if (i === data.current_page - 3 || i === data.current_page + 3) {
-                html += `<li class="page-item disabled"><span class="page-link">...</span></li>`;
+        for (let i = 1; i <= last; i++) {
+            if (i === cur) {
+                html += `<li class="page-item active"><span class="page-link">${i}</span></li>`;
+            } else {
+                html += `<li class="page-item"><a class="page-link" href="#" data-page="${i}">${i}</a></li>`;
             }
         }
 
-        // 다음 페이지
-        if (data.current_page < data.last_page) {
-            html += `<li class="page-item"><a class="page-link" href="#" data-page="${data.current_page + 1}">&gt;</a></li>`;
+        // 다음 페이지 ›
+        if (cur >= last) {
+            html += '<li class="page-item disabled"><span class="page-link"><i class="fas fa-chevron-right"></i></span></li>';
+        } else {
+            html += `<li class="page-item"><a class="page-link" href="#" data-page="${cur + 1}" title="다음 페이지"><i class="fas fa-chevron-right"></i></a></li>`;
         }
 
-        html += '</ul></nav>';
+        // 마지막 페이지 »
+        if (cur >= last) {
+            html += '<li class="page-item disabled"><span class="page-link"><i class="fas fa-angle-double-right"></i></span></li>';
+        } else {
+            html += `<li class="page-item"><a class="page-link" href="#" data-page="${last}" title="마지막 페이지로"><i class="fas fa-angle-double-right"></i></a></li>`;
+        }
+
+        html += '</ul></nav></div>';
         paginationDiv.innerHTML = html;
 
-        // 페이지 클릭 이벤트
-        paginationDiv.querySelectorAll('.page-link[data-page]').forEach(function(link) {
+        paginationDiv.querySelectorAll('a.page-link[data-page]').forEach(function(link) {
             link.addEventListener('click', function(e) {
                 e.preventDefault();
-                const page = parseInt(this.getAttribute('data-page'));
+                const page = parseInt(this.getAttribute('data-page'), 10) || 1;
                 searchLectures(page);
             });
         });
+    }
+
+    // 강의영상 검색 폼 초기화 (검색 버튼/엔터 통합 처리)
+    function initLectureSearchForm() {
+        const form = document.getElementById('lectureSearchForm');
+        const searchBtn = document.getElementById('btnSearchLectures');
+        const termEl = document.getElementById('lecture_search_term');
+
+        if (form) {
+            form.addEventListener('submit', function(e) {
+                e.preventDefault();
+                searchLectures(1);
+            });
+        }
+
+        if (searchBtn) {
+            searchBtn.addEventListener('click', function() {
+                searchLectures(1);
+            });
+        }
+
+        if (termEl) {
+            termEl.addEventListener('keydown', function(e) {
+                if (e.key === 'Enter') {
+                    e.preventDefault();
+                    searchLectures(1);
+                }
+            });
+        }
     }
 
     // 강의영상 선택
@@ -342,7 +392,7 @@
         // 기존 강의영상 로드
         loadExistingLectures();
 
-        // 추가 버튼
+        // 추가 버튼 (강의영상 검색 모달)
         const addBtn = document.getElementById('btnAddLecture');
         if (addBtn) {
             addBtn.addEventListener('click', function() {
@@ -350,17 +400,11 @@
             });
         }
 
-
         // 무료 체크박스
         initFreeCheckbox();
 
-        // 검색 버튼
-        const searchBtn = document.getElementById('btnSearchLectures');
-        if (searchBtn) {
-            searchBtn.addEventListener('click', function() {
-                searchLectures(1);
-            });
-        }
+        // 강의영상 검색 폼/버튼/엔터 처리
+        initLectureSearchForm();
 
         // 폼 제출 시 강의영상 데이터 전송
         const form = document.getElementById('onlineEducationForm');

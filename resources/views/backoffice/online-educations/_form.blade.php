@@ -1,17 +1,3 @@
-@php
-    $isEdit = isset($onlineEducation) && $onlineEducation->exists;
-    $program = $isEdit ? $onlineEducation : new \App\Models\EducationProgram();
-    $attachments = $isEdit ? $program->attachments : collect([]);
-    $lectures = $isEdit ? $program->lectures : collect([]);
-
-    $appStart = $program->application_start;
-    $appEnd = $program->application_end;
-    $appStartDate = old('application_start_date', $appStart ? $appStart->format('Y-m-d') : '');
-    $appStartHour = old('application_start_hour', $appStart ? (int)$appStart->format('H') : 0);
-    $appEndDate = old('application_end_date', $appEnd ? $appEnd->format('Y-m-d') : '');
-    $appEndHour = old('application_end_hour', $appEnd ? (int)$appEnd->format('H') : 23);
-@endphp
-
 <form action="{{ $isEdit ? route('backoffice.online-educations.update', $program) : route('backoffice.online-educations.store') }}" method="POST" enctype="multipart/form-data" id="onlineEducationForm">
     @csrf
     @if($isEdit)
@@ -90,17 +76,17 @@
                 <label class="member-form-label">신청기간</label>
                 <div class="member-form-field">
                     <div class="application-period-row">
-                        <input type="date" class="board-form-control" id="application_start_date" name="application_start_date" value="{{ $appStartDate }}">
+                        <input type="date" class="board-form-control" id="application_start_date" name="application_start_date" value="{{ $application_start_date }}">
                         <select class="board-form-control application-hour-select" id="application_start_hour" name="application_start_hour">
                             @for($h = 0; $h <= 23; $h++)
-                                <option value="{{ $h }}" @selected($appStartHour == $h)>{{ sprintf('%02d', $h) }}시</option>
+                                <option value="{{ $h }}" @selected($application_start_hour == $h)>{{ sprintf('%02d', $h) }}시</option>
                             @endfor
                         </select>
                         <span class="period-sep">~</span>
-                        <input type="date" class="board-form-control" id="application_end_date" name="application_end_date" value="{{ $appEndDate }}">
+                        <input type="date" class="board-form-control" id="application_end_date" name="application_end_date" value="{{ $application_end_date }}">
                         <select class="board-form-control application-hour-select" id="application_end_hour" name="application_end_hour">
                             @for($h = 0; $h <= 23; $h++)
-                                <option value="{{ $h }}" @selected($appEndHour == $h)>{{ sprintf('%02d', $h) }}시</option>
+                                <option value="{{ $h }}" @selected($application_end_hour == $h)>{{ sprintf('%02d', $h) }}시</option>
                             @endfor
                         </select>
                     </div>

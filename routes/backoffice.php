@@ -28,6 +28,7 @@ use App\Http\Controllers\Backoffice\OnlineEducationController;
 use App\Http\Controllers\Backoffice\CertificationController;
 use App\Http\Controllers\Backoffice\SeminarTrainingController;
 use App\Http\Controllers\Backoffice\LectureVideoController;
+use App\Http\Controllers\Backoffice\EducationApplicationController;
 
 // =============================================================================
 // 백오피스 인증 라우트
@@ -260,6 +261,34 @@ Route::prefix('backoffice')->middleware(['backoffice'])->group(function () {
     Route::resource('education-programs', EducationProgramController::class, [
         'names' => 'backoffice.education-programs'
     ]);
+
+    // 교육 신청내역 관리
+    Route::get('education-applications', [EducationApplicationController::class, 'index'])
+        ->name('backoffice.education-applications.index');
+    Route::get('education-applications/create', [EducationApplicationController::class, 'create'])
+        ->name('backoffice.education-applications.create');
+    Route::post('education-applications', [EducationApplicationController::class, 'store'])
+        ->name('backoffice.education-applications.store');
+    Route::post('education-applications/batch-payment-complete', [EducationApplicationController::class, 'batchPaymentComplete'])
+        ->name('backoffice.education-applications.batch-payment-complete');
+    Route::post('education-applications/batch-complete', [EducationApplicationController::class, 'batchComplete'])
+        ->name('backoffice.education-applications.batch-complete');
+    // 구체적인 라우트를 먼저 정의 (순서 중요!)
+    Route::get('education-applications/{education_application}/edit', [EducationApplicationController::class, 'edit'])
+        ->name('backoffice.education-applications.edit');
+    Route::put('education-applications/{education_application}', [EducationApplicationController::class, 'update'])
+        ->name('backoffice.education-applications.update');
+    Route::delete('education-applications/{education_application}', [EducationApplicationController::class, 'destroy'])
+        ->name('backoffice.education-applications.destroy');
+    Route::put('education-applications/{program}/status', [EducationApplicationController::class, 'updateStatus'])
+        ->name('backoffice.education-applications.update-status');
+    Route::post('education-applications/{program}/export', [EducationApplicationController::class, 'export'])
+        ->name('backoffice.education-applications.export');
+    Route::get('education-applications/{program}/export', [EducationApplicationController::class, 'export'])
+        ->name('backoffice.education-applications.export.get');
+    // show는 가장 마지막에 (다른 모든 경로와 매칭되지 않을 때)
+    Route::get('education-applications/{program}', [EducationApplicationController::class, 'show'])
+        ->name('backoffice.education-applications.show');
 
     // 온라인 교육 관리
     Route::resource('online-educations', OnlineEducationController::class, [

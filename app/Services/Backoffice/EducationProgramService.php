@@ -383,6 +383,46 @@ class EducationProgramService
     }
 
     /**
+     * "교육 시작일 기준 N일 전" 문자열에서 일수(N)를 추출합니다.
+     */
+    private function parseRefundDeadlineDays(?string $val): ?int
+    {
+        if (!$val) {
+            return null;
+        }
+        if (preg_match('/(\d+)\s*일\s*전/u', $val, $m)) {
+            return (int) $m[1];
+        }
+        return null;
+    }
+
+    /**
+     * 교육 프로그램 폼에 넘길 데이터를 반환합니다. (MVC: 뷰 로직 제거용)
+     */
+    public function getFormData(?EducationProgram $program): array
+    {
+        $isEdit = $program && $program->exists;
+        $program = $program ?? new EducationProgram();
+        $attachments = $isEdit ? $program->attachments : collect([]);
+
+        $appStart = $program->application_start;
+        $appEnd = $program->application_end;
+
+        return [
+            'program' => $program,
+            'isEdit' => $isEdit,
+            'attachments' => $attachments,
+            'application_start_date' => old('application_start_date', $appStart ? $appStart->format('Y-m-d') : ''),
+            'application_start_hour' => (int) old('application_start_hour', $appStart ? (int) $appStart->format('H') : 0),
+            'application_end_date' => old('application_end_date', $appEnd ? $appEnd->format('Y-m-d') : ''),
+            'application_end_hour' => (int) old('application_end_hour', $appEnd ? (int) $appEnd->format('H') : 23),
+            'refund_twin_deadline_days' => old('refund_twin_deadline_days', $this->parseRefundDeadlineDays($program->refund_twin_deadline)),
+            'refund_single_deadline_days' => old('refund_single_deadline_days', $this->parseRefundDeadlineDays($program->refund_single_deadline)),
+            'refund_no_stay_deadline_days' => old('refund_no_stay_deadline_days', $this->parseRefundDeadlineDays($program->refund_no_stay_deadline)),
+        ];
+    }
+
+    /**
      * 파일을 삭제합니다.
      */
     private function deleteFile(string $filePath): void

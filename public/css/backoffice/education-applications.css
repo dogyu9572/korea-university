@@ -1,0 +1,132 @@
+/* 교육 신청 관리 페이지 전용 스타일 */
+/* 기본 폼 스타일은 members.css, education-programs.css 참고 */
+
+/* 읽기 전용 필드 (자동 생성, 표시용) */
+.education-applications .readonly-field,
+.readonly-field {
+    background-color: #f8f9fa;
+    padding: 8px 12px;
+    width: 100%;
+    max-width: 400px;
+}
+
+.education-applications .readonly-field-full,
+.readonly-field-full {
+    background-color: #f8f9fa;
+    padding: 8px 12px;
+    width: 100%;
+    max-width: none !important;
+}
+
+/* 입력+버튼 조합 (회원 검색 등) */
+.education-applications .input-with-button {
+    max-width: 400px;
+}
+
+/* 환불계좌정보 행 */
+.education-applications .refund-account-row,
+.refund-account-row {
+    display: flex;
+    gap: 10px;
+    align-items: flex-end;
+}
+
+.refund-account-row .form-field-flex {
+    flex: 1;
+}
+
+/* 서브 라벨 (예금주명, 은행선택 등) */
+.education-applications .sub-label,
+.sub-label {
+    font-size: 0.875rem;
+    color: #6c757d;
+    margin-bottom: 5px;
+    display: block;
+}
+
+/* 세로 그룹 (flex-direction: column) */
+.education-applications .form-row-group,
+.form-row-group {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+/* 가로 그룹 (한 줄에 라벨+컨트롤) */
+.education-applications .form-row-inline,
+.form-row-inline {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+}
+
+/* flex 아이템 (max-width 제한) */
+.education-applications .form-field-flex,
+.form-field-flex {
+    flex: 1;
+}
+
+.education-applications .form-field-flex-200,
+.form-field-flex-200 {
+    flex: 1;
+    max-width: 200px;
+}
+
+.education-applications .form-field-flex-300,
+.form-field-flex-300 {
+    flex: 1;
+    max-width: 300px;
+}
+
+.education-applications .form-field-flex-150,
+.form-field-flex-150 {
+    flex: 1;
+    max-width: 150px;
+}
+
+/* 구분자 (/) */
+.education-applications .separator,
+.separator {
+    color: #6c757d;
+}
+
+/* 회원 검색 모달 필터 하단 여백 */
+.education-applications .member-search-modal-filter,
+.member-search-modal-filter {
+    margin-bottom: 20px;
+}
+
+/* 우측 정렬 버튼 그룹 (show 페이지 일괄 처리 등) */
+.education-applications .action-buttons-right,
+.action-buttons-right {
+    margin-bottom: 20px;
+    text-align: right;
+}
+
+/* 테이블 내 셀렉트 박스 (show 페이지) */
+.education-applications .table-select-sm,
+.table-select-sm {
+    padding: 4px 8px;
+    line-height: 1.5;
+}
+
+/* show 페이지 이수 여부 인라인 */
+.education-applications .form-check-inline-no-margin,
+.form-check-inline-no-margin {
+    margin: 0;
+}
+
+/* 등록된 파일 목록 아이템 */
+.education-applications .attachment-item-inline,
+.attachment-item-inline {
+    display: inline-block;
+    margin-right: 8px;
+    margin-top: 4px;
+}
+
+/* 셀렉트 전체 너비 (show 페이지 접수상태 등) */
+.education-applications .select-full-width,
+.select-full-width {
+    width: 100%;
+    max-width: none !important;
+}

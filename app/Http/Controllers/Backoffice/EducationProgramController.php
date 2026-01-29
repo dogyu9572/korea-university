@@ -31,7 +31,8 @@ class EducationProgramController extends BaseController
      */
     public function create()
     {
-        return $this->view('backoffice.education-programs.create');
+        $formData = $this->educationProgramService->getFormData(null);
+        return $this->view('backoffice.education-programs.create', $formData);
     }
 
     /**
@@ -56,7 +57,8 @@ class EducationProgramController extends BaseController
     public function edit(EducationProgram $educationProgram)
     {
         $educationProgram->load(['schedules', 'attachments']);
-        return $this->view('backoffice.education-programs.edit', compact('educationProgram'));
+        $formData = $this->educationProgramService->getFormData($educationProgram);
+        return $this->view('backoffice.education-programs.edit', array_merge(compact('educationProgram'), $formData));
     }
 
     /**

@@ -59,9 +59,6 @@
                     <!-- 페이지네이션이 여기에 동적으로 추가됩니다 -->
                 </div>
             </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-dismiss="modal">닫기</button>
-            </div>
         </div>
     </div>
 </div>

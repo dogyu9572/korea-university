@@ -102,4 +102,12 @@ class EducationProgram extends Model
     {
         return $this->hasMany(OnlineEducationLecture::class, 'education_program_id')->orderBy('order', 'asc');
     }
+
+    /**
+     * 교육 신청 관계
+     */
+    public function applications(): HasMany
+    {
+        return $this->hasMany(EducationApplication::class, 'education_program_id');
+    }
 }

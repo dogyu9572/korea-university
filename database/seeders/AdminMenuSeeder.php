@@ -449,6 +449,18 @@ class AdminMenuSeeder extends Seeder
                 'updated_at' => '2026-01-27 05:33:40',
                 'permission_key' => null,
             ],
+            [
+                'id' => 63,
+                'parent_id' => 56,
+                'name' => '교육 신청내역',
+                'url' => '/backoffice/education-applications',
+                'icon' => null,
+                'order' => 7,
+                'is_active' => 1,
+                'created_at' => now(),
+                'updated_at' => now(),
+                'permission_key' => null,
+            ],
         ];
 
         // parent_id가 null인 메뉴들을 먼저 생성

@@ -44,6 +44,11 @@ Route::prefix('education_certification')->name('education_certification.')->grou
 Route::prefix('education_certification')->name('education_certification.')->group(function () {
     Route::get('/application_ec_receipt_end', [SubController::class, 'application_ec_receipt_end'])->name('application_ec_receipt_end');
 });
+Route::prefix('education_certification')->name('education_certification.')->group(function () {
+    Route::get('/application_ec_e-learning', [SubController::class, 'application_ec_e_learning'])
+        ->name('application_ec_e_learning');
+});
+
 
 //세미나 · 해외연수
 Route::prefix('seminars_training')->name('seminars_training.')->group(function () {

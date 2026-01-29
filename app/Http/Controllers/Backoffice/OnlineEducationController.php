@@ -31,7 +31,8 @@ class OnlineEducationController extends BaseController
      */
     public function create()
     {
-        return $this->view('backoffice.online-educations.create');
+        $formData = $this->onlineEducationService->getFormData(null);
+        return $this->view('backoffice.online-educations.create', $formData);
     }
 
     /**
@@ -55,13 +56,13 @@ class OnlineEducationController extends BaseController
      */
     public function edit(EducationProgram $onlineEducation)
     {
-        // 온라인 교육인지 확인
         if ($onlineEducation->education_type !== '온라인교육') {
             abort(404);
         }
-        
+
         $onlineEducation->load(['lectures', 'attachments']);
-        return $this->view('backoffice.online-educations.edit', compact('onlineEducation'));
+        $formData = $this->onlineEducationService->getFormData($onlineEducation);
+        return $this->view('backoffice.online-educations.edit', array_merge(compact('onlineEducation'), $formData));
     }
 
     /**

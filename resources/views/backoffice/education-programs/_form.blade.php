@@ -1,25 +1,3 @@
-@php
-    $isEdit = isset($educationProgram) && $educationProgram->exists;
-    $program = $isEdit ? $educationProgram : new \App\Models\EducationProgram();
-    $attachments = $isEdit ? $program->attachments : collect([]);
-
-    $appStart = $program->application_start;
-    $appEnd = $program->application_end;
-    $appStartDate = old('application_start_date', $appStart ? $appStart->format('Y-m-d') : '');
-    $appStartHour = old('application_start_hour', $appStart ? (int)$appStart->format('H') : 0);
-    $appEndDate = old('application_end_date', $appEnd ? $appEnd->format('Y-m-d') : '');
-    $appEndHour = old('application_end_hour', $appEnd ? (int)$appEnd->format('H') : 23);
-
-    $parseRefundDeadline = function ($val) {
-        if (!$val) return null;
-        if (preg_match('/(\d+)\s*일\s*전/u', $val, $m)) return (int)$m[1];
-        return null;
-    };
-    $refundTwinDays = old('refund_twin_deadline_days', $parseRefundDeadline($program->refund_twin_deadline));
-    $refundSingleDays = old('refund_single_deadline_days', $parseRefundDeadline($program->refund_single_deadline));
-    $refundNoStayDays = old('refund_no_stay_deadline_days', $parseRefundDeadline($program->refund_no_stay_deadline));
-@endphp
-
 <form action="{{ $isEdit ? route('backoffice.education-programs.update', $program) : route('backoffice.education-programs.store') }}" method="POST" enctype="multipart/form-data" id="educationProgramForm">
     @csrf
     @if($isEdit)
@@ -276,17 +254,17 @@
                 <label class="member-form-label">신청기간</label>
                 <div class="member-form-field">
                     <div class="application-period-row">
-                        <input type="date" class="board-form-control" id="application_start_date" name="application_start_date" value="{{ $appStartDate }}">
+                        <input type="date" class="board-form-control" id="application_start_date" name="application_start_date" value="{{ $application_start_date }}">
                         <select class="board-form-control application-hour-select" id="application_start_hour" name="application_start_hour">
                             @for($h = 0; $h <= 23; $h++)
-                                <option value="{{ $h }}" @selected($appStartHour == $h)>{{ sprintf('%02d', $h) }}시</option>
+                                <option value="{{ $h }}" @selected($application_start_hour == $h)>{{ sprintf('%02d', $h) }}시</option>
                             @endfor
                         </select>
                         <span class="period-sep">~</span>
-                        <input type="date" class="board-form-control" id="application_end_date" name="application_end_date" value="{{ $appEndDate }}">
+                        <input type="date" class="board-form-control" id="application_end_date" name="application_end_date" value="{{ $application_end_date }}">
                         <select class="board-form-control application-hour-select" id="application_end_hour" name="application_end_hour">
                             @for($h = 0; $h <= 23; $h++)
-                                <option value="{{ $h }}" @selected($appEndHour == $h)>{{ sprintf('%02d', $h) }}시</option>
+                                <option value="{{ $h }}" @selected($application_end_hour == $h)>{{ sprintf('%02d', $h) }}시</option>
                             @endfor
                         </select>
                     </div>
@@ -437,7 +415,7 @@
                                     <select class="board-form-control form-control-sm refund-deadline-days" name="refund_twin_deadline_days">
                                         <option value="">선택</option>
                                         @for($d = 1; $d <= 30; $d++)
-                                            <option value="{{ $d }}" @selected($refundTwinDays == $d)>{{ $d }}일 전</option>
+                                            <option value="{{ $d }}" @selected($refund_twin_deadline_days == $d)>{{ $d }}일 전</option>
                                         @endfor
                                     </select>
                                 </td>
@@ -450,7 +428,7 @@
                                     <select class="board-form-control form-control-sm refund-deadline-days" name="refund_single_deadline_days">
                                         <option value="">선택</option>
                                         @for($d = 1; $d <= 30; $d++)
-                                            <option value="{{ $d }}" @selected($refundSingleDays == $d)>{{ $d }}일 전</option>
+                                            <option value="{{ $d }}" @selected($refund_single_deadline_days == $d)>{{ $d }}일 전</option>
                                         @endfor
                                     </select>
                                 </td>
@@ -463,7 +441,7 @@
                                     <select class="board-form-control form-control-sm refund-deadline-days" name="refund_no_stay_deadline_days">
                                         <option value="">선택</option>
                                         @for($d = 1; $d <= 30; $d++)
-                                            <option value="{{ $d }}" @selected($refundNoStayDays == $d)>{{ $d }}일 전</option>
+                                            <option value="{{ $d }}" @selected($refund_no_stay_deadline_days == $d)>{{ $d }}일 전</option>
                                         @endfor
                                     </select>
                                 </td>
