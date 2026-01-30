@@ -7,6 +7,11 @@ use App\Http\Controllers\Auth\ForgotPasswordController;
 use App\Http\Controllers\Auth\ResetPasswordController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\SubController;
+use App\Http\Controllers\MemberController;
+use App\Http\Controllers\NoticeController;
+use App\Http\Controllers\EducationCertificationController;
+use App\Http\Controllers\SeminarTrainingController;
+use App\Http\Controllers\MypageController;
 use App\Http\Controllers\Backoffice\PopupController;
 
 // =============================================================================
@@ -16,87 +21,42 @@ use App\Http\Controllers\Backoffice\PopupController;
 // 메인 페이지
 Route::get('/', [HomeController::class, 'index'])->name('home');
 
-// 교육 · 자격증 라우트
+// 교육 · 자격증 (안내 퍼블: SubController, 신청 관련: EducationCertificationController)
 Route::prefix('education_certification')->name('education_certification.')->group(function () {
     Route::get('/education', [SubController::class, 'education'])->name('education');
-});
-Route::prefix('education_certification')->name('education_certification.')->group(function () {
     Route::get('/certification', [SubController::class, 'certification'])->name('certification');
-});
-Route::prefix('education_certification')->name('education_certification.')->group(function () {
-    Route::get('/application_ec', [SubController::class, 'application_ec'])->name('application_ec');
-});
-Route::prefix('education_certification')->name('education_certification.')->group(function () {
-    Route::get('/application_ec_view', [SubController::class, 'application_ec_view'])->name('application_ec_view');
-});
-Route::prefix('education_certification')->name('education_certification.')->group(function () {
-    Route::get('/application_ec_apply', [SubController::class, 'application_ec_apply'])->name('application_ec_apply');
-});
-Route::prefix('education_certification')->name('education_certification.')->group(function () {
-    Route::get('/application_ec_apply_end', [SubController::class, 'application_ec_apply_end'])->name('application_ec_apply_end');
-});
-Route::prefix('education_certification')->name('education_certification.')->group(function () {
-    Route::get('/application_ec_view_type2', [SubController::class, 'application_ec_view_type2'])->name('application_ec_view_type2');
-});
-Route::prefix('education_certification')->name('education_certification.')->group(function () {
-    Route::get('/application_ec_receipt', [SubController::class, 'application_ec_receipt'])->name('application_ec_receipt');
-});
-Route::prefix('education_certification')->name('education_certification.')->group(function () {
-    Route::get('/application_ec_receipt_end', [SubController::class, 'application_ec_receipt_end'])->name('application_ec_receipt_end');
-});
-Route::prefix('education_certification')->name('education_certification.')->group(function () {
-    Route::get('/application_ec_e_learning', [SubController::class, 'application_ec_e_learning'])
-        ->name('application_ec_e_learning');
+    Route::get('/application_ec', [EducationCertificationController::class, 'application_ec'])->name('application_ec');
+    Route::get('/application_ec_view', [EducationCertificationController::class, 'application_ec_view'])->name('application_ec_view');
+    Route::get('/application_ec_apply', [EducationCertificationController::class, 'application_ec_apply'])->name('application_ec_apply');
+    Route::get('/application_ec_apply_end', [EducationCertificationController::class, 'application_ec_apply_end'])->name('application_ec_apply_end');
+    Route::get('/application_ec_view_type2', [EducationCertificationController::class, 'application_ec_view_type2'])->name('application_ec_view_type2');
+    Route::get('/application_ec_receipt', [EducationCertificationController::class, 'application_ec_receipt'])->name('application_ec_receipt');
+    Route::get('/application_ec_receipt_end', [EducationCertificationController::class, 'application_ec_receipt_end'])->name('application_ec_receipt_end');
+    Route::get('/application_ec_e_learning', [EducationCertificationController::class, 'application_ec_e_learning'])->name('application_ec_e_learning');
 });
 
 
-//세미나 · 해외연수
+// 세미나 · 해외연수 (안내 퍼블: SubController, 신청 관련: SeminarTrainingController)
 Route::prefix('seminars_training')->name('seminars_training.')->group(function () {
     Route::get('/seminar', [SubController::class, 'seminar'])->name('seminar');
-});
-Route::prefix('seminars_training')->name('seminars_training.')->group(function () {
     Route::get('/overseas_training', [SubController::class, 'overseas_training'])->name('overseas_training');
-});
-Route::prefix('seminars_training')->name('seminars_training.')->group(function () {
-    Route::get('/application_st', [SubController::class, 'application_st'])->name('application_st');
-});
-Route::prefix('seminars_training')->name('seminars_training.')->group(function () {
-    Route::get('/application_st_view', [SubController::class, 'application_st_view'])->name('application_st_view');
-});
-Route::prefix('seminars_training')->name('seminars_training.')->group(function () {
-    Route::get('/application_st_apply', [SubController::class, 'application_st_apply'])->name('application_st_apply');
-});
-Route::prefix('seminars_training')->name('seminars_training.')->group(function () {
-    Route::get('/application_st_apply_end', [SubController::class, 'application_st_apply_end'])->name('application_st_apply_end');
+    Route::get('/application_st', [SeminarTrainingController::class, 'application_st'])->name('application_st');
+    Route::get('/application_st_view', [SeminarTrainingController::class, 'application_st_view'])->name('application_st_view');
+    Route::get('/application_st_apply', [SeminarTrainingController::class, 'application_st_apply'])->name('application_st_apply');
+    Route::get('/application_st_apply_end', [SeminarTrainingController::class, 'application_st_apply_end'])->name('application_st_apply_end');
 });
 
-//알림마당
+// 알림마당 (게시판 연동) - NoticeController
 Route::prefix('notice')->name('notice.')->group(function () {
-    Route::get('/notice', [SubController::class, 'notice'])->name('notice');
-});
-Route::prefix('notice')->name('notice.')->group(function () {
-    Route::get('/notice_view', [SubController::class, 'notice_view'])->name('notice_view');
-});
-Route::prefix('notice')->name('notice.')->group(function () {
-    Route::get('/faq', [SubController::class, 'faq'])->name('faq');
-});
-Route::prefix('notice')->name('notice.')->group(function () {
-    Route::get('/data_room', [SubController::class, 'data_room'])->name('data_room');
-});
-Route::prefix('notice')->name('notice.')->group(function () {
-    Route::get('/data_room_view', [SubController::class, 'data_room_view'])->name('data_room_view');
-});
-Route::prefix('notice')->name('notice.')->group(function () {
-    Route::get('/past_events', [SubController::class, 'past_events'])->name('past_events');
-});
-Route::prefix('notice')->name('notice.')->group(function () {
-    Route::get('/past_events_view', [SubController::class, 'past_events_view'])->name('past_events_view');
-});
-Route::prefix('notice')->name('notice.')->group(function () {
-    Route::get('/recruitment', [SubController::class, 'recruitment'])->name('recruitment');
-});
-Route::prefix('notice')->name('notice.')->group(function () {
-    Route::get('/recruitment_view', [SubController::class, 'recruitment_view'])->name('recruitment_view');
+    Route::get('/notice', [NoticeController::class, 'notice'])->name('notice');
+    Route::get('/notice_view/{id}', [NoticeController::class, 'noticeView'])->name('notice_view')->whereNumber('id');
+    Route::get('/faq', [NoticeController::class, 'faq'])->name('faq');
+    Route::get('/data_room', [NoticeController::class, 'dataRoom'])->name('data_room');
+    Route::get('/data_room_view/{id}', [NoticeController::class, 'dataRoomView'])->name('data_room_view')->whereNumber('id');
+    Route::get('/past_events', [NoticeController::class, 'pastEvents'])->name('past_events');
+    Route::get('/past_events_view/{id}', [NoticeController::class, 'pastEventsView'])->name('past_events_view')->whereNumber('id');
+    Route::get('/recruitment', [NoticeController::class, 'recruitment'])->name('recruitment');
+    Route::get('/recruitment_view/{id}', [NoticeController::class, 'recruitmentView'])->name('recruitment_view')->whereNumber('id');
 });
 
 //협회 소개
@@ -119,65 +79,31 @@ Route::prefix('about')->name('about.')->group(function () {
     Route::get('/about_institutions', [SubController::class, 'about_institutions'])->name('about_institutions');
 });
 
-//마이페이지
+// 마이페이지 - MypageController
 Route::prefix('mypage')->name('mypage.')->group(function () {
-    Route::get('/application_status', [SubController::class, 'application_status'])->name('application_status');
-});
-Route::prefix('mypage')->name('mypage.')->group(function () {
-    Route::get('/application_status_view', [SubController::class, 'application_status_view'])->name('application_status_view');
-});
-Route::prefix('mypage')->name('mypage.')->group(function () {
-    Route::get('/application_status_view2', [SubController::class, 'application_status_view2'])->name('application_status_view2');
-});
-Route::prefix('mypage')->name('mypage.')->group(function () {
-    Route::get('/my_qualification', [SubController::class, 'my_qualification'])->name('my_qualification');
-});
-Route::prefix('mypage')->name('mypage.')->group(function () {
-    Route::get('/my_qualification_view', [SubController::class, 'my_qualification_view'])->name('my_qualification_view');
-});
-Route::prefix('mypage')->name('mypage.')->group(function () {
-    Route::get('/my_inquiries', [SubController::class, 'my_inquiries'])->name('my_inquiries');
-});
-Route::prefix('mypage')->name('mypage.')->group(function () {
-    Route::get('/my_inquiries_view', [SubController::class, 'my_inquiries_view'])->name('my_inquiries_view');
-});
-Route::prefix('mypage')->name('mypage.')->group(function () {
-    Route::get('/my_inquiries_write', [SubController::class, 'my_inquiries_write'])->name('my_inquiries_write');
-});
-Route::prefix('mypage')->name('mypage.')->group(function () {
-    Route::get('/edit_member_information', [SubController::class, 'edit_member_information'])->name('edit_member_information');
+    Route::get('/application_status', [MypageController::class, 'application_status'])->name('application_status');
+    Route::get('/application_status_view', [MypageController::class, 'application_status_view'])->name('application_status_view');
+    Route::get('/application_status_view2', [MypageController::class, 'application_status_view2'])->name('application_status_view2');
+    Route::get('/my_qualification', [MypageController::class, 'my_qualification'])->name('my_qualification');
+    Route::get('/my_qualification_view', [MypageController::class, 'my_qualification_view'])->name('my_qualification_view');
+    Route::get('/my_inquiries', [MypageController::class, 'my_inquiries'])->name('my_inquiries');
+    Route::get('/my_inquiries_view', [MypageController::class, 'my_inquiries_view'])->name('my_inquiries_view');
+    Route::get('/my_inquiries_write', [MypageController::class, 'my_inquiries_write'])->name('my_inquiries_write');
+    Route::get('/edit_member_information', [MypageController::class, 'edit_member_information'])->name('edit_member_information');
 });
 
-//로그인,회원가입
+// 회원 (로그인/가입/ID·PW 찾기) - MemberController
 Route::prefix('member')->name('member.')->group(function () {
-    Route::get('/login', [SubController::class, 'login'])->name('login');
-});
-Route::prefix('member')->name('member.')->group(function () {
-    Route::get('/join', [SubController::class, 'join'])->name('join');
-});
-Route::prefix('member')->name('member.')->group(function () {
-    Route::get('/join_easy', [SubController::class, 'join_easy'])->name('join_easy');
-});
-Route::prefix('member')->name('member.')->group(function () {
-    Route::get('/join_end', [SubController::class, 'join_end'])->name('join_end');
-});
-Route::prefix('member')->name('member.')->group(function () {
-    Route::get('/find_id', [SubController::class, 'find_id'])->name('find_id');
-});
-Route::prefix('member')->name('member.')->group(function () {
-    Route::get('/find_id_end', [SubController::class, 'find_id_end'])->name('find_id_end');
-});
-Route::prefix('member')->name('member.')->group(function () {
-    Route::get('/find_pw', [SubController::class, 'find_pw'])->name('find_pw');
-});
-Route::prefix('member')->name('member.')->group(function () {
-    Route::get('/find_pw_reset', [SubController::class, 'find_pw_reset'])->name('find_pw_reset');
-});
-Route::prefix('member')->name('member.')->group(function () {
-    Route::get('/find_pw_end', [SubController::class, 'find_pw_end'])->name('find_pw_end');
-});
-Route::prefix('member')->name('member.')->group(function () {
-    Route::get('/pop_search_school', [SubController::class, 'pop_search_school'])->name('pop_search_school');
+    Route::get('/login', [MemberController::class, 'login'])->name('login');
+    Route::get('/join', [MemberController::class, 'join'])->name('join');
+    Route::get('/join_easy', [MemberController::class, 'join_easy'])->name('join_easy');
+    Route::get('/join_end', [MemberController::class, 'join_end'])->name('join_end');
+    Route::get('/find_id', [MemberController::class, 'find_id'])->name('find_id');
+    Route::get('/find_id_end', [MemberController::class, 'find_id_end'])->name('find_id_end');
+    Route::get('/find_pw', [MemberController::class, 'find_pw'])->name('find_pw');
+    Route::get('/find_pw_reset', [MemberController::class, 'find_pw_reset'])->name('find_pw_reset');
+    Route::get('/find_pw_end', [MemberController::class, 'find_pw_end'])->name('find_pw_end');
+    Route::get('/pop_search_school', [MemberController::class, 'pop_search_school'])->name('pop_search_school');
 });
 
 //약관

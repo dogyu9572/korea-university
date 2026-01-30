@@ -344,6 +344,7 @@
 	.board_top .right_btns .btn {font-size:15px; color:#0A195B; font-weight:500; line-height:32px; height:34px; padding:0 14px; border:#0A195B 1px solid; border-radius:4px; transition:none;}
 	.board_top .right_btns .btn.flex_center {gap:8px;}
 	.board_search {background:#F8F9FB; border-radius:16px; padding:24px; display:flex; justify-content:center; align-items:center; gap:8px;}
+	.board_search form {display:flex; justify-content:center; align-items:center; gap:8px;}
 	.board_search .text,
 	.board_search .btn {height:50px; font-size:16px;}
 	.board_search select {width:160px;}
@@ -393,6 +394,7 @@
 	.board_bottom .paging a {width:40px; height:40px; line-height:40px; text-align:center; font-size:18px; color:#464C53; border-radius:20px;}
 	.board_bottom .paging a.on {background:#0A195B !important; color:#fff !important; font-weight:500;}
 	.board_bottom .paging .arrow {font-size:0; background:no-repeat 50% 50% !important;}
+	.board_bottom .paging span.arrow {display:inline-block; width:40px; height:40px; line-height:40px; text-align:center; border-radius:20px;}
 	.board_bottom .paging .two {background-image:url('/images/page_two.svg') !important;}
 	.board_bottom .paging .one {background-image:url('/images/page_one.svg') !important;}
 	.board_bottom .paging .prev {margin-right:8px;}

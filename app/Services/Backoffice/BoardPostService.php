@@ -19,11 +19,16 @@ class BoardPostService
 
     /**
      * 게시글 목록 조회
+     * @param bool $forPublic 사용자 페이지용이면 true(삭제/비활성 제외)
      */
-    public function getPosts(string $slug, Request $request)
+    public function getPosts(string $slug, Request $request, bool $forPublic = false)
     {
         $query = DB::table($this->getTableName($slug));
-        
+
+        if ($forPublic) {
+            $query->whereNull('deleted_at')->where('is_active', 1);
+        }
+
         $this->applySearchFilters($query, $request);
         
         // 목록 개수 설정
@@ -272,16 +277,75 @@ class BoardPostService
 
     /**
      * 게시글 조회
+     * @param bool $forPublic 사용자 페이지용이면 true(삭제/비활성 제외)
      */
-    public function getPost(string $slug, int $postId)
+    public function getPost(string $slug, int $postId, bool $forPublic = false)
     {
-        $post = DB::table($this->getTableName($slug))->where('id', $postId)->first();
-        
+        $query = DB::table($this->getTableName($slug))->where('id', $postId);
+        if ($forPublic) {
+            $query->whereNull('deleted_at')->where('is_active', 1);
+        }
+        $post = $query->first();
+
         if (!$post) {
             return null;
         }
 
         $this->transformSinglePostDates($post);
+        return $post;
+    }
+
+    /**
+     * 이전 글 조회 (목록에서 현재 글 위에 있는 글, 공지·최신순 기준)
+     * @param object $currentPost 현재 글 (id, is_notice, created_at 포함)
+     */
+    public function getPrevPost(string $slug, $currentPost, bool $forPublic = false)
+    {
+        $query = DB::table($this->getTableName($slug))
+            ->where(function ($q) use ($currentPost) {
+                $q->where('is_notice', '>', $currentPost->is_notice ?? 0)
+                    ->orWhere(function ($q2) use ($currentPost) {
+                        $q2->where('is_notice', '=', $currentPost->is_notice ?? 0)
+                            ->where('created_at', '>', $currentPost->created_at);
+                    });
+            })
+            ->orderBy('is_notice', 'asc')
+            ->orderBy('created_at', 'asc')
+            ->limit(1);
+        if ($forPublic) {
+            $query->whereNull('deleted_at')->where('is_active', 1);
+        }
+        $post = $query->first();
+        if ($post) {
+            $this->transformSinglePostDates($post);
+        }
+        return $post;
+    }
+
+    /**
+     * 다음 글 조회 (목록에서 현재 글 아래에 있는 글, 공지·최신순 기준)
+     * @param object $currentPost 현재 글 (id, is_notice, created_at 포함)
+     */
+    public function getNextPost(string $slug, $currentPost, bool $forPublic = false)
+    {
+        $query = DB::table($this->getTableName($slug))
+            ->where(function ($q) use ($currentPost) {
+                $q->where('is_notice', '<', $currentPost->is_notice ?? 0)
+                    ->orWhere(function ($q2) use ($currentPost) {
+                        $q2->where('is_notice', '=', $currentPost->is_notice ?? 0)
+                            ->where('created_at', '<', $currentPost->created_at);
+                    });
+            })
+            ->orderBy('is_notice', 'desc')
+            ->orderBy('created_at', 'desc')
+            ->limit(1);
+        if ($forPublic) {
+            $query->whereNull('deleted_at')->where('is_active', 1);
+        }
+        $post = $query->first();
+        if ($post) {
+            $this->transformSinglePostDates($post);
+        }
         return $post;
     }
 

@@ -1031,6 +1031,7 @@
 	.board_top .right_btns .btn {font-size:12px; line-height:34px; height:36px; padding:0 10px; border-radius:2px;}
 	.board_top .right_btns .btn.flex_center {gap:4px;}
 	.board_search {border-radius:12px; padding:12px; gap:4px;}
+	.board_search form {gap:4px;}
 	.board_search .text,
 	.board_search .btn {height:40px; font-size:12px;}
 	.board_search select {width:80px;}
@@ -1077,6 +1078,7 @@
 /* 게시판 하단 */
 	.board_bottom .paging {gap:6px; margin-top:48px;}
 	.board_bottom .paging a {width:30px; height:30px; line-height:30px; font-size:14px;}
+	.board_bottom .paging span.arrow {width:30px; height:30px; line-height:30px;}
 	.board_bottom .paging .prev {margin-right:6px;}
 	.board_bottom .paging .next {margin-left:6px;}
 /* 게시판 상세 */
