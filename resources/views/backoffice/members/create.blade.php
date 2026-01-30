@@ -251,6 +251,9 @@ document.addEventListener('DOMContentLoaded', function() {
                                         <label for="is_school_representative_n">N</label>
                                     </div>
                                 </div>
+                                @error('is_school_representative')
+                                    <div class="invalid-feedback" style="display:block;color:#c00;font-size:0.875rem;margin-top:0.25rem;">{{ $message }}</div>
+                                @enderror
                             </div>
                         </div>
 

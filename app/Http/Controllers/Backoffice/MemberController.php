@@ -232,11 +232,19 @@ class MemberController extends Controller
     /**
      * 탈퇴회원 복원
      */
-    public function restore(int $id)
+    public function restore(Request $request, int $id)
     {
         $this->memberService->restoreMember($id);
 
-        return redirect()->route('backoffice.withdrawn')
+        if ($request->expectsJson() || $request->ajax()) {
+            return response()->json([
+                'success' => true,
+                'message' => '회원이 복원되었습니다.',
+                'redirect' => route('backoffice.members.index'),
+            ]);
+        }
+
+        return redirect()->route('backoffice.members.index')
             ->with('success', '회원이 복원되었습니다.');
     }
 

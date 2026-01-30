@@ -11,6 +11,7 @@
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script src="{{ asset('js/backoffice/members.js') }}"></script>
 <script>
+$(function() {
 // 탈퇴회원 일괄 영구 삭제
 $(document).on('click', '#btnForceDeleteMultiple', function() {
     const selectedIds = [];
@@ -95,7 +96,7 @@ $(document).on('click', '.btn-force-delete-member', function() {
     });
 });
 
-// 복원
+// 복원 (서버 302 리다이렉트 시 fetch가 POST 유지로 따라가 405 나오므로 redirect: 'manual' 후 302면 이동)
 $(document).on('click', '.btn-restore-member', function() {
     const memberId = $(this).data('id');
     if (!memberId) {
@@ -107,35 +108,45 @@ $(document).on('click', '.btn-restore-member', function() {
         return;
     }
 
-    const token = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
-    
+    const meta = document.querySelector('meta[name="csrf-token"]');
+    const token = meta ? meta.getAttribute('content') : '';
+
     fetch(`/backoffice/withdrawn/${memberId}/restore`, {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
             'X-CSRF-TOKEN': token,
-            'Accept': 'application/json'
+            'Accept': 'application/json',
+            'X-Requested-With': 'XMLHttpRequest'
         },
-        body: JSON.stringify({ _token: token })
+        body: JSON.stringify({ _token: token }),
+        redirect: 'manual'
     })
-    .then(response => {
-        if (response.ok || response.redirected) {
+    .then(function(response) {
+        if (response.type === 'opaqueredirect' || response.status === 302) {
             alert('회원이 복원되었습니다.');
             window.location.href = '/backoffice/members';
             return;
         }
-        return response.json().catch(() => ({ success: false }));
+        if (response.ok) {
+            return response.json().catch(function() { return { success: true, redirect: '/backoffice/members' }; });
+        }
+        return response.json().catch(function() { return { success: false }; });
     })
-    .then(result => {
-        if (result && !result.success) {
-            alert('복원 중 오류가 발생했습니다.');
+    .then(function(result) {
+        if (result && result.success) {
+            alert(result.message || '회원이 복원되었습니다.');
+            window.location.href = result.redirect || '/backoffice/members';
+        } else if (result && !result.success) {
+            alert(result.message || '복원 중 오류가 발생했습니다.');
         }
     })
-    .catch(error => {
+    .catch(function(error) {
         console.error('복원 오류:', error);
         alert('복원 중 오류가 발생했습니다.');
     });
 });
+}); // jQuery ready
 </script>
 @endsection
 
@@ -279,9 +290,12 @@ $(document).on('click', '.btn-restore-member', function() {
                                 <td>{{ $member->withdrawn_at ? $member->withdrawn_at->format('Y.m.d') : '-' }}</td>
                                 <td>
                                     <div class="board-btn-group">
-                                        <button type="button" class="btn btn-success btn-sm btn-restore-member" data-id="{{ $member->id }}">
-                                            <i class="fas fa-undo"></i> 복원
-                                        </button>
+                                        <form method="POST" action="{{ route('backoffice.withdrawn.restore', $member->id) }}" style="display:inline;" onsubmit="return confirm('이 회원을 복원하시겠습니까?\n복원 시 전체회원 목록으로 이동합니다.');">
+                                            @csrf
+                                            <button type="submit" class="btn btn-success btn-sm">
+                                                <i class="fas fa-undo"></i> 복원
+                                            </button>
+                                        </form>
                                         <button type="button" class="btn btn-danger btn-sm btn-force-delete-member" data-id="{{ $member->id }}">
                                             <i class="fas fa-trash"></i> 삭제
                                         </button>

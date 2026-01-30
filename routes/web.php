@@ -96,6 +96,10 @@ Route::prefix('mypage')->name('mypage.')->group(function () {
 Route::prefix('member')->name('member.')->group(function () {
     Route::get('/login', [MemberController::class, 'login'])->name('login');
     Route::get('/join', [MemberController::class, 'join'])->name('join');
+    Route::post('/join', [MemberController::class, 'store'])->name('join.store');
+    Route::post('/check-email', [MemberController::class, 'checkEmail'])->name('check_email');
+    Route::post('/check-phone', [MemberController::class, 'checkPhone'])->name('check_phone');
+    Route::get('/schools', [MemberController::class, 'schools'])->name('schools');
     Route::get('/join_easy', [MemberController::class, 'join_easy'])->name('join_easy');
     Route::get('/join_end', [MemberController::class, 'join_end'])->name('join_end');
     Route::get('/find_id', [MemberController::class, 'find_id'])->name('find_id');

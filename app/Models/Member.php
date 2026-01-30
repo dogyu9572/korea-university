@@ -129,4 +129,36 @@ class Member extends Model
         }
         return $query;
     }
+
+    /**
+     * 휴대폰번호 숫자만 추출 (DB 저장·중복 확인용)
+     */
+    public static function normalizePhone(?string $phone): string
+    {
+        if ($phone === null || $phone === '') {
+            return '';
+        }
+        return preg_replace('/\D/', '', $phone);
+    }
+
+    /**
+     * 휴대폰번호 표시용 포맷 (010-1234-5678 등)
+     */
+    public static function formatPhoneForDisplay(?string $phone): string
+    {
+        if ($phone === null || $phone === '') {
+            return '';
+        }
+        $digits = self::normalizePhone($phone);
+        if (strlen($digits) === 11 && str_starts_with($digits, '010')) {
+            return substr($digits, 0, 3) . '-' . substr($digits, 3, 4) . '-' . substr($digits, 7);
+        }
+        if (strlen($digits) === 10 && str_starts_with($digits, '02')) {
+            return substr($digits, 0, 2) . '-' . substr($digits, 2, 3) . '-' . substr($digits, 5);
+        }
+        if (strlen($digits) === 10) {
+            return substr($digits, 0, 3) . '-' . substr($digits, 3, 3) . '-' . substr($digits, 6);
+        }
+        return $phone;
+    }
 }

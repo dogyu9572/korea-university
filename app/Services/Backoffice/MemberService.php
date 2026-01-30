@@ -77,6 +77,11 @@ class MemberService
             $data['terms_agreed_at'] = now();
         }
 
+        // 휴대폰번호 숫자만 저장
+        if (isset($data['phone_number'])) {
+            $data['phone_number'] = Member::normalizePhone($data['phone_number']);
+        }
+
         return Member::create($data);
     }
 
@@ -96,6 +101,11 @@ class MemberService
 
         // password_confirmation은 저장하지 않음
         unset($data['password_confirmation']);
+
+        // 휴대폰번호 숫자만 저장
+        if (isset($data['phone_number'])) {
+            $data['phone_number'] = Member::normalizePhone($data['phone_number']);
+        }
 
         $member->update($data);
         return $member;
@@ -186,8 +196,9 @@ class MemberService
      */
     public function checkDuplicatePhone(string $phone, ?int $excludeId = null)
     {
+        $phone = Member::normalizePhone($phone);
         $query = Member::where('phone_number', $phone);
-        
+
         if ($excludeId) {
             $query->where('id', '!=', $excludeId);
         }

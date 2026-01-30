@@ -136,6 +136,22 @@ class SchoolService
     }
 
     /**
+     * 회원가입용 회원교 목록 (회원교만, 검색 옵션)
+     */
+    public function getMemberSchoolsForSelect(?string $schoolName = null)
+    {
+        $query = School::query()
+            ->where('is_member_school', true)
+            ->orderBy('school_name');
+
+        if ($schoolName !== null && $schoolName !== '') {
+            $query->searchByName($schoolName);
+        }
+
+        return $query->get(['id', 'school_name', 'branch', 'year']);
+    }
+
+    /**
      * 연도 목록 생성 (1970년부터 현재 연도까지)
      */
     public function getYears(): array

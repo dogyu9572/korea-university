@@ -64,12 +64,13 @@ document.addEventListener('DOMContentLoaded', function() {
     console.log('Form:', memberForm);
     
     const formSubmitBtn = memberForm ? memberForm.querySelector('button[type="submit"]') : null;
-    console.log('Form submit button:', formSubmitBtn);
-    
-    // form 안의 버튼 클릭 이벤트
-    if (formSubmitBtn && memberForm) {
-        formSubmitBtn.addEventListener('click', function(e) {
-            console.log('Form 내부 저장 버튼 클릭됨');
+    const btnMemberFormSubmit = document.getElementById('btnMemberFormSubmit');
+    console.log('Form submit button:', formSubmitBtn || btnMemberFormSubmit);
+
+    // 저장 버튼이 폼 밖에 있을 때: 클릭 시 폼 제출(검증 이벤트 포함)
+    if (btnMemberFormSubmit && memberForm) {
+        btnMemberFormSubmit.addEventListener('click', function() {
+            memberForm.requestSubmit();
         });
     }
     
@@ -379,6 +380,9 @@ document.addEventListener('DOMContentLoaded', function() {
                                         <label for="is_school_representative_n">N</label>
                                     </div>
                                 </div>
+                                @error('is_school_representative')
+                                    <div class="invalid-feedback" style="display:block;color:#c00;font-size:0.875rem;margin-top:0.25rem;">{{ $message }}</div>
+                                @enderror
                             </div>
                         </div>
 
@@ -408,21 +412,21 @@ document.addEventListener('DOMContentLoaded', function() {
                         </div>
                     </div>
                 </div>
-
-                <div class="board-form-actions">
-                    <button type="submit" class="btn btn-primary">
-                        <i class="fas fa-save"></i> 저장
-                    </button>
-                    <form action="{{ route('backoffice.members.destroy', $member->id) }}" method="POST" style="display: inline-block;" onsubmit="return confirm('정말로 삭제하시겠습니까?');">
-                        @csrf
-                        @method('DELETE')
-                        <button type="submit" class="btn btn-danger">
-                            <i class="fas fa-trash"></i> 삭제
-                        </button>
-                    </form>
-                    <a href="{{ route('backoffice.members.index') }}" class="btn btn-secondary">취소</a>
-                </div>
             </form>
+
+            <div class="board-form-actions">
+                <button type="button" id="btnMemberFormSubmit" class="btn btn-primary">
+                    <i class="fas fa-save"></i> 저장
+                </button>
+                <a href="{{ route('backoffice.members.index') }}" class="btn btn-secondary">취소</a>
+                <form action="{{ route('backoffice.members.destroy', $member->id) }}" method="POST" style="display: inline-block; margin: 0;" onsubmit="return confirm('정말로 삭제하시겠습니까?');">
+                    @csrf
+                    @method('DELETE')
+                    <button type="submit" class="btn btn-danger">
+                        <i class="fas fa-trash"></i> 삭제
+                    </button>
+                </form>
+            </div>
         </div>
     </div>
 </div>

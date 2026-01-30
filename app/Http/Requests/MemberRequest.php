@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests;
 
+use App\Models\Member;
 use Illuminate\Foundation\Http\FormRequest;
 
 class MemberRequest extends FormRequest
@@ -83,5 +84,31 @@ class MemberRequest extends FormRequest
             'password.confirmed' => '비밀번호와 비밀번호 확인이 일치하지 않습니다.',
             'password_confirmation.same' => '비밀번호와 비밀번호 확인이 일치하지 않습니다.',
         ];
+    }
+
+    /**
+     * 학교당 대표자 1명 제한: 해당 학교에 이미 대표자가 있으면 에러 (등록/수정 공통)
+     */
+    public function withValidator($validator)
+    {
+        $validator->after(function ($validator) {
+            $isRep = $this->boolean('is_school_representative');
+            $schoolName = trim((string) $this->input('school_name', ''));
+            if (!$isRep || $schoolName === '') {
+                return;
+            }
+            $query = Member::active()
+                ->where('school_name', $schoolName)
+                ->where('is_school_representative', true);
+            if ($this->isMethod('PUT') || $this->isMethod('PATCH')) {
+                $memberId = $this->route('member');
+                if ($memberId) {
+                    $query->where('id', '!=', $memberId);
+                }
+            }
+            if ($query->exists()) {
+                $validator->errors()->add('is_school_representative', '해당 학교의 대표자가 이미 등록되어 있습니다.');
+            }
+        });
     }
 }

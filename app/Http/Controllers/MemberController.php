@@ -2,6 +2,11 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\MemberJoinRequest;
+use App\Services\Backoffice\MemberService;
+use App\Services\Backoffice\SchoolService;
+use Illuminate\Http\Request;
+
 class MemberController extends Controller
 {
     /** 메뉴 메타 (gNum, sNum, gName, sName) - 회원 메뉴 공통 */
@@ -13,6 +18,49 @@ class MemberController extends Controller
             'gName' => '회원',
             'sName' => $sName,
         ];
+    }
+
+    /** 회원가입 처리 */
+    public function store(MemberJoinRequest $request, MemberService $memberService)
+    {
+        $memberService->createMember($request->getMemberData());
+        return redirect()->route('member.join_end')->with('success', '회원가입이 완료되었습니다.');
+    }
+
+    /** 이메일 중복 확인 (AJAX) */
+    public function checkEmail(Request $request, MemberService $memberService)
+    {
+        $email = $request->input('email');
+        if (!$email) {
+            return response()->json(['available' => false, 'message' => '이메일을 입력해 주세요.'], 400);
+        }
+        $exists = $memberService->checkDuplicateEmail($email, null);
+        return response()->json([
+            'available' => !$exists,
+            'message' => $exists ? '이미 사용 중인 이메일입니다.' : '사용 가능한 이메일입니다.',
+        ]);
+    }
+
+    /** 휴대폰 중복 확인 (AJAX) */
+    public function checkPhone(Request $request, MemberService $memberService)
+    {
+        $phone = $request->input('phone');
+        if (!$phone) {
+            return response()->json(['available' => false, 'message' => '휴대폰번호를 입력해 주세요.'], 400);
+        }
+        $exists = $memberService->checkDuplicatePhone($phone, null);
+        return response()->json([
+            'available' => !$exists,
+            'message' => $exists ? '이미 사용 중인 휴대폰번호입니다.' : '사용 가능한 휴대폰번호입니다.',
+        ]);
+    }
+
+    /** 회원가입용 회원교 목록 (AJAX) */
+    public function schools(Request $request, SchoolService $schoolService)
+    {
+        $schoolName = $request->get('school_name');
+        $list = $schoolService->getMemberSchoolsForSelect($schoolName);
+        return response()->json(['schools' => $list]);
     }
 
     public function login()
