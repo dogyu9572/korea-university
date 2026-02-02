@@ -3,26 +3,9 @@
 <main class="sub_wrap pb0">
     
 	<div class="inner">
-		@if($chartContent)
-			<div class="organizational_chart_content">
-				{!! $chartContent !!}
-			</div>
-		@else
-			<div class="organizational_chart">
-				<div class="general">총회</div>
-				<div class="side right">
-					<div class="box">감사</div>
-				</div>
-				<div class="middle box dotc">이사회</div>
-				<div class="head box dotc">회장</div>
-				<div class="side left">
-					<div class="box">고문</div>
-				</div>
-				<div class="btm">
-					<div class="box">사무국</div>
-				</div>
-			</div>
-		@endif
+		<div class="organizational_chart">
+			{!! $chartContent !!}
+		</div>
 	</div>
 	
 	<div class="organizational_list gbox">

@@ -243,7 +243,7 @@ Route::prefix('backoffice')->middleware(['backoffice'])->group(function () {
     Route::get('organizational', [OrganizationalController::class, 'index'])->name('backoffice.organizational.index');
     Route::post('organizational/chart', [OrganizationalController::class, 'updateChart'])->name('backoffice.organizational.update-chart');
     Route::post('organizational-members', [OrganizationalController::class, 'storeMember'])->name('backoffice.organizational.store-member');
-    Route::put('organizational-members/{id}', [OrganizationalController::class, 'updateMember'])->name('backoffice.organizational.update-member');
+    Route::match(['put', 'post'], 'organizational-members/{id}', [OrganizationalController::class, 'updateMember'])->name('backoffice.organizational.update-member');
     Route::delete('organizational-members/{id}', [OrganizationalController::class, 'destroyMember'])->name('backoffice.organizational.destroy-member');
     Route::post('organizational-members/update-order', [OrganizationalController::class, 'updateOrder'])->name('backoffice.organizational.update-order');
 

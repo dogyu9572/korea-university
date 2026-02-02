@@ -18,9 +18,6 @@ document.addEventListener('DOMContentLoaded', function() {
     }
     
     waitForJQuery();
-    
-    // 바닐라 JS 이벤트 핸들러 (안전장치)
-    initVanillaEventHandlers();
 });
 
 // 페이지 초기화
@@ -97,79 +94,17 @@ function initEventHandlers() {
     });
 }
 
-// 바닐라 JS 이벤트 핸들러 (안전장치)
-function initVanillaEventHandlers() {
-    console.log('[DEBUG] initVanillaEventHandlers 함수 호출됨');
-    
-    // 연혁 추가 버튼
-    const btnAddHistory = document.getElementById('btnAddHistory');
-    if (btnAddHistory) {
-        btnAddHistory.addEventListener('click', function(e) {
-            console.log('[DEBUG] 연혁 추가 버튼 클릭 (바닐라 JS)');
-            e.preventDefault();
-            if (typeof $ !== 'undefined') {
-                addHistory();
-            }
-        });
-    }
-    
-    // 연혁 수정/삭제 버튼 (이벤트 위임)
-    document.addEventListener('click', function(e) {
-        // 수정 버튼
-        const saveBtn = e.target.closest('.btn-save-history');
-        if (saveBtn) {
-            console.log('[DEBUG] 연혁 수정 버튼 클릭 (바닐라 JS)');
-            e.preventDefault();
-            e.stopPropagation();
-            
-            if (typeof $ === 'undefined') {
-                alert('jQuery가 로드되지 않았습니다. 페이지를 새로고침해주세요.');
-                return;
-            }
-            
-            const historyId = $(saveBtn).data('id');
-            console.log('[DEBUG] 연혁 ID:', historyId);
-            if (!historyId) {
-                alert('연혁 ID를 찾을 수 없습니다.');
-                return;
-            }
-            
-            updateHistory(historyId);
-            return;
-        }
-        
-        // 삭제 버튼
-        const deleteBtn = e.target.closest('.btn-delete-history');
-        if (deleteBtn) {
-            console.log('[DEBUG] 연혁 삭제 버튼 클릭 (바닐라 JS)');
-            e.preventDefault();
-            e.stopPropagation();
-            
-            if (typeof $ === 'undefined') {
-                return;
-            }
-            
-            const historyId = $(deleteBtn).data('id');
-            console.log('[DEBUG] 연혁 ID:', historyId);
-            if (!historyId) {
-                return;
-            }
-            
-            deleteHistory(historyId);
-            return;
-        }
-    });
-}
-
 // 연혁 추가
 function addHistory() {
     const date = $('#dateInput').val();
+    const dateEnd = $('#dateEndInput').val() || null;
+    const title = ($('#titleInput').val() || '').trim() || null;
     const content = $('#contentInput').val();
     const isVisible = $('#isVisibleInput').val();
 
     // 유효성 검사
     if (!date) {
-        alert('날짜를 선택해주세요.');
+        alert('시작일을 선택해주세요.');
         $('#dateInput').focus();
         return;
     }
@@ -182,6 +117,8 @@ function addHistory() {
 
     const data = {
         date: date,
+        date_end: dateEnd,
+        title: title,
         content: content.trim(),
         is_visible: isVisible,
         _token: document.querySelector('meta[name="csrf-token"]').getAttribute('content')
@@ -250,18 +187,19 @@ function updateHistory(historyId) {
         return;
     }
     
+    const dateEndVal = row.find('.history-date-end').val();
     const data = {
         date: row.find('.history-date').val(),
+        date_end: dateEndVal || null,
+        title: (row.find('.history-title').val() || '').trim() || null,
         content: row.find('.history-content').val(),
         is_visible: row.find('.history-is-visible').val(),
         _token: document.querySelector('meta[name="csrf-token"]').getAttribute('content')
     };
-    
-    console.log('[DEBUG] 수정할 데이터:', data);
 
     // 유효성 검사
     if (!data.date) {
-        alert('날짜를 선택해주세요.');
+        alert('시작일을 선택해주세요.');
         row.find('.history-date').focus();
         return;
     }

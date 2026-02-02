@@ -64,8 +64,16 @@
                             <input type="text" id="yearInput" class="board-form-control" readonly>
                         </div>
                         <div class="board-form-group">
-                            <label class="board-form-label">날짜</label>
+                            <label class="board-form-label">시작일</label>
                             <input type="date" id="dateInput" name="date" class="board-form-control" required>
+                        </div>
+                        <div class="board-form-group">
+                            <label class="board-form-label">종료일</label>
+                            <input type="date" id="dateEndInput" name="date_end" class="board-form-control" placeholder="미입력 시 하루">
+                        </div>
+                        <div class="board-form-group">
+                            <label class="board-form-label">제목</label>
+                            <input type="text" id="titleInput" name="title" class="board-form-control" placeholder="제목 (선택)">
                         </div>
                         <div class="board-form-group">
                             <label class="board-form-label">내용</label>
@@ -98,7 +106,8 @@
                         <tr>
                             <th>No</th>
                             <th>연도</th>
-                            <th>날짜</th>
+                            <th>기간</th>
+                            <th>제목</th>
                             <th>내용</th>
                             <th>노출여부</th>
                             <th>관리</th>
@@ -110,7 +119,11 @@
                                 <td>{{ $histories->count() - $index }}</td>
                                 <td>{{ $history->year }}년</td>
                                 <td>
-                                    <input type="date" class="board-form-control form-control-sm history-date" name="date" value="{{ $history->date->format('Y-m-d') }}">
+                                    <div><input type="date" class="board-form-control form-control-sm history-date" name="date" value="{{ $history->date->format('Y-m-d') }}"></div>
+                                    <div class="mt-1"><input type="date" class="board-form-control form-control-sm history-date-end" name="date_end" value="{{ $history->date_end?->format('Y-m-d') }}"></div>
+                                </td>
+                                <td>
+                                    <input type="text" class="board-form-control form-control-sm history-title" name="title" value="{{ $history->title ?? '' }}" placeholder="제목">
                                 </td>
                                 <td>
                                     <input type="text" class="board-form-control form-control-sm history-content" name="content" value="{{ $history->content }}">
@@ -134,7 +147,7 @@
                             </tr>
                         @empty
                             <tr class="empty-row">
-                                <td colspan="6" class="text-center">등록된 연혁이 없습니다.</td>
+                                <td colspan="7" class="text-center">등록된 연혁이 없습니다.</td>
                             </tr>
                         @endforelse
                     </tbody>

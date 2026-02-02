@@ -46,6 +46,10 @@ class OrganizationalController extends Controller
     {
         $this->organizationalService->createMember($request->validated());
 
+        if ($request->expectsJson() || $request->ajax()) {
+            return response()->json(['success' => true, 'message' => '구성원이 추가되었습니다.']);
+        }
+
         return redirect()->route('backoffice.organizational.index')
             ->with('success', '구성원이 추가되었습니다.');
     }
@@ -57,6 +61,10 @@ class OrganizationalController extends Controller
     {
         $this->organizationalService->updateMember($id, $request->validated());
 
+        if ($request->expectsJson() || $request->ajax()) {
+            return response()->json(['success' => true, 'message' => '구성원 정보가 수정되었습니다.']);
+        }
+
         return redirect()->route('backoffice.organizational.index')
             ->with('success', '구성원 정보가 수정되었습니다.');
     }
@@ -64,9 +72,13 @@ class OrganizationalController extends Controller
     /**
      * 구성원 삭제
      */
-    public function destroyMember($id)
+    public function destroyMember(Request $request, $id)
     {
         $this->organizationalService->deleteMember($id);
+
+        if ($request->expectsJson() || $request->ajax()) {
+            return response()->json(['success' => true, 'message' => '구성원이 삭제되었습니다.']);
+        }
 
         return redirect()->route('backoffice.organizational.index')
             ->with('success', '구성원이 삭제되었습니다.');

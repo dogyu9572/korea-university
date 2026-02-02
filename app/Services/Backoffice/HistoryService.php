@@ -23,10 +23,15 @@ class HistoryService
      */
     public function createHistory(array $data)
     {
-        // 날짜에서 연도 자동 추출
+        // 날짜에서 연도 자동 추출 (시작일 기준)
         if (isset($data['date'])) {
             $date = Carbon::parse($data['date']);
             $data['year'] = $date->year;
+        }
+
+        // date_end 빈 문자열이면 null로 저장
+        if (isset($data['date_end']) && $data['date_end'] === '') {
+            $data['date_end'] = null;
         }
 
         return History::create($data);
@@ -39,10 +44,15 @@ class HistoryService
     {
         $history = History::findOrFail($id);
 
-        // 날짜가 변경된 경우 연도 자동 추출
+        // 날짜가 변경된 경우 연도 자동 추출 (시작일 기준)
         if (isset($data['date'])) {
             $date = Carbon::parse($data['date']);
             $data['year'] = $date->year;
+        }
+
+        // date_end 빈 문자열이면 null로 저장
+        if (isset($data['date_end']) && $data['date_end'] === '') {
+            $data['date_end'] = null;
         }
 
         $history->update($data);

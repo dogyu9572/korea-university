@@ -7,7 +7,9 @@ use Illuminate\Database\Eloquent\Model;
 class History extends Model
 {
     protected $fillable = [
+        'title',
         'date',
+        'date_end',
         'year',
         'content',
         'is_visible',
@@ -15,7 +17,20 @@ class History extends Model
 
     protected $casts = [
         'date' => 'date',
+        'date_end' => 'date',
     ];
+
+    /**
+     * 날짜 표시 (단일일: Y.m.d, 기간: Y.m.d~Y.m.d)
+     */
+    public function getDateDisplayAttribute(): string
+    {
+        $start = $this->date->format('Y.m.d');
+        if (!$this->date_end || $this->date_end->eq($this->date)) {
+            return $start;
+        }
+        return $start . '~' . $this->date_end->format('Y.m.d');
+    }
 
     /**
      * 날짜 기준 내림차순 정렬 스코프

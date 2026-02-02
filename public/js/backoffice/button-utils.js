@@ -57,7 +57,7 @@ class ButtonManager {
         }
 
         // 특정 클래스의 버튼들
-        const skipClasses = ['btn-link', 'dropdown-toggle', 'close', 'modal-close', 'expand-toggle', 'add-first-depth-btn', 'add-group-btn', 'add-category-btn', 'edit-category-btn', 'delete-category-btn'];
+        const skipClasses = ['btn-link', 'dropdown-toggle', 'close', 'modal-close', 'expand-toggle', 'add-first-depth-btn', 'add-group-btn', 'add-category-btn', 'edit-category-btn', 'delete-category-btn', 'btn-save-member', 'btn-delete-member', 'btn-save-new-member', 'btn-cancel-new-member', 'btn-save-history', 'btn-delete-history'];
         if (skipClasses.some(cls => button.classList.contains(cls))) {
             return true;
         }

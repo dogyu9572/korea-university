@@ -23,67 +23,26 @@
 			<button type="button"><p>1992년</p><strong>1999년</strong><img src="/images/history04.jpg" alt=""></button>
 		</div>
 		<div class="daylist">
-			@php
-				// 10년 단위로 그룹화
-				$groupedHistories = [];
-				foreach ($histories as $history) {
-					$year = $history->year;
-					if ($year >= 2020) {
-						$groupedHistories['2020-current'][] = $history;
-					} elseif ($year >= 2010 && $year <= 2019) {
-						$groupedHistories['2010-2019'][] = $history;
-					} elseif ($year >= 2000 && $year <= 2009) {
-						$groupedHistories['2000-2009'][] = $history;
-					} elseif ($year >= 1992 && $year <= 1999) {
-						$groupedHistories['1992-1999'][] = $history;
-					}
-				}
-			@endphp
-			
-			{{-- 현재 ~ 2020년 --}}
+			@foreach($yearRanges as $range)
 			<div class="cont_area">
-				@if(isset($groupedHistories['2020-current']))
-					@foreach($groupedHistories['2020-current'] as $history)
-						<div class="box"><i></i>
-							<div class="day"><strong>{{ $history->date->format('Y.m.d') }}</strong><p>{{ $history->content }}</p></div>
-						</div>
-					@endforeach
-				@endif
+				@forelse($range['histories'] as $history)
+				<div class="box"><i></i>
+					<div class="day"><strong>{{ $history->date_display }}</strong><p>{{ $history->title ?: $history->content }}</p></div>
+					@if($history->content)
+					<ul class="gbox dots_list">
+						@foreach(array_filter(preg_split('/\r\n|\r|\n/', $history->content)) as $line)
+						<li>{{ trim($line) }}</li>
+						@endforeach
+					</ul>
+					@endif
+				</div>
+				@empty
+				<div class="box"><i></i>
+					<div class="day"><strong>—</strong><p>해당 기간 등록된 연혁이 없습니다.</p></div>
+				</div>
+				@endforelse
 			</div>
-			
-			{{-- 2010년 ~ 2019년 --}}
-			<div class="cont_area">
-				@if(isset($groupedHistories['2010-2019']))
-					@foreach($groupedHistories['2010-2019'] as $history)
-						<div class="box"><i></i>
-							<div class="day"><strong>{{ $history->date->format('Y.m.d') }}</strong><p>{{ $history->content }}</p></div>
-						</div>
-					@endforeach
-				@endif
-			</div>
-			
-			{{-- 2000년 ~ 2009년 --}}
-			<div class="cont_area">
-				@if(isset($groupedHistories['2000-2009']))
-					@foreach($groupedHistories['2000-2009'] as $history)
-						<div class="box"><i></i>
-							<div class="day"><strong>{{ $history->date->format('Y.m.d') }}</strong><p>{{ $history->content }}</p></div>
-						</div>
-					@endforeach
-				@endif
-			</div>
-			
-			{{-- 1992년 ~ 1999년 --}}
-			<div class="cont_area">
-				@if(isset($groupedHistories['1992-1999']))
-					@foreach($groupedHistories['1992-1999'] as $history)
-						<div class="box"><i></i>
-							<div class="day"><strong>{{ $history->date->format('Y.m.d') }}</strong><p>{{ $history->content }}</p></div>
-						</div>
-					@endforeach
-				@endif
-			</div>
-			
+			@endforeach
 			<div class="line"><div class="bar"></div></div>
 		</div>
 	</div>

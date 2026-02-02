@@ -144,16 +144,11 @@ function uploadImage(file, editor) {
 
 // 새 구성원 행 추가
 function addNewMemberRow() {
-    const tbody = $('#membersTableBody');
-    
-    if (tbody.length === 0) {
-        return;
-    }
-    
-    // 빈 행 메시지 제거
-    tbody.find('.empty-row').remove();
-    
-    // 새 행은 처음부터 편집 가능한 상태로 추가 (disabled 없음)
+    const tbody = document.getElementById('membersTableBody');
+    if (!tbody) return;
+
+    tbody.querySelectorAll('.empty-row').forEach(el => el.remove());
+
     const newRow = `
         <tr data-id="new" class="new-member-row">
             <td>
@@ -194,53 +189,48 @@ function addNewMemberRow() {
             </td>
         </tr>
     `;
-    
-    tbody.prepend(newRow);
-    
-    // 새 행으로 스크롤
-    const firstRow = tbody.find('tr:first');
-    if (firstRow.length > 0 && firstRow.offset()) {
-        $('html, body').animate({
-            scrollTop: firstRow.offset().top - 100
-        }, 300);
+
+    tbody.insertAdjacentHTML('afterbegin', newRow);
+
+    const firstRow = tbody.querySelector('tr');
+    if (firstRow) {
+        firstRow.scrollIntoView({ behavior: 'smooth', block: 'start' });
     }
 }
 
 
 // 구성원 수정
 function updateMember(memberId) {
-    const row = $(`tr[data-id="${memberId}"]`);
-    
-    if (row.length === 0) {
+    const row = document.querySelector(`tr[data-id="${memberId}"]`);
+    if (!row) {
         showErrorMessage('구성원 정보를 찾을 수 없습니다.');
         return;
     }
-    
+
+    const getVal = (sel) => (row.querySelector(sel)?.value ?? '').trim();
     const data = {
-        category: row.find('.member-category').val(),
-        name: row.find('.member-name').val(),
-        position: row.find('.member-position').val(),
-        affiliation: row.find('.member-affiliation').val(),
-        phone: row.find('.member-phone').val(),
-        sort_order: row.find('.member-sort-order').val() || 0,
-        _token: document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+        category: getVal('.member-category'),
+        name: getVal('.member-name'),
+        position: getVal('.member-position'),
+        affiliation: getVal('.member-affiliation'),
+        phone: getVal('.member-phone'),
+        sort_order: parseInt(row.querySelector('.member-sort-order')?.value, 10) || 0,
+        _token: document.querySelector('meta[name="csrf-token"]')?.getAttribute('content')
     };
 
-    // 필수 필드 검증
-    if (!data.category || data.category.trim() === '') {
+    if (!data.category) {
         alert('분류를 선택해주세요.');
-        row.find('.member-category').focus();
+        row.querySelector('.member-category')?.focus();
         return;
     }
-    
-    if (!data.name || data.name.trim() === '') {
+    if (!data.name) {
         alert('이름을 입력해주세요.');
-        row.find('.member-name').focus();
+        row.querySelector('.member-name')?.focus();
         return;
     }
 
     fetch(`/backoffice/organizational-members/${memberId}`, {
-        method: 'PUT',
+        method: 'POST',
         headers: {
             'Content-Type': 'application/json',
             'X-CSRF-TOKEN': data._token,
@@ -249,18 +239,25 @@ function updateMember(memberId) {
         body: JSON.stringify(data)
     })
     .then(response => {
-        if (response.ok || response.redirected) {
+        if (response.ok) {
+            const contentType = response.headers.get('content-type');
+            if (contentType && contentType.includes('application/json')) {
+                return response.json().then(result => {
+                    showSuccessMessage(result.message || '구성원 정보가 수정되었습니다.');
+                    setTimeout(() => location.reload(), 500);
+                });
+            }
             showSuccessMessage('구성원 정보가 수정되었습니다.');
-            setTimeout(() => {
-                location.reload();
-            }, 1000);
+            setTimeout(() => location.reload(), 500);
             return;
         }
-        return response.json().then(err => {
-            throw new Error(err.message || '수정에 실패했습니다.');
-        }).catch(() => {
-            throw new Error('수정에 실패했습니다.');
-        });
+        if (response.status === 422) {
+            return response.json().then(err => {
+                const msg = err.errors ? Object.values(err.errors).flat().join(' ') : (err.message || '입력값을 확인해주세요.');
+                throw new Error(msg);
+            });
+        }
+        throw new Error('수정에 실패했습니다.');
     })
     .catch(error => {
         showErrorMessage(error.message || '수정 중 오류가 발생했습니다.');
@@ -269,41 +266,30 @@ function updateMember(memberId) {
 
 // 새 구성원 생성
 function createMember(row) {
-    if (!row || row.length === 0) {
+    if (!row || !row.querySelector) {
         showErrorMessage('구성원 정보를 찾을 수 없습니다.');
         return;
     }
-    
-    // 각 필드 값 추출
-    const categorySelect = row.find('.member-category');
-    const nameInput = row.find('.member-name');
-    
-    // select 요소 직접 확인
-    const categorySelectElement = categorySelect[0];
-    const categoryValue = categorySelectElement ? categorySelectElement.value : '';
-    
+
+    const getVal = (sel) => (row.querySelector(sel)?.value ?? '').trim();
     const data = {
-        category: categoryValue || categorySelect.val() || '',
-        name: nameInput.val() || '',
-        position: row.find('.member-position').val() || '',
-        affiliation: row.find('.member-affiliation').val() || '',
-        phone: row.find('.member-phone').val() || '',
-        sort_order: parseInt(row.find('.member-sort-order').val()) || 0,
-        _token: document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+        category: getVal('.member-category'),
+        name: getVal('.member-name'),
+        position: getVal('.member-position'),
+        affiliation: getVal('.member-affiliation'),
+        phone: getVal('.member-phone'),
+        sort_order: parseInt(row.querySelector('.member-sort-order')?.value, 10) || 0,
+        _token: document.querySelector('meta[name="csrf-token"]')?.getAttribute('content')
     };
 
-    // 필수 필드 검증
-    if (!data.category || data.category.trim() === '') {
+    if (!data.category) {
         alert('분류를 선택해주세요.');
-        if (categorySelectElement) {
-            categorySelectElement.focus();
-        }
+        row.querySelector('.member-category')?.focus();
         return;
     }
-    
-    if (!data.name || data.name.trim() === '') {
+    if (!data.name) {
         alert('이름을 입력해주세요.');
-        nameInput.focus();
+        row.querySelector('.member-name')?.focus();
         return;
     }
 
@@ -315,42 +301,28 @@ function createMember(row) {
             'Accept': 'application/json',
             'X-Requested-With': 'XMLHttpRequest'
         },
-        body: JSON.stringify(data),
-        redirect: 'follow'
+        body: JSON.stringify(data)
     })
     .then(response => {
-        // 성공 응답 (200, 201, 302 등)
-        if (response.ok || response.status === 302 || response.redirected) {
+        if (response.ok) {
+            const contentType = response.headers.get('content-type');
+            if (contentType && contentType.includes('application/json')) {
+                return response.json().then(result => {
+                    showSuccessMessage(result.message || '구성원이 추가되었습니다.');
+                    setTimeout(() => location.reload(), 500);
+                });
+            }
             showSuccessMessage('구성원이 추가되었습니다.');
-            setTimeout(() => {
-                location.reload();
-            }, 1000);
+            setTimeout(() => location.reload(), 500);
             return;
         }
-        
-        // JSON 응답 시도
-        const contentType = response.headers.get('content-type');
-        
-        if (contentType && contentType.includes('application/json')) {
-            return response.json().then(result => {
-                showSuccessMessage('구성원이 추가되었습니다.');
-                setTimeout(() => {
-                    location.reload();
-                }, 1000);
-                return result;
-            }).catch(() => {
-                showSuccessMessage('구성원이 추가되었습니다.');
-                setTimeout(() => {
-                    location.reload();
-                }, 1000);
+        if (response.status === 422) {
+            return response.json().then(err => {
+                const msg = err.errors ? Object.values(err.errors).flat().join(' ') : (err.message || '입력값을 확인해주세요.');
+                throw new Error(msg);
             });
         }
-        
-        // HTML 응답인 경우 (리다이렉트)
-        showSuccessMessage('구성원이 추가되었습니다.');
-        setTimeout(() => {
-            location.reload();
-        }, 1000);
+        throw new Error('추가에 실패했습니다.');
     })
     .catch(error => {
         showErrorMessage(error.message || '추가 중 오류가 발생했습니다.');
@@ -369,29 +341,28 @@ function deleteMember(memberId) {
         method: 'DELETE',
         headers: {
             'Content-Type': 'application/json',
-            'X-CSRF-TOKEN': token
+            'X-CSRF-TOKEN': token,
+            'Accept': 'application/json'
         },
-        body: JSON.stringify({
-            _token: token
-        })
+        body: JSON.stringify({ _token: token })
     })
     .then(response => {
-        if (response.ok || response.redirected) {
-            location.reload();
+        if (response.ok) {
+            const contentType = response.headers.get('content-type');
+            if (contentType && contentType.includes('application/json')) {
+                return response.json().then(result => {
+                    showSuccessMessage(result.message || '구성원이 삭제되었습니다.');
+                    setTimeout(() => location.reload(), 500);
+                });
+            }
+            showSuccessMessage('구성원이 삭제되었습니다.');
+            setTimeout(() => location.reload(), 500);
             return;
         }
-        return response.json().catch(() => ({ success: true }));
-    })
-    .then(result => {
-        if (result) {
-            showSuccessMessage('구성원이 삭제되었습니다.');
-            setTimeout(() => {
-                location.reload();
-            }, 1000);
-        }
+        throw new Error('삭제에 실패했습니다.');
     })
     .catch(error => {
-        showErrorMessage('삭제 중 오류가 발생했습니다.');
+        showErrorMessage(error.message || '삭제 중 오류가 발생했습니다.');
     });
 }
 
@@ -429,197 +400,96 @@ function showErrorMessage(message) {
 
 // 페이지 초기화
 function initPage() {
-    console.log('[DEBUG] initPage 함수 호출됨');
-    
     // Summernote 초기화
-    console.log('[DEBUG] Summernote 초기화 시작');
     initSummernote();
     
     // 이벤트 핸들러 등록
     console.log('[DEBUG] 이벤트 핸들러 등록 시작');
     initEventHandlers();
-    console.log('[DEBUG] 이벤트 핸들러 등록 완료');
 }
 
 // 이벤트 핸들러 등록
 function initEventHandlers() {
-    console.log('[DEBUG] initEventHandlers 함수 호출됨');
-    
-    if (typeof $ === 'undefined') {
-        console.error('[DEBUG] jQuery가 로드되지 않았습니다.');
-        return;
-    }
-
-    // 구성원 추가 버튼
-    $(document).on('click', '#btnAddMember', function(e) {
-        e.preventDefault();
-        addNewMemberRow();
-    });
-
-    // 새 구성원 저장 버튼
-    $(document).on('click', '.btn-save-new-member', function(e) {
-        e.preventDefault();
-        e.stopPropagation();
-        const row = $(this).closest('tr');
-        if (row.length === 0) {
-            showErrorMessage('행을 찾을 수 없습니다.');
-            return;
-        }
-        createMember(row);
-    });
-
-    // 새 구성원 취소 버튼
-    $(document).on('click', '.btn-cancel-new-member', function() {
-        const row = $(this).closest('tr');
-        row.remove();
-        
-        // 행이 없으면 빈 행 메시지 표시
-        if ($('#membersTableBody tr').length === 0) {
-            $('#membersTableBody').html('<tr class="empty-row"><td colspan="7" class="text-center">등록된 구성원이 없습니다.</td></tr>');
-        }
-    });
-
-    // 구성원 저장 버튼 (수정 버튼 역할)
-    $(document).on('click', '.btn-save-member', function(e) {
-        e.preventDefault();
-        e.stopPropagation();
-        const memberId = $(this).data('id');
-        if (!memberId) {
-            alert('구성원 ID를 찾을 수 없습니다.');
-            return;
-        }
-        updateMember(memberId);
-    });
-
-    // 구성원 삭제 버튼
-    $(document).on('click', '.btn-delete-member', function(e) {
-        e.preventDefault();
-        e.stopPropagation();
-        const memberId = $(this).data('id');
-        if (!memberId) {
-            alert('구성원 ID를 찾을 수 없습니다.');
-            return;
-        }
-        deleteMember(memberId);
-    });
-
-    // 조직도 폼 제출 전 Summernote 내용 동기화
-    $(document).on('submit', '#chartForm', function(e) {
-        console.log('[DEBUG] 조직도 폼 submit 이벤트 발생');
-        e.preventDefault();
-        
-        // Summernote 내용을 textarea에 동기화
-        if (typeof $('#chartContent').summernote === 'function') {
-            console.log('[DEBUG] Summernote 내용 동기화 중...');
-            const content = $('#chartContent').summernote('code');
-            $('#chartContent').val(content);
-            console.log('[DEBUG] Summernote 내용 동기화 완료, 길이:', content ? content.length : 0);
-        } else {
-            console.log('[DEBUG] Summernote 함수를 찾을 수 없음');
-        }
-        
-        // 폼 제출
-        console.log('[DEBUG] 폼 제출 시도');
-        this.submit();
-    });
-    
-    // 조직도 저장 버튼 클릭
-    $(document).on('click', '#btnSaveChart', function(e) {
-        console.log('[DEBUG] 조직도 저장 버튼 클릭 (jQuery 이벤트)');
-        console.log('[DEBUG] 버튼 요소:', this);
-        e.preventDefault();
-        e.stopPropagation();
-        
-        const form = document.getElementById('chartForm');
-        console.log('[DEBUG] 찾은 폼:', form);
-        if (!form) {
-            console.error('[DEBUG] 폼을 찾을 수 없습니다.');
-            alert('폼을 찾을 수 없습니다.');
-            return;
-        }
-        
-        // Summernote 내용을 textarea에 동기화
-        if (typeof $('#chartContent').summernote === 'function') {
-            console.log('[DEBUG] Summernote 내용 동기화 중...');
-            const content = $('#chartContent').summernote('code');
-            $('#chartContent').val(content);
-            console.log('[DEBUG] Summernote 내용 동기화 완료, 길이:', content ? content.length : 0);
-        } else {
-            console.log('[DEBUG] Summernote 함수를 찾을 수 없음');
-        }
-        
-        // 폼 제출
-        console.log('[DEBUG] 폼 제출 시도');
-        form.submit();
-    });
-}
-
-// DOMContentLoaded 이벤트로 초기화
-document.addEventListener('DOMContentLoaded', function() {
-    console.log('[DEBUG] DOMContentLoaded 이벤트 발생');
-    
-    // jQuery와 Summernote 로드 확인
-    function waitForDependencies() {
-        if (typeof jQuery !== 'undefined' && typeof $ !== 'undefined' && typeof $.fn.summernote !== 'undefined') {
-            console.log('[DEBUG] 모든 의존성 로드 확인됨');
-            console.log('[DEBUG] jQuery 존재:', typeof $ !== 'undefined');
-            console.log('[DEBUG] Summernote 존재:', typeof $.fn.summernote !== 'undefined');
-            
-            // jQuery ready 이벤트로 초기화
-            $(document).ready(function() {
-                console.log('[DEBUG] jQuery ready 이벤트 발생');
-                initPage();
-            });
-        } else {
-            console.log('[DEBUG] 의존성 대기 중... (jQuery:', typeof $ !== 'undefined', ', Summernote:', typeof $.fn !== 'undefined' && typeof $.fn.summernote !== 'undefined', ')');
-            setTimeout(waitForDependencies, 50);
+    function syncSummernoteToTextarea() {
+        if (typeof $ !== 'undefined' && typeof $.fn.summernote !== 'undefined') {
+            const editor = document.getElementById('chartContent');
+            if (editor) editor.value = $(editor).summernote('code');
         }
     }
-    
-    waitForDependencies();
-    
-    // 바닐라 JS 이벤트 핸들러 (안전장치)
-    const btnSaveChart = document.getElementById('btnSaveChart');
-    if (btnSaveChart) {
-        console.log('[DEBUG] 조직도 저장 버튼 요소 찾음 (바닐라 JS)');
-        btnSaveChart.addEventListener('click', function(e) {
-            console.log('[DEBUG] 조직도 저장 버튼 클릭 (바닐라 JS 이벤트)');
-            e.preventDefault();
-            e.stopPropagation();
-            
+
+    document.addEventListener('click', function(e) {
+        const target = e.target.closest('#btnAddMember, .btn-save-new-member, .btn-cancel-new-member, .btn-save-member, .btn-delete-member, #btnSaveChart');
+        if (!target) return;
+
+        e.preventDefault();
+        e.stopPropagation();
+
+        if (target.id === 'btnAddMember') {
+            addNewMemberRow();
+            return;
+        }
+        if (target.classList.contains('btn-save-new-member')) {
+            const row = target.closest('tr');
+            if (row) createMember(row);
+            else showErrorMessage('행을 찾을 수 없습니다.');
+            return;
+        }
+        if (target.classList.contains('btn-cancel-new-member')) {
+            const row = target.closest('tr');
+            if (row) row.remove();
+            const tbody = document.getElementById('membersTableBody');
+            if (tbody && !tbody.querySelector('tr')) {
+                tbody.innerHTML = '<tr class="empty-row"><td colspan="7" class="text-center">등록된 구성원이 없습니다.</td></tr>';
+            }
+            return;
+        }
+        if (target.classList.contains('btn-save-member')) {
+            const memberId = target.dataset.id;
+            if (memberId) updateMember(memberId);
+            else alert('구성원 ID를 찾을 수 없습니다.');
+            return;
+        }
+        if (target.classList.contains('btn-delete-member')) {
+            const memberId = target.dataset.id;
+            if (memberId) deleteMember(memberId);
+            else alert('구성원 ID를 찾을 수 없습니다.');
+            return;
+        }
+        if (target.id === 'btnSaveChart') {
             const form = document.getElementById('chartForm');
             if (!form) {
-                console.error('[DEBUG] 폼을 찾을 수 없습니다.');
                 alert('폼을 찾을 수 없습니다.');
                 return;
             }
-            
-            // Summernote 내용을 textarea에 동기화
-            if (typeof $ !== 'undefined' && typeof $('#chartContent').summernote === 'function') {
-                console.log('[DEBUG] Summernote 내용 동기화 중...');
-                const content = $('#chartContent').summernote('code');
-                $('#chartContent').val(content);
-                console.log('[DEBUG] Summernote 내용 동기화 완료');
-            } else {
-                console.log('[DEBUG] jQuery 또는 Summernote 함수를 찾을 수 없음');
-            }
-            
-            // 폼 제출
-            console.log('[DEBUG] 폼 제출 시도');
+            syncSummernoteToTextarea();
             form.submit();
-        });
-    } else {
-        console.error('[DEBUG] 조직도 저장 버튼을 찾을 수 없습니다.');
-    }
-    
-    // 구성원 추가 버튼 (바닐라 JS)
-    const btnAddMember = document.getElementById('btnAddMember');
-    if (btnAddMember) {
-        btnAddMember.addEventListener('click', function(e) {
+        }
+    });
+
+    const chartFormEl = document.getElementById('chartForm');
+    if (chartFormEl) {
+        chartFormEl.addEventListener('submit', function(e) {
             e.preventDefault();
-            if (typeof $ !== 'undefined') {
-                addNewMemberRow();
-            }
+            syncSummernoteToTextarea();
+            this.submit();
         });
     }
-});
+}
+
+// DOM 준비 여부에 상관없이 초기화 실행
+function initOrganizational() {
+    function waitForDependencies() {
+        if (typeof jQuery !== 'undefined' && typeof $ !== 'undefined' && typeof $.fn.summernote !== 'undefined') {
+            initPage();
+        } else {
+            setTimeout(waitForDependencies, 50);
+        }
+    }
+    waitForDependencies();
+}
+
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initOrganizational);
+} else {
+    initOrganizational();
+}
