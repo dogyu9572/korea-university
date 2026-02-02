@@ -2,10 +2,13 @@
 
 namespace App\Models;
 
+use Illuminate\Auth\Authenticatable;
+use Illuminate\Contracts\Auth\Authenticatable as AuthenticatableContract;
 use Illuminate\Database\Eloquent\Model;
 
-class Member extends Model
+class Member extends Model implements AuthenticatableContract
 {
+    use Authenticatable;
     protected $fillable = [
         'join_type',
         'email',
@@ -160,5 +163,20 @@ class Member extends Model
             return substr($digits, 0, 3) . '-' . substr($digits, 3, 3) . '-' . substr($digits, 6);
         }
         return $phone;
+    }
+
+    /**
+     * 아이디 찾기 결과용 마스킹 (앞 6자만 노출, 나머지는 *로 동일 길이 유지)
+     */
+    public static function maskLoginId(?string $loginId): string
+    {
+        if ($loginId === null || $loginId === '') {
+            return '';
+        }
+        $len = mb_strlen($loginId);
+        if ($len <= 6) {
+            return str_repeat('*', $len);
+        }
+        return mb_substr($loginId, 0, 6) . str_repeat('*', $len - 6);
     }
 }

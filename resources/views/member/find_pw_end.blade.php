@@ -10,7 +10,7 @@
 				<div class="tit mb8">비밀번호 변경이 완료되었습니다.</div>
 				<p>새로운 비밀번호로 로그인을 해주세요.</p>
 				<div class="btns_tac colm mt40">
-					<a href="/member/login" class="btn btn_wbb">로그인</a>
+					<a href="{{ route('member.login') }}" class="btn btn_wbb">로그인</a>
 				</div>
 			</div>
 		</div>

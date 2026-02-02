@@ -35,9 +35,12 @@
 	.header .gnb .snb a {display:block; font-size:18px; color:inherit; font-weight:500; line-height:30px; padding:0 20px; letter-spacing:-.5px;}
 	.header .gnb .snb a + a {margin-top:16px;}
 	.header .gnb .snb a.on {color:#034DA2; font-weight:600;}
-	.header .member {position:absolute; top:0; right:86px; height:100%; gap:16px;}
-	.header .member a {font-size:16px; color:#464C53; line-height:30px; display:flex; align-items:center; gap:6px;}
-	.header .member a:before {content:""; display:block; width:18px; height:30px; background:no-repeat 50% 50%;}
+	.header .member {position:absolute; top:0; right:86px; height:100%; gap:16px; align-items:center;}
+	.header .member form {display:inline-flex; align-items:center; height:100%;}
+	.header .member a,
+	.header .member button.btn_link {font-size:16px; color:#464C53; line-height:30px; display:flex; align-items:center; gap:6px; background:none; border:none; padding:0; cursor:pointer; font:inherit;}
+	.header .member a:before,
+	.header .member button.btn_link:before {content:""; display:block; width:18px; height:30px; background:no-repeat 50% 50%;}
 	.header .member .i1:before {background-image:url('/images/icon_signup.svg');}
 	.header .member .i2:before {background-image:url('/images/icon_login.svg');}
 	.header .btn_menu {position:absolute; top:0; right:20px; width:26px; height:100%; z-index:10;}

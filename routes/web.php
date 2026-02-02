@@ -79,8 +79,8 @@ Route::prefix('about')->name('about.')->group(function () {
     Route::get('/about_institutions', [SubController::class, 'about_institutions'])->name('about_institutions');
 });
 
-// 마이페이지 - MypageController
-Route::prefix('mypage')->name('mypage.')->group(function () {
+// 마이페이지 - MypageController (회원 로그인 필요)
+Route::prefix('mypage')->name('mypage.')->middleware('member')->group(function () {
     Route::get('/application_status', [MypageController::class, 'application_status'])->name('application_status');
     Route::get('/application_status_view', [MypageController::class, 'application_status_view'])->name('application_status_view');
     Route::get('/application_status_view2', [MypageController::class, 'application_status_view2'])->name('application_status_view2');
@@ -95,6 +95,8 @@ Route::prefix('mypage')->name('mypage.')->group(function () {
 // 회원 (로그인/가입/ID·PW 찾기) - MemberController
 Route::prefix('member')->name('member.')->group(function () {
     Route::get('/login', [MemberController::class, 'login'])->name('login');
+    Route::post('/login', [MemberController::class, 'postLogin'])->name('login.post');
+    Route::post('/logout', [MemberController::class, 'logout'])->name('logout');
     Route::get('/join', [MemberController::class, 'join'])->name('join');
     Route::post('/join', [MemberController::class, 'store'])->name('join.store');
     Route::post('/check-email', [MemberController::class, 'checkEmail'])->name('check_email');
@@ -103,9 +105,12 @@ Route::prefix('member')->name('member.')->group(function () {
     Route::get('/join_easy', [MemberController::class, 'join_easy'])->name('join_easy');
     Route::get('/join_end', [MemberController::class, 'join_end'])->name('join_end');
     Route::get('/find_id', [MemberController::class, 'find_id'])->name('find_id');
+    Route::post('/find_id', [MemberController::class, 'postFindId'])->name('find_id.post');
     Route::get('/find_id_end', [MemberController::class, 'find_id_end'])->name('find_id_end');
     Route::get('/find_pw', [MemberController::class, 'find_pw'])->name('find_pw');
+    Route::post('/find_pw', [MemberController::class, 'postFindPw'])->name('find_pw.post');
     Route::get('/find_pw_reset', [MemberController::class, 'find_pw_reset'])->name('find_pw_reset');
+    Route::post('/find_pw_reset', [MemberController::class, 'postFindPwReset'])->name('find_pw_reset.post');
     Route::get('/find_pw_end', [MemberController::class, 'find_pw_end'])->name('find_pw_end');
     Route::get('/pop_search_school', [MemberController::class, 'pop_search_school'])->name('pop_search_school');
 });

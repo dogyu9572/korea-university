@@ -29,6 +29,7 @@
     <!-- jQuery -->
     <script src="//code.jquery.com/jquery-3.7.1.min.js"></script>
     <script src="/js/com.js"></script>
+    <script src="{{ asset('js/phone-input.js') }}"></script>
 </head>
 <body class="ios_safe">
 	@if(isset($gNum) && $gNum !== '99')
@@ -78,8 +79,15 @@
 				</div>
 			</div>
 			<div class="member flex">
-				<a href="/member/join" class="i1">SIGN UP</a>
-				<a href="/member/login" class="i2">LOGIN</a>
+				<a href="{{ route('member.join') }}" class="i1">SIGN UP</a>
+				@auth('member')
+					<form method="POST" action="{{ route('member.logout') }}" class="d-inline">
+						@csrf
+						<button type="submit" class="i2 btn_link">LOGOUT</button>
+					</form>
+				@else
+					<a href="{{ route('member.login') }}" class="i2">LOGIN</a>
+				@endauth
 			</div>
 			<a href="javascript:void(0);" class="btn_menu">
 				<p class="t"></p>
