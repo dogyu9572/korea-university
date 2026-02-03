@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Services\EducationCertificationApplicationService;
 use Illuminate\Http\Request;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 class EducationCertificationController extends Controller
 {
@@ -34,9 +35,18 @@ class EducationCertificationController extends Controller
         ));
     }
 
-    public function application_ec_view()
+    public function application_ec_view(int $id)
     {
-        return view('education_certification.application_ec_view', $this->menuMeta());
+        $education = $this->applicationService->getEducationDetail($id);
+        if (!$education) {
+            throw new NotFoundHttpException();
+        }
+        $viewData = $this->applicationService->prepareEducationDetailView($education);
+
+        return view('education_certification.application_ec_view', array_merge(
+            $this->menuMeta(),
+            compact('education', 'viewData')
+        ));
     }
 
     public function application_ec_apply()
@@ -49,9 +59,32 @@ class EducationCertificationController extends Controller
         return view('education_certification.application_ec_apply_end', $this->menuMeta());
     }
 
-    public function application_ec_view_type2()
+    public function application_ec_view_type2(int $id)
     {
-        return view('education_certification.application_ec_view_type2', $this->menuMeta());
+        $certification = $this->applicationService->getCertificationDetail($id);
+        if (!$certification) {
+            throw new NotFoundHttpException();
+        }
+        $viewData = $this->applicationService->prepareCertificationDetailView($certification);
+
+        return view('education_certification.application_ec_view_type2', array_merge(
+            $this->menuMeta(),
+            compact('certification', 'viewData')
+        ));
+    }
+
+    public function application_ec_view_online(int $id)
+    {
+        $onlineEducation = $this->applicationService->getOnlineEducationDetail($id);
+        if (!$onlineEducation) {
+            throw new NotFoundHttpException();
+        }
+        $viewData = $this->applicationService->prepareOnlineEducationDetailView($onlineEducation);
+
+        return view('education_certification.application_ec_view_online', array_merge(
+            $this->menuMeta(),
+            compact('onlineEducation', 'viewData')
+        ));
     }
 
     public function application_ec_receipt()

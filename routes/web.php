@@ -26,10 +26,11 @@ Route::prefix('education_certification')->name('education_certification.')->grou
     Route::get('/education', [SubController::class, 'education'])->name('education');
     Route::get('/certification', [SubController::class, 'certification'])->name('certification');
     Route::get('/application_ec', [EducationCertificationController::class, 'application_ec'])->name('application_ec');
-    Route::get('/application_ec_view', [EducationCertificationController::class, 'application_ec_view'])->name('application_ec_view');
+    Route::get('/application_ec_view/{id}', [EducationCertificationController::class, 'application_ec_view'])->name('application_ec_view');
     Route::get('/application_ec_apply', [EducationCertificationController::class, 'application_ec_apply'])->name('application_ec_apply');
     Route::get('/application_ec_apply_end', [EducationCertificationController::class, 'application_ec_apply_end'])->name('application_ec_apply_end');
-    Route::get('/application_ec_view_type2', [EducationCertificationController::class, 'application_ec_view_type2'])->name('application_ec_view_type2');
+    Route::get('/application_ec_view_type2/{id}', [EducationCertificationController::class, 'application_ec_view_type2'])->name('application_ec_view_type2');
+    Route::get('/application_ec_view_online/{id}', [EducationCertificationController::class, 'application_ec_view_online'])->name('application_ec_view_online');
     Route::get('/application_ec_receipt', [EducationCertificationController::class, 'application_ec_receipt'])->name('application_ec_receipt');
     Route::get('/application_ec_receipt_end', [EducationCertificationController::class, 'application_ec_receipt_end'])->name('application_ec_receipt_end');
     Route::get('/application_ec_e_learning', [EducationCertificationController::class, 'application_ec_e_learning'])->name('application_ec_e_learning');
