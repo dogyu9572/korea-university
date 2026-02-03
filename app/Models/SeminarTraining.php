@@ -5,12 +5,12 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
-class EducationProgram extends Model
+class SeminarTraining extends Model
 {
-    protected $table = 'education_programs';
+    protected $table = 'seminar_trainings';
 
     protected $fillable = [
-        'education_type',
+        'type',
         'education_class',
         'is_public',
         'application_status',
@@ -21,12 +21,10 @@ class EducationProgram extends Model
         'is_accommodation',
         'location',
         'target',
-        'content',
         'completion_criteria',
         'survey_url',
         'certificate_type',
         'completion_hours',
-        'annual_fee',
         'application_start',
         'application_end',
         'capacity',
@@ -49,9 +47,14 @@ class EducationProgram extends Model
         'refund_single_deadline',
         'refund_no_stay_deadline',
         'refund_same_day_fee',
+        'annual_fee',
         'thumbnail_path',
-        'fee',
-        'is_free',
+        'education_overview',
+        'education_schedule',
+        'fee_info',
+        'refund_policy',
+        'curriculum',
+        'education_notice',
     ];
 
     protected $casts = [
@@ -59,7 +62,6 @@ class EducationProgram extends Model
         'is_accommodation' => 'boolean',
         'capacity_unlimited' => 'boolean',
         'capacity_per_school_unlimited' => 'boolean',
-        'is_free' => 'boolean',
         'payment_methods' => 'array',
         'period_start' => 'date',
         'period_end' => 'date',
@@ -75,32 +77,15 @@ class EducationProgram extends Model
         'refund_single_fee' => 'decimal:2',
         'refund_no_stay_fee' => 'decimal:2',
         'refund_same_day_fee' => 'decimal:2',
-        'fee' => 'decimal:2',
         'annual_fee' => 'decimal:2',
     ];
-
-    /**
-     * 교육 일정 관계
-     */
-    public function schedules(): HasMany
-    {
-        return $this->hasMany(EducationSchedule::class, 'education_program_id')->orderBy('id', 'asc');
-    }
 
     /**
      * 첨부파일 관계
      */
     public function attachments(): HasMany
     {
-        return $this->hasMany(EducationAttachment::class, 'education_program_id')->orderBy('order', 'asc');
-    }
-
-    /**
-     * 강의영상 관계 (온라인 교육 전용)
-     */
-    public function lectures(): HasMany
-    {
-        return $this->hasMany(OnlineEducationLecture::class, 'education_program_id')->orderBy('order', 'asc');
+        return $this->hasMany(SeminarTrainingAttachment::class, 'seminar_training_id')->orderBy('order', 'asc');
     }
 
     /**
@@ -108,6 +93,6 @@ class EducationProgram extends Model
      */
     public function applications(): HasMany
     {
-        return $this->hasMany(EducationApplication::class, 'education_program_id');
+        return $this->hasMany(EducationApplication::class, 'seminar_training_id');
     }
 }

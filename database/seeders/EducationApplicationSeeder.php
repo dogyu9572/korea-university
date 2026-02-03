@@ -3,7 +3,7 @@
 namespace Database\Seeders;
 
 use Illuminate\Database\Seeder;
-use App\Models\EducationProgram;
+use App\Models\Education;
 use App\Models\EducationApplication;
 use App\Models\Member;
 use Carbon\Carbon;
@@ -15,10 +15,7 @@ class EducationApplicationSeeder extends Seeder
      */
     public function run(): void
     {
-        // 정기교육 또는 수시교육 프로그램 가져오기
-        $programs = EducationProgram::whereIn('education_type', ['정기교육', '수시교육'])
-            ->limit(5)
-            ->get();
+        $programs = Education::query()->limit(5)->get();
 
         if ($programs->isEmpty()) {
             $this->command->warn('정기교육 또는 수시교육 프로그램이 없습니다. 먼저 교육 프로그램을 생성해주세요.');
@@ -70,7 +67,7 @@ class EducationApplicationSeeder extends Seeder
 
                 EducationApplication::create([
                     'application_number' => $applicationNumber,
-                    'education_program_id' => $program->id,
+                    'education_id' => $program->id,
                     'member_id' => $member->id,
                     'applicant_name' => $member->name,
                     'affiliation' => $member->school_name,
@@ -168,7 +165,7 @@ class EducationApplicationSeeder extends Seeder
     /**
      * 참가비 계산
      */
-    private function calculateParticipationFee(EducationProgram $program): ?float
+    private function calculateParticipationFee(Education $program): ?float
     {
         $feeTypes = [
             'fee_member_twin',

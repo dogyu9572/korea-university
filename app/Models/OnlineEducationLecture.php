@@ -10,7 +10,7 @@ class OnlineEducationLecture extends Model
     protected $table = 'online_education_lectures';
 
     protected $fillable = [
-        'education_program_id',
+        'online_education_id',
         'lecture_name',
         'instructor_name',
         'lecture_time',
@@ -23,10 +23,10 @@ class OnlineEducationLecture extends Model
     ];
 
     /**
-     * 교육 프로그램 관계
+     * 온라인 교육 관계
      */
-    public function educationProgram(): BelongsTo
+    public function onlineEducation(): BelongsTo
     {
-        return $this->belongsTo(EducationProgram::class, 'education_program_id');
+        return $this->belongsTo(OnlineEducation::class, 'online_education_id');
     }
 }

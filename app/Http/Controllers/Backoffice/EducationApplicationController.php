@@ -6,7 +6,10 @@ use App\Services\Backoffice\EducationApplicationService;
 use App\Services\Backoffice\CategoryService;
 use App\Http\Requests\Backoffice\EducationApplicationStoreRequest;
 use App\Http\Requests\Backoffice\EducationApplicationUpdateRequest;
-use App\Models\EducationProgram;
+use App\Models\Education;
+use App\Models\OnlineEducation;
+use App\Models\Certification;
+use App\Models\SeminarTraining;
 use App\Models\EducationApplication;
 use Illuminate\Http\Request;
 
@@ -64,16 +67,8 @@ class EducationApplicationController extends BaseController
     public function create(Request $request)
     {
         $programId = $request->get('program');
-        $program = null;
-        
-        if ($programId) {
-            $program = EducationProgram::find($programId);
-        }
-
-        $programs = EducationProgram::whereIn('education_type', ['정기교육', '수시교육'])
-            ->orderBy('name', 'asc')
-            ->get();
-
+        $program = $programId ? Education::find($programId) : null;
+        $programs = Education::query()->orderBy('name', 'asc')->get();
         $examVenues = $this->categoryService->getExamVenues();
 
         return $this->view('backoffice.education-applications.create', compact('program', 'programs', 'examVenues'));
@@ -92,22 +87,22 @@ class EducationApplicationController extends BaseController
 
         try {
             $application = $this->educationApplicationService->createApplication($request);
-            $programId = $application->education_program_id;
 
-            $showRoute = $isSeminarTraining ? 'backoffice.seminar-training-applications.show'
-                : ($isCertification ? 'backoffice.certification-applications.show'
-                    : ($isOnline ? 'backoffice.online-education-applications.show' : 'backoffice.education-applications.show'));
+            $indexRoute = $isSeminarTraining ? 'backoffice.seminar-training-applications.index'
+                : ($isCertification ? 'backoffice.certification-applications.index'
+                    : ($isOnline ? 'backoffice.online-education-applications.index' : 'backoffice.education-applications.index'));
             $createRoute = $isSeminarTraining ? 'backoffice.seminar-training-applications.create'
                 : ($isCertification ? 'backoffice.certification-applications.create'
                     : ($isOnline ? 'backoffice.online-education-applications.create' : 'backoffice.education-applications.create'));
 
-            return redirect()->route($showRoute, $programId)
+            return redirect()->route($indexRoute)
                 ->with('success', '교육 신청이 등록되었습니다.');
         } catch (\Exception $e) {
             $createRoute = $isSeminarTraining ? 'backoffice.seminar-training-applications.create'
                 : ($isCertification ? 'backoffice.certification-applications.create'
                     : ($isOnline ? 'backoffice.online-education-applications.create' : 'backoffice.education-applications.create'));
-            return redirect()->route($createRoute, ['program' => $request->education_program_id])
+            $programParam = $request->education_id ?? $request->online_education_id ?? $request->certification_id ?? $request->seminar_training_id;
+            return redirect()->route($createRoute, ['program' => $programParam])
                 ->with('error', '등록 중 오류가 발생했습니다: ' . $e->getMessage())
                 ->withInput();
         }
@@ -130,9 +125,7 @@ class EducationApplicationController extends BaseController
             return $this->view('backoffice.certification-applications.edit', compact('application', 'examVenues'));
         }
         if ($isSeminarTraining) {
-            $programs = EducationProgram::whereIn('education_type', ['세미나', '해외연수'])
-                ->orderBy('name', 'asc')
-                ->get();
+            $programs = SeminarTraining::query()->orderBy('name', 'asc')->get();
             return $this->view('backoffice.seminar-training-applications.edit', compact('application', 'programs'));
         }
         if ($isOnline) {
@@ -161,7 +154,7 @@ class EducationApplicationController extends BaseController
 
         try {
             $application = $this->educationApplicationService->updateApplication($education_application, $request);
-            $programId = $application->education_program_id;
+            $programId = $application->program_id;
 
             return redirect()->route($showRoute, $programId)
                 ->with('success', '교육 신청이 수정되었습니다.');
@@ -173,73 +166,49 @@ class EducationApplicationController extends BaseController
     }
 
     /**
-     * 온라인 교육 신청 등록 폼을 표시합니다. (온라인 전용 뷰)
+     * 온라인 교육 신청 등록 폼을 표시합니다.
      */
     public function onlineCreate(Request $request)
     {
         $programId = $request->get('program');
-        $program = null;
-        
-        if ($programId) {
-            $program = EducationProgram::where('education_type', '온라인교육')->find($programId);
-        }
-
-        $programs = EducationProgram::where('education_type', '온라인교육')
-            ->orderBy('name', 'asc')
-            ->get();
+        $program = $programId ? OnlineEducation::find($programId) : null;
+        $programs = OnlineEducation::query()->orderBy('name', 'asc')->get();
 
         return $this->view('backoffice.online-education-applications.create', compact('program', 'programs'));
     }
 
     /**
-     * 자격증 신청 등록 폼을 표시합니다. (자격증 전용 뷰)
+     * 자격증 신청 등록 폼을 표시합니다.
      */
     public function certificationCreate(Request $request)
     {
         $programId = $request->get('program');
-        $program = null;
-
-        if ($programId) {
-            $program = EducationProgram::where('education_type', '자격증')->find($programId);
-        }
-
-        $programs = EducationProgram::where('education_type', '자격증')
-            ->orderBy('name', 'asc')
-            ->get();
-
+        $program = $programId ? Certification::find($programId) : null;
+        $programs = Certification::query()->orderBy('name', 'asc')->get();
         $examVenues = $this->categoryService->getExamVenues();
 
         return $this->view('backoffice.certification-applications.create', compact('program', 'programs', 'examVenues'));
     }
 
     /**
-     * 세미나/해외연수 신청 등록 폼을 표시합니다. (세미나/해외연수 전용 뷰)
+     * 세미나/해외연수 신청 등록 폼을 표시합니다.
      */
     public function seminarTrainingCreate(Request $request)
     {
         $programId = $request->get('program');
-        $program = null;
-
-        if ($programId) {
-            $program = EducationProgram::whereIn('education_type', ['세미나', '해외연수'])->find($programId);
-        }
-
-        $programs = EducationProgram::whereIn('education_type', ['세미나', '해외연수'])
-            ->orderBy('name', 'asc')
-            ->get();
+        $program = $programId ? SeminarTraining::find($programId) : null;
+        $programs = SeminarTraining::query()->orderBy('name', 'asc')->get();
 
         return $this->view('backoffice.seminar-training-applications.create', compact('program', 'programs'));
     }
 
     /**
-     * 특정 교육 프로그램의 신청 명단을 표시합니다. (신청 인원 없어도 프로그램 정보 + 빈 명단으로 표시)
+     * 특정 교육의 신청 명단을 표시합니다.
      */
     public function show($program, Request $request)
     {
-        $program = EducationProgram::findOrFail($program);
-
-        // 신청 인원이 없어도 빈 목록으로 조회 (404 발생하지 않음)
-        $applications = $this->educationApplicationService->getApplicationList($program->id, $request);
+        $program = Education::findOrFail($program);
+        $applications = $this->educationApplicationService->getApplicationList('education_id', $program->id, $request);
 
         return $this->view('backoffice.education-applications.show', [
             'program' => $program,
@@ -248,13 +217,12 @@ class EducationApplicationController extends BaseController
     }
 
     /**
-     * 특정 온라인 교육 프로그램의 신청 명단을 표시합니다. (온라인 전용 상세 페이지)
+     * 특정 온라인 교육의 신청 명단을 표시합니다.
      */
     public function onlineShow($program, Request $request)
     {
-        $program = EducationProgram::where('education_type', '온라인교육')->findOrFail($program);
-
-        $applications = $this->educationApplicationService->getApplicationList($program->id, $request);
+        $program = OnlineEducation::findOrFail($program);
+        $applications = $this->educationApplicationService->getApplicationList('online_education_id', $program->id, $request);
 
         return $this->view('backoffice.online-education-applications.show', [
             'program' => $program,
@@ -263,13 +231,12 @@ class EducationApplicationController extends BaseController
     }
 
     /**
-     * 특정 자격증 프로그램의 신청 명단을 표시합니다. (자격증 전용 상세 페이지)
+     * 특정 자격증의 신청 명단을 표시합니다.
      */
     public function certificationShow($program, Request $request)
     {
-        $program = EducationProgram::where('education_type', '자격증')->findOrFail($program);
-
-        $applications = $this->educationApplicationService->getApplicationList($program->id, $request);
+        $program = Certification::findOrFail($program);
+        $applications = $this->educationApplicationService->getApplicationList('certification_id', $program->id, $request);
 
         return $this->view('backoffice.certification-applications.show', [
             'program' => $program,
@@ -278,13 +245,12 @@ class EducationApplicationController extends BaseController
     }
 
     /**
-     * 특정 세미나/해외연수 프로그램의 신청 명단을 표시합니다. (세미나/해외연수 전용 상세 페이지)
+     * 특정 세미나/해외연수의 신청 명단을 표시합니다.
      */
     public function seminarTrainingShow($program, Request $request)
     {
-        $program = EducationProgram::whereIn('education_type', ['세미나', '해외연수'])->findOrFail($program);
-
-        $applications = $this->educationApplicationService->getApplicationList($program->id, $request);
+        $program = SeminarTraining::findOrFail($program);
+        $applications = $this->educationApplicationService->getApplicationList('seminar_training_id', $program->id, $request);
 
         return $this->view('backoffice.seminar-training-applications.show', [
             'program' => $program,
@@ -297,7 +263,7 @@ class EducationApplicationController extends BaseController
      */
     public function batchScores(Request $request, $program)
     {
-        $program = EducationProgram::where('education_type', '자격증')->findOrFail($program);
+        $program = Certification::findOrFail($program);
 
         $request->validate([
             'scores' => 'required|array',
@@ -318,21 +284,27 @@ class EducationApplicationController extends BaseController
     }
 
     /**
-     * 교육 프로그램의 접수상태를 업데이트합니다.
+     * 프로그램의 접수상태를 업데이트합니다.
      */
     public function updateStatus($program, Request $request)
     {
-        $program = EducationProgram::findOrFail($program);
-        
+        $routeName = $request->route()->getName();
+        if ($routeName === 'backoffice.seminar-training-applications.update-status') {
+            $program = SeminarTraining::findOrFail($program);
+        } elseif ($routeName === 'backoffice.certification-applications.update-status') {
+            $program = Certification::findOrFail($program);
+        } elseif ($routeName === 'backoffice.online-education-applications.update-status') {
+            $program = OnlineEducation::findOrFail($program);
+        } else {
+            $program = Education::findOrFail($program);
+        }
+
         $request->validate([
             'application_status' => 'required|in:접수중,접수마감,접수예정,비공개',
         ]);
 
-        $program->update([
-            'application_status' => $request->application_status,
-        ]);
+        $program->update(['application_status' => $request->application_status]);
 
-        $routeName = $request->route()->getName();
         $showRoute = $routeName === 'backoffice.seminar-training-applications.update-status'
             ? 'backoffice.seminar-training-applications.show'
             : ($routeName === 'backoffice.certification-applications.update-status'
@@ -386,18 +358,28 @@ class EducationApplicationController extends BaseController
      */
     public function export($program, Request $request)
     {
-        $program = EducationProgram::findOrFail($program);
+        $routeName = $request->route()->getName();
+        if (str_contains($routeName ?? '', 'certification-applications')) {
+            $program = Certification::findOrFail($program);
+            $programColumn = 'certification_id';
+        } elseif (str_contains($routeName ?? '', 'seminar-training-applications')) {
+            $program = SeminarTraining::findOrFail($program);
+            $programColumn = 'seminar_training_id';
+        } elseif (str_contains($routeName ?? '', 'online-education-applications')) {
+            $program = OnlineEducation::findOrFail($program);
+            $programColumn = 'online_education_id';
+        } else {
+            $program = Education::findOrFail($program);
+            $programColumn = 'education_id';
+        }
 
-        // 선택된 항목 ID 배열 (POST 요청일 때)
         $applicationIds = null;
         if ($request->isMethod('POST')) {
             $applicationIds = $request->input('application_ids', []);
-            if (empty($applicationIds)) {
-                $applicationIds = null;
-            }
+            $applicationIds = empty($applicationIds) ? null : $applicationIds;
         }
 
-        $applications = $this->educationApplicationService->exportApplicationsToExcel($program->id, $request, $applicationIds);
+        $applications = $this->educationApplicationService->exportApplicationsToExcel($programColumn, $program->id, $request, $applicationIds);
         $routeName = $request->route()->getName();
         $isCertification = $routeName === 'backoffice.certification-applications.export' || $routeName === 'backoffice.certification-applications.export.get';
         $isSeminarTraining = $routeName === 'backoffice.seminar-training-applications.export' || $routeName === 'backoffice.seminar-training-applications.export.get';
@@ -517,7 +499,7 @@ class EducationApplicationController extends BaseController
      */
     public function destroy(EducationApplication $education_application)
     {
-        $programId = $education_application->education_program_id;
+        $programId = $education_application->program_id;
         $education_application->delete();
 
         $routeName = request()->route()->getName();

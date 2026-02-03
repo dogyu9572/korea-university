@@ -20,8 +20,12 @@ return new class extends Migration
             $table->string('exam_method')->nullable()->comment('시험방식');
             $table->unsignedInteger('passing_score')->nullable()->comment('합격점수 기준');
             $table->text('eligibility')->nullable()->comment('응시자격');
-            $table->text('content')->nullable()->comment('상세내용(에디터 HTML)');
             $table->string('thumbnail_path')->nullable()->comment('썸네일 경로');
+            
+            // 에디터 항목 3개
+            $table->text('exam_overview')->nullable()->comment('시험개요');
+            $table->text('exam_trend')->nullable()->comment('출제경향');
+            $table->text('exam_venue')->nullable()->comment('시험장 정보');
             $table->boolean('is_public')->default(true)->comment('공개(true) / 비공개(false)');
             $table->dateTime('application_start')->nullable()->comment('신청기간 시작');
             $table->dateTime('application_end')->nullable()->comment('신청기간 종료');

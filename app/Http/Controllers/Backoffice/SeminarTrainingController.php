@@ -5,7 +5,7 @@ namespace App\Http\Controllers\Backoffice;
 use App\Http\Requests\Backoffice\SeminarTrainingStoreRequest;
 use App\Http\Requests\Backoffice\SeminarTrainingUpdateRequest;
 use App\Services\Backoffice\SeminarTrainingService;
-use App\Models\EducationProgram;
+use App\Models\SeminarTraining;
 use Illuminate\Http\Request;
 
 class SeminarTrainingController extends BaseController
@@ -22,7 +22,7 @@ class SeminarTrainingController extends BaseController
 
     public function create()
     {
-        $program = new EducationProgram();
+        $program = new SeminarTraining();
         $formData = $this->prepareFormData($program);
         return $this->view('backoffice.seminar-trainings.create', $formData);
     }
@@ -40,22 +40,16 @@ class SeminarTrainingController extends BaseController
         }
     }
 
-    public function edit(EducationProgram $seminar_training)
+    public function edit(SeminarTraining $seminar_training)
     {
-        if (! in_array($seminar_training->education_type, ['세미나', '해외연수'], true)) {
-            abort(404);
-        }
         $seminar_training->load(['attachments']);
         $formData = $this->prepareFormData($seminar_training);
         return $this->view('backoffice.seminar-trainings.edit', $formData);
     }
 
-    public function update(SeminarTrainingUpdateRequest $request, EducationProgram $seminar_training)
+    public function update(SeminarTrainingUpdateRequest $request, SeminarTraining $seminar_training)
     {
         try {
-            if (! in_array($seminar_training->education_type, ['세미나', '해외연수'], true)) {
-                abort(404);
-            }
             $this->seminarTrainingService->update($seminar_training, $request);
             return redirect()->route('backoffice.seminar-trainings.index')
                 ->with('success', '세미나/해외연수가 수정되었습니다.');
@@ -66,12 +60,9 @@ class SeminarTrainingController extends BaseController
         }
     }
 
-    public function destroy(EducationProgram $seminar_training)
+    public function destroy(SeminarTraining $seminar_training)
     {
         try {
-            if (! in_array($seminar_training->education_type, ['세미나', '해외연수'], true)) {
-                abort(404);
-            }
             $this->seminarTrainingService->delete($seminar_training);
             return redirect()->route('backoffice.seminar-trainings.index')
                 ->with('success', '세미나/해외연수가 삭제되었습니다.');
@@ -84,7 +75,7 @@ class SeminarTrainingController extends BaseController
     /**
      * 폼에 필요한 데이터를 준비합니다.
      */
-    private function prepareFormData(EducationProgram $program): array
+    private function prepareFormData(SeminarTraining $program): array
     {
         $isEdit = $program->exists;
         $attachments = $isEdit ? $program->attachments : collect([]);

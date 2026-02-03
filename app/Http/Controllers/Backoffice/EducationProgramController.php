@@ -5,7 +5,7 @@ namespace App\Http\Controllers\Backoffice;
 use App\Http\Requests\Backoffice\EducationProgramStoreRequest;
 use App\Http\Requests\Backoffice\EducationProgramUpdateRequest;
 use App\Services\Backoffice\EducationProgramService;
-use App\Models\EducationProgram;
+use App\Models\Education;
 use Illuminate\Http\Request;
 
 class EducationProgramController extends BaseController
@@ -54,9 +54,9 @@ class EducationProgramController extends BaseController
     /**
      * 교육 프로그램 수정 폼을 표시합니다.
      */
-    public function edit(EducationProgram $educationProgram)
+    public function edit(Education $educationProgram)
     {
-        $educationProgram->load(['schedules', 'attachments']);
+        $educationProgram->load(['attachments']);
         $formData = $this->educationProgramService->getFormData($educationProgram);
         return $this->view('backoffice.education-programs.edit', array_merge(compact('educationProgram'), $formData));
     }
@@ -64,7 +64,7 @@ class EducationProgramController extends BaseController
     /**
      * 교육 프로그램을 수정합니다.
      */
-    public function update(EducationProgramUpdateRequest $request, EducationProgram $educationProgram)
+    public function update(EducationProgramUpdateRequest $request, Education $educationProgram)
     {
         try {
             $this->educationProgramService->update($educationProgram, $request);
@@ -80,7 +80,7 @@ class EducationProgramController extends BaseController
     /**
      * 교육 프로그램을 삭제합니다.
      */
-    public function destroy(EducationProgram $educationProgram)
+    public function destroy(Education $educationProgram)
     {
         try {
             $this->educationProgramService->delete($educationProgram);

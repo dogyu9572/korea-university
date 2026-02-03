@@ -33,14 +33,14 @@
 
 <div class="board-container education-applications">
     <div class="board-header">
-        <a href="{{ route('backoffice.online-education-applications.show', $application->education_program_id) }}" class="btn btn-secondary btn-sm">
+        <a href="{{ route('backoffice.online-education-applications.show', $application->program_id) }}" class="btn btn-secondary btn-sm">
             <i class="fas fa-arrow-left"></i> 목록으로
         </a>
     </div>
 
     <div class="board-card">
         <div class="board-card-body">
-            @include('backoffice.online-education-applications._form', ['isEdit' => true, 'application' => $application, 'program' => $application->educationProgram])
+            @include('backoffice.online-education-applications._form', ['isEdit' => true, 'application' => $application, 'program' => $application->onlineEducation])
         </div>
     </div>
 </div>

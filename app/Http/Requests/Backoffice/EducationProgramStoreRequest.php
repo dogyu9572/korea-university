@@ -20,7 +20,7 @@ class EducationProgramStoreRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'education_type' => 'required|in:정기교육,수시교육,자격증,온라인교육',
+            'education_type' => 'required|in:정기교육,수시교육',
             'education_class' => 'nullable|string|max:255',
             'is_public' => 'nullable|boolean',
             'application_status' => 'required|in:접수중,접수마감,접수예정,비공개',
@@ -61,13 +61,12 @@ class EducationProgramStoreRequest extends FormRequest
             'refund_same_day_fee' => 'nullable|numeric|min:0',
             'thumbnail' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
             'attachments.*' => 'nullable|file|max:10240',
-            'schedules' => 'nullable|array',
-            'schedules.*.class_name' => 'nullable|string|max:255',
-            'schedules.*.schedule_start' => 'nullable|date',
-            'schedules.*.schedule_end' => 'nullable|date',
-            'schedules.*.location' => 'nullable|string|max:255',
-            'schedules.*.capacity' => 'nullable|string|max:255',
-            'schedules.*.note' => 'nullable|string|max:500',
+            'education_overview' => 'nullable|string',
+            'education_schedule' => 'nullable|string',
+            'fee_info' => 'nullable|string',
+            'refund_policy' => 'nullable|string',
+            'curriculum' => 'nullable|string',
+            'education_notice' => 'nullable|string',
         ];
     }
 

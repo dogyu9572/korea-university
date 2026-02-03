@@ -2,7 +2,10 @@
 
 namespace App\Services\Backoffice;
 
-use App\Models\EducationProgram;
+use App\Models\Education;
+use App\Models\OnlineEducation;
+use App\Models\Certification;
+use App\Models\SeminarTraining;
 use App\Models\EducationApplication;
 use App\Models\EducationApplicationAttachment;
 use Illuminate\Http\Request;
@@ -13,68 +16,47 @@ class EducationApplicationService
 {
     /**
      * 교육 신청내역 목록을 조회합니다.
-     * 교육 프로그램별로 신청 인원 수를 집계하여 반환합니다.
-     * 정기교육/수시교육만 조회합니다.
+     * 교육별로 신청 인원 수를 집계하여 반환합니다.
      */
     public function getList(Request $request)
     {
-        $query = EducationProgram::query()
-            ->whereIn('education_type', ['정기교육', '수시교육'])
-            ->withCount('applications as enrolled_count');
-
-        return $this->buildListQuery($query, $request);
+        $query = Education::query()->withCount('applications as enrolled_count');
+        return $this->buildListQuery($query, $request, 'education');
     }
 
     /**
      * 온라인 교육 신청내역 목록을 조회합니다.
-     * 교육 프로그램별로 신청 인원 수를 집계하여 반환합니다.
-     * 온라인교육만 조회합니다.
      */
     public function getOnlineList(Request $request)
     {
-        $query = EducationProgram::query()
-            ->where('education_type', '온라인교육')
-            ->withCount('applications as enrolled_count');
-
-        return $this->buildListQuery($query, $request);
+        $query = OnlineEducation::query()->withCount('applications as enrolled_count');
+        return $this->buildListQuery($query, $request, 'online_education');
     }
 
     /**
      * 세미나/해외연수 신청내역 목록을 조회합니다.
-     * 교육 프로그램별로 신청 인원 수를 집계하여 반환합니다.
-     * education_type = '세미나', '해외연수'만 조회합니다.
      */
     public function getSeminarTrainingList(Request $request)
     {
-        $query = EducationProgram::query()
-            ->whereIn('education_type', ['세미나', '해외연수'])
-            ->withCount('applications as enrolled_count');
-
-        return $this->buildListQuery($query, $request);
+        $query = SeminarTraining::query()->withCount('applications as enrolled_count');
+        return $this->buildListQuery($query, $request, 'seminar_training');
     }
 
     /**
      * 자격증 신청내역 목록을 조회합니다.
-     * 교육 프로그램별로 신청 인원 수를 집계하여 반환합니다.
-     * education_type = '자격증'만 조회합니다.
      */
     public function getCertificationList(Request $request)
     {
-        $query = EducationProgram::query()
-            ->where('education_type', '자격증')
-            ->withCount('applications as enrolled_count');
+        $query = Certification::query()->withCount('applications as enrolled_count');
 
         if ($request->filled('application_status')) {
             $query->where('application_status', $request->application_status);
         }
-        if ($request->filled('education_class')) {
-            $query->where('education_class', $request->education_class);
+        if ($request->filled('exam_date_start')) {
+            $query->where('exam_date', '>=', $request->exam_date_start);
         }
-        if ($request->filled('period_start')) {
-            $query->where('period_start', '>=', $request->period_start);
-        }
-        if ($request->filled('period_end')) {
-            $query->where('period_end', '<=', $request->period_end);
+        if ($request->filled('exam_date_end')) {
+            $query->where('exam_date', '<=', $request->exam_date_end);
         }
         if ($request->filled('name')) {
             $query->where('name', 'like', '%' . $request->name . '%');
@@ -101,7 +83,7 @@ class EducationApplicationService
 
         $count = 0;
         $applications = EducationApplication::query()
-            ->where('education_program_id', $programId)
+            ->where('certification_id', $programId)
             ->whereIn('id', array_keys($scores))
             ->get();
 
@@ -115,28 +97,37 @@ class EducationApplicationService
 
         return $count;
     }
-    private function buildListQuery($query, Request $request)
-    {
 
-        // 접수상태 검색
+    private function buildListQuery($query, Request $request, string $type): \Illuminate\Contracts\Pagination\LengthAwarePaginator
+    {
         if ($request->filled('application_status')) {
             $query->where('application_status', $request->application_status);
         }
 
-        // 교육유형 검색 (사용자가 선택한 경우)
-        if ($request->filled('education_type')) {
+        if ($type === 'education' && $request->filled('education_type')) {
             $query->where('education_type', $request->education_type);
         }
-
-        // 교육기간 검색
-        if ($request->filled('period_start')) {
-            $query->where('period_start', '>=', $request->period_start);
-        }
-        if ($request->filled('period_end')) {
-            $query->where('period_end', '<=', $request->period_end);
+        if ($type === 'seminar_training' && $request->filled('type')) {
+            $query->where('type', $request->type);
         }
 
-        // 신청기간 검색
+        if (in_array($type, ['education', 'online_education', 'seminar_training'])) {
+            if ($request->filled('period_start')) {
+                $query->where('period_start', '>=', $request->period_start);
+            }
+            if ($request->filled('period_end')) {
+                $query->where('period_end', '<=', $request->period_end);
+            }
+        }
+        if ($type === 'certification') {
+            if ($request->filled('period_start')) {
+                $query->where('exam_date', '>=', $request->period_start);
+            }
+            if ($request->filled('period_end')) {
+                $query->where('exam_date', '<=', $request->period_end);
+            }
+        }
+
         if ($request->filled('application_start')) {
             $query->where('application_start', '>=', $request->application_start);
         }
@@ -144,12 +135,10 @@ class EducationApplicationService
             $query->where('application_end', '<=', $request->application_end);
         }
 
-        // 교육명 검색
         if ($request->filled('name')) {
             $query->where('name', 'like', '%' . $request->name . '%');
         }
 
-        // 정렬: 최신순
         $query->orderBy('created_at', 'desc');
 
         $perPage = $request->get('per_page', 20);
@@ -159,22 +148,18 @@ class EducationApplicationService
     }
 
     /**
-     * 특정 교육 프로그램의 신청 명단을 조회합니다.
+     * 특정 프로그램의 신청 명단을 조회합니다.
      */
-    public function getApplicationList(int $educationProgramId, Request $request)
+    public function getApplicationList(string $programColumn, int $programId, Request $request)
     {
         $query = EducationApplication::query()
-            ->where('education_program_id', $educationProgramId)
-            ->with(['member', 'educationProgram']);
+            ->where($programColumn, $programId)
+            ->with(['member', 'education', 'onlineEducation', 'certification', 'seminarTraining']);
 
-        // 결제상태 검색
-        if ($request->filled('payment_status')) {
-            if ($request->payment_status !== '전체') {
-                $query->where('payment_status', $request->payment_status);
-            }
+        if ($request->filled('payment_status') && $request->payment_status !== '전체') {
+            $query->where('payment_status', $request->payment_status);
         }
 
-        // 신청자명/ID 검색
         if ($request->filled('search')) {
             $search = $request->search;
             $query->where(function ($q) use ($search) {
@@ -185,39 +170,28 @@ class EducationApplicationService
             });
         }
 
-        // 정렬: 최신순
         $query->orderBy('application_date', 'desc');
 
-        $perPage = $request->get('per_page', 20);
-
-        return $query->paginate($perPage)->withQueryString();
+        return $query->paginate($request->get('per_page', 20))->withQueryString();
     }
 
     /**
-     * 엑셀 다운로드용 신청 명단 조회 (페이지네이션 없이 전체 조회)
-     * @param int $educationProgramId 교육 프로그램 ID
-     * @param Request $request 요청 객체
-     * @param array|null $applicationIds 선택된 신청 ID 배열 (null이면 전체)
+     * 엑셀 다운로드용 신청 명단 조회
      */
-    public function exportApplicationsToExcel(int $educationProgramId, Request $request, ?array $applicationIds = null)
+    public function exportApplicationsToExcel(string $programColumn, int $programId, Request $request, ?array $applicationIds = null)
     {
         $query = EducationApplication::query()
-            ->where('education_program_id', $educationProgramId)
-            ->with(['member', 'educationProgram']);
+            ->where($programColumn, $programId)
+            ->with(['member', 'education', 'onlineEducation', 'certification', 'seminarTraining']);
 
-        // 선택된 항목만 필터링
         if ($applicationIds !== null && !empty($applicationIds)) {
             $query->whereIn('id', $applicationIds);
         }
 
-        // 결제상태 검색
-        if ($request->filled('payment_status')) {
-            if ($request->payment_status !== '전체') {
-                $query->where('payment_status', $request->payment_status);
-            }
+        if ($request->filled('payment_status') && $request->payment_status !== '전체') {
+            $query->where('payment_status', $request->payment_status);
         }
 
-        // 신청자명/ID 검색
         if ($request->filled('search')) {
             $search = $request->search;
             $query->where(function ($q) use ($search) {
@@ -228,10 +202,7 @@ class EducationApplicationService
             });
         }
 
-        // 정렬: 최신순
-        $query->orderBy('application_date', 'desc');
-
-        return $query->get();
+        return $query->orderBy('application_date', 'desc')->get();
     }
 
     /**
@@ -254,11 +225,11 @@ class EducationApplicationService
     {
         $updated = 0;
         foreach ($applicationIds as $id) {
-            $application = EducationApplication::with('educationProgram')->find($id);
+            $application = EducationApplication::with(['education', 'onlineEducation', 'certification', 'seminarTraining'])->find($id);
             if ($application && !$application->is_completed) {
                 $application->update([
                     'is_completed' => true,
-                    'certificate_number' => $this->generateCertificateNumber(now(), $application->educationProgram),
+                    'certificate_number' => $this->generateCertificateNumber(now(), $application->program),
                 ]);
                 $updated++;
             }
@@ -291,7 +262,7 @@ class EducationApplicationService
      * 이수증(CMP): KUCRA-CMP-연도-일련번호
      * 수료증(CRF): KUCRA-CRF-연도-일련번호
      */
-    private function generateCertificateNumber(\Carbon\Carbon $date, ?EducationProgram $program = null): string
+    private function generateCertificateNumber(\Carbon\Carbon $date, $program = null): string
     {
         $year = $date->format('Y');
         
@@ -380,7 +351,7 @@ class EducationApplicationService
      * 수험표 번호 생성 (KUCRA-EXM-연도-자격코드-회차-일련번호)
      * 자격코드와 회차는 프로그램 정보에서 가져옴
      */
-    private function generateExamTicketNumber(\Carbon\Carbon $date, ?EducationProgram $program = null): string
+    private function generateExamTicketNumber(\Carbon\Carbon $date, $program = null): string
     {
         $year = $date->format('Y');
         
@@ -410,7 +381,10 @@ class EducationApplicationService
         DB::beginTransaction();
         try {
             $data = $request->only([
-                'education_program_id',
+                'education_id',
+                'online_education_id',
+                'certification_id',
+                'seminar_training_id',
                 'member_id',
                 'applicant_name',
                 'affiliation',
@@ -478,25 +452,15 @@ class EducationApplicationService
                 }
             }
 
-            // 교육 프로그램 조회 (수료증 번호 생성 시 필요)
-            $program = EducationProgram::find($data['education_program_id']);
+            $program = $this->resolveProgramFromRequest($request);
 
-            // 교육 유형별 필드 처리
             if ($program) {
-                $educationType = $program->education_type;
-
-                // 온라인교육 전용 필드 처리
-                if ($educationType === '온라인교육') {
-                    // 수강상태 기본값 설정
+                if ($program instanceof \App\Models\OnlineEducation) {
                     if (!isset($data['course_status']) || empty($data['course_status'])) {
                         $data['course_status'] = '접수';
                     }
-                    // 수강률은 계산되거나 별도 업데이트로 처리
                 }
-
-                // 자격증 전용 필드 처리
-                if ($educationType === '자격증') {
-                    // 합격여부가 "합격"이고 자격확인서/합격확인서 번호가 없으면 자동 생성
+                if ($program instanceof \App\Models\Certification) {
                     if (isset($data['pass_status']) && $data['pass_status'] === '합격') {
                         if (!isset($data['qualification_certificate_number']) || empty($data['qualification_certificate_number'])) {
                             $data['qualification_certificate_number'] = $this->generateQualificationCertificateNumber(now());
@@ -505,14 +469,12 @@ class EducationApplicationService
                             $data['pass_confirmation_number'] = $this->generatePassConfirmationNumber(now());
                         }
                     }
-                    // 입금완료 시 수험표 번호 자동 생성
                     if ($data['payment_status'] === '입금완료' && (!isset($data['exam_ticket_number']) || empty($data['exam_ticket_number']))) {
                         $data['exam_ticket_number'] = $this->generateExamTicketNumber(now(), $program);
                     }
                 }
             }
 
-            // 이수 완료 시 수료증 번호 자동 생성
             if ($data['is_completed'] && !$request->has('certificate_number')) {
                 $data['certificate_number'] = $this->generateCertificateNumber(now(), $program);
             }
@@ -619,28 +581,19 @@ class EducationApplicationService
                 }
             }
 
-            // 이수 처리 시 수료증 번호 자동 생성
+            $program = $application->program;
+
             if ($data['is_completed'] && !$application->certificate_number) {
-                $program = $application->educationProgram;
                 $data['certificate_number'] = $this->generateCertificateNumber(now(), $program);
             }
 
-            // 교육 유형별 필드 처리
-            $program = $application->educationProgram;
             if ($program) {
-                $educationType = $program->education_type;
-
-                // 온라인교육 전용 필드 처리
-                if ($educationType === '온라인교육') {
-                    // 수강상태가 없으면 기본값 설정
+                if ($program instanceof \App\Models\OnlineEducation) {
                     if (!isset($data['course_status']) || empty($data['course_status'])) {
                         $data['course_status'] = $application->course_status ?? '접수';
                     }
                 }
-
-                // 자격증 전용 필드 처리
-                if ($educationType === '자격증') {
-                    // 합격여부가 "합격"으로 변경되고 자격확인서/합격확인서 번호가 없으면 자동 생성
+                if ($program instanceof \App\Models\Certification) {
                     if (isset($data['pass_status']) && $data['pass_status'] === '합격' && $application->pass_status !== '합격') {
                         if (!isset($data['qualification_certificate_number']) || empty($data['qualification_certificate_number'])) {
                             $data['qualification_certificate_number'] = $this->generateQualificationCertificateNumber(now());
@@ -649,7 +602,6 @@ class EducationApplicationService
                             $data['pass_confirmation_number'] = $this->generatePassConfirmationNumber(now());
                         }
                     }
-                    // 입금완료로 변경 시 수험표 번호 자동 생성
                     if ($data['payment_status'] === '입금완료' && !$application->exam_ticket_number) {
                         $data['exam_ticket_number'] = $this->generateExamTicketNumber(now(), $program);
                     }
@@ -715,7 +667,27 @@ class EducationApplicationService
      */
     public function getApplication(int $id): EducationApplication
     {
-        return EducationApplication::with(['educationProgram', 'member', 'attachments', 'roommate', 'examVenue'])
+        return EducationApplication::with(['education', 'onlineEducation', 'certification', 'seminarTraining', 'member', 'attachments', 'roommate', 'examVenue'])
             ->findOrFail($id);
+    }
+
+    /**
+     * 요청에서 프로그램 모델을 조회합니다.
+     */
+    private function resolveProgramFromRequest(Request $request)
+    {
+        if ($request->filled('education_id')) {
+            return Education::find($request->education_id);
+        }
+        if ($request->filled('online_education_id')) {
+            return OnlineEducation::find($request->online_education_id);
+        }
+        if ($request->filled('certification_id')) {
+            return Certification::find($request->certification_id);
+        }
+        if ($request->filled('seminar_training_id')) {
+            return SeminarTraining::find($request->seminar_training_id);
+        }
+        return null;
     }
 }

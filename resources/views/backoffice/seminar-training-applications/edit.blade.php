@@ -33,7 +33,7 @@
 
 <div class="board-container education-applications">
     <div class="board-header">
-        <a href="{{ $application->educationProgram ? route('backoffice.seminar-training-applications.show', $application->education_program_id) : route('backoffice.seminar-training-applications.index') }}" class="btn btn-secondary btn-sm">
+        <a href="{{ $application->program ? route('backoffice.seminar-training-applications.show', $application->program_id) : route('backoffice.seminar-training-applications.index') }}" class="btn btn-secondary btn-sm">
             <i class="fas fa-arrow-left"></i> 목록으로
         </a>
     </div>

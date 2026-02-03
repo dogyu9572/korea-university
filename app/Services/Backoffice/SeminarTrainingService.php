@@ -2,9 +2,8 @@
 
 namespace App\Services\Backoffice;
 
-use App\Models\EducationProgram;
-use App\Models\EducationSchedule;
-use App\Models\EducationAttachment;
+use App\Models\SeminarTraining;
+use App\Models\SeminarTrainingAttachment;
 use Illuminate\Http\Request;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Facades\Storage;
@@ -20,10 +19,10 @@ class SeminarTrainingService
      */
     public function getList(Request $request): LengthAwarePaginator
     {
-        $query = EducationProgram::whereIn('education_type', self::TYPES);
+        $query = SeminarTraining::query();
 
-        if ($request->filled('education_type')) {
-            $query->where('education_type', $request->education_type);
+        if ($request->filled('type')) {
+            $query->where('type', $request->type);
         }
         if ($request->filled('application_status')) {
             $query->where('application_status', $request->application_status);
@@ -54,14 +53,14 @@ class SeminarTrainingService
     /**
      * 세미나/해외연수를 생성합니다.
      */
-    public function create(Request $request): EducationProgram
+    public function create(Request $request): SeminarTraining
     {
-        $this->ensureType($request->education_type);
+        $this->ensureType($request->type);
 
         DB::beginTransaction();
         try {
             $data = $request->only([
-                'education_type',
+                'type',
                 'education_class',
                 'is_public',
                 'application_status',
@@ -72,7 +71,12 @@ class SeminarTrainingService
                 'is_accommodation',
                 'location',
                 'target',
-                'content',
+                'education_overview',
+                'education_schedule',
+                'fee_info',
+                'refund_policy',
+                'curriculum',
+                'education_notice',
                 'completion_criteria',
                 'survey_url',
                 'certificate_type',
@@ -121,14 +125,14 @@ class SeminarTrainingService
                 $data['deposit_deadline_days'] = null;
             }
 
-            $program = EducationProgram::create($data);
+            $program = SeminarTraining::create($data);
 
             if ($request->hasFile('attachments')) {
                 $order = 0;
                 foreach ($request->file('attachments') as $file) {
-                    $path = $file->store('education_programs/attachments', 'public');
-                    EducationAttachment::create([
-                        'education_program_id' => $program->id,
+                    $path = $file->store('seminar_trainings/attachments', 'public');
+                    SeminarTrainingAttachment::create([
+                        'seminar_training_id' => $program->id,
                         'path' => Storage::url($path),
                         'name' => $file->getClientOriginalName(),
                         'order' => $order++,
@@ -148,15 +152,15 @@ class SeminarTrainingService
     /**
      * 세미나/해외연수를 수정합니다.
      */
-    public function update(EducationProgram $program, Request $request): EducationProgram
+    public function update(SeminarTraining $program, Request $request): SeminarTraining
     {
         $this->ensureProgramType($program);
-        $this->ensureType($request->education_type);
+        $this->ensureType($request->type);
 
         DB::beginTransaction();
         try {
             $data = $request->only([
-                'education_type',
+                'type',
                 'education_class',
                 'is_public',
                 'application_status',
@@ -167,7 +171,12 @@ class SeminarTrainingService
                 'is_accommodation',
                 'location',
                 'target',
-                'content',
+                'education_overview',
+                'education_schedule',
+                'fee_info',
+                'refund_policy',
+                'curriculum',
+                'education_notice',
                 'completion_criteria',
                 'survey_url',
                 'certificate_type',
@@ -223,8 +232,8 @@ class SeminarTrainingService
                     if (empty($id)) {
                         continue;
                     }
-                    $att = EducationAttachment::find($id);
-                    if ($att && $att->education_program_id === (int) $program->id) {
+                    $att = SeminarTrainingAttachment::find($id);
+                    if ($att && $att->seminar_training_id === (int) $program->id) {
                         $this->deleteFile($att->path);
                         $att->delete();
                     }
@@ -234,9 +243,9 @@ class SeminarTrainingService
                 $maxOrder = (int) $program->attachments()->max('order');
                 $order = $maxOrder + 1;
                 foreach ($request->file('attachments') as $file) {
-                    $path = $file->store('education_programs/attachments', 'public');
-                    EducationAttachment::create([
-                        'education_program_id' => $program->id,
+                    $path = $file->store('seminar_trainings/attachments', 'public');
+                    SeminarTrainingAttachment::create([
+                        'seminar_training_id' => $program->id,
                         'path' => Storage::url($path),
                         'name' => $file->getClientOriginalName(),
                         'order' => $order++,
@@ -256,7 +265,7 @@ class SeminarTrainingService
     /**
      * 세미나/해외연수를 삭제합니다.
      */
-    public function delete(EducationProgram $program): bool
+    public function delete(SeminarTraining $program): bool
     {
         $this->ensureProgramType($program);
 
@@ -284,9 +293,9 @@ class SeminarTrainingService
         }
     }
 
-    private function ensureProgramType(EducationProgram $program): void
+    private function ensureProgramType(SeminarTraining $program): void
     {
-        if (! in_array($program->education_type, self::TYPES, true)) {
+        if (! in_array($program->type, self::TYPES, true)) {
             abort(404);
         }
     }

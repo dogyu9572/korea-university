@@ -2,8 +2,8 @@
 
 namespace App\Services\Backoffice;
 
-use App\Models\EducationProgram;
-use App\Models\EducationAttachment;
+use App\Models\OnlineEducation;
+use App\Models\OnlineEducationAttachment;
 use App\Models\OnlineEducationLecture;
 use App\Models\LectureVideo;
 use Illuminate\Http\Request;
@@ -18,7 +18,7 @@ class OnlineEducationService
      */
     public function getList(Request $request)
     {
-        $query = EducationProgram::where('education_type', '온라인교육');
+        $query = OnlineEducation::query();
 
         // 접수상태 검색
         if ($request->filled('application_status')) {
@@ -58,7 +58,7 @@ class OnlineEducationService
     /**
      * 온라인 교육을 생성합니다.
      */
-    public function create(Request $request): EducationProgram
+    public function create(Request $request): OnlineEducation
     {
         DB::beginTransaction();
         try {
@@ -70,7 +70,12 @@ class OnlineEducationService
                 'period_start',
                 'period_end',
                 'period_time',
-                'content',
+                'education_overview',
+                'education_schedule',
+                'fee_info',
+                'refund_policy',
+                'curriculum',
+                'education_notice',
                 'survey_url',
                 'certificate_type',
                 'completion_hours',
@@ -81,9 +86,6 @@ class OnlineEducationService
                 'is_free',
                 'thumbnail_path',
             ]);
-
-            // 온라인 교육 타입 고정
-            $data['education_type'] = '온라인교육';
 
             $data['application_start'] = $this->buildApplicationDatetime(
                 $request->application_start_date,
@@ -115,8 +117,8 @@ class OnlineEducationService
                 $data['thumbnail_path'] = Storage::url($thumbnailPath);
             }
 
-            // 교육 프로그램 생성
-            $program = EducationProgram::create($data);
+            // 온라인 교육 생성
+            $program = OnlineEducation::create($data);
 
             // 강의영상 저장
             if ($request->has('lectures') && is_array($request->lectures)) {
@@ -124,7 +126,7 @@ class OnlineEducationService
                 foreach ($request->lectures as $lectureData) {
                     if (!empty($lectureData['lecture_name'])) {
                         OnlineEducationLecture::create([
-                            'education_program_id' => $program->id,
+                            'online_education_id' => $program->id,
                             'lecture_name' => $lectureData['lecture_name'],
                             'instructor_name' => $lectureData['instructor_name'] ?? '',
                             'lecture_time' => (int)($lectureData['lecture_time'] ?? 0),
@@ -138,9 +140,9 @@ class OnlineEducationService
             if ($request->hasFile('attachments')) {
                 $order = 0;
                 foreach ($request->file('attachments') as $file) {
-                    $path = $file->store('education_programs/attachments', 'public');
-                    EducationAttachment::create([
-                        'education_program_id' => $program->id,
+                    $path = $file->store('online_educations/attachments', 'public');
+                    OnlineEducationAttachment::create([
+                        'online_education_id' => $program->id,
                         'path' => Storage::url($path),
                         'name' => $file->getClientOriginalName(),
                         'order' => $order++,
@@ -160,7 +162,7 @@ class OnlineEducationService
     /**
      * 온라인 교육을 수정합니다.
      */
-    public function update(EducationProgram $program, Request $request): EducationProgram
+    public function update(OnlineEducation $program, Request $request): OnlineEducation
     {
         DB::beginTransaction();
         try {
@@ -172,7 +174,12 @@ class OnlineEducationService
                 'period_start',
                 'period_end',
                 'period_time',
-                'content',
+                'education_overview',
+                'education_schedule',
+                'fee_info',
+                'refund_policy',
+                'curriculum',
+                'education_notice',
                 'survey_url',
                 'certificate_type',
                 'completion_hours',
@@ -235,7 +242,7 @@ class OnlineEducationService
                 foreach ($request->lectures as $lectureData) {
                     if (!empty($lectureData['lecture_name'])) {
                         OnlineEducationLecture::create([
-                            'education_program_id' => $program->id,
+                            'online_education_id' => $program->id,
                             'lecture_name' => $lectureData['lecture_name'],
                             'instructor_name' => $lectureData['instructor_name'] ?? '',
                             'lecture_time' => (int)($lectureData['lecture_time'] ?? 0),
@@ -251,8 +258,8 @@ class OnlineEducationService
                     if (empty($attachmentId)) {
                         continue;
                     }
-                    $attachment = EducationAttachment::find($attachmentId);
-                    if ($attachment && $attachment->education_program_id == $program->id) {
+                    $attachment = OnlineEducationAttachment::find($attachmentId);
+                    if ($attachment && $attachment->online_education_id == $program->id) {
                         $this->deleteFile($attachment->path);
                         $attachment->delete();
                     }
@@ -264,9 +271,9 @@ class OnlineEducationService
                 $maxOrder = $program->attachments()->max('order') ?? -1;
                 $order = $maxOrder + 1;
                 foreach ($request->file('attachments') as $file) {
-                    $path = $file->store('education_programs/attachments', 'public');
-                    EducationAttachment::create([
-                        'education_program_id' => $program->id,
+                    $path = $file->store('online_educations/attachments', 'public');
+                    OnlineEducationAttachment::create([
+                        'online_education_id' => $program->id,
                         'path' => Storage::url($path),
                         'name' => $file->getClientOriginalName(),
                         'order' => $order++,
@@ -286,7 +293,7 @@ class OnlineEducationService
     /**
      * 온라인 교육을 삭제합니다.
      */
-    public function delete(EducationProgram $program): bool
+    public function delete(OnlineEducation $program): bool
     {
         DB::beginTransaction();
         try {
@@ -362,10 +369,10 @@ class OnlineEducationService
     /**
      * 온라인 교육 폼에 넘길 데이터를 반환합니다. (MVC: 뷰 로직 제거용)
      */
-    public function getFormData(?EducationProgram $program): array
+    public function getFormData(?OnlineEducation $program): array
     {
         $isEdit = $program && $program->exists;
-        $program = $program ?? new EducationProgram();
+        $program = $program ?? new OnlineEducation();
         $attachments = $isEdit ? $program->attachments : collect([]);
         $lectures = $isEdit ? $program->lectures : collect([]);
 

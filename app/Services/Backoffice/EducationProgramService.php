@@ -2,8 +2,7 @@
 
 namespace App\Services\Backoffice;
 
-use App\Models\EducationProgram;
-use App\Models\EducationSchedule;
+use App\Models\Education;
 use App\Models\EducationAttachment;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
@@ -18,8 +17,7 @@ class EducationProgramService
      */
     public function getList(Request $request)
     {
-        $query = EducationProgram::query()
-            ->whereIn('education_type', ['정기교육', '수시교육']);
+        $query = Education::query();
 
         // 접수상태 검색
         if ($request->filled('application_status')) {
@@ -64,7 +62,7 @@ class EducationProgramService
     /**
      * 교육 프로그램을 생성합니다.
      */
-    public function create(Request $request): EducationProgram
+    public function create(Request $request): Education
     {
         DB::beginTransaction();
         try {
@@ -80,7 +78,12 @@ class EducationProgramService
                 'is_accommodation',
                 'location',
                 'target',
-                'content',
+                'education_overview',
+                'education_schedule',
+                'fee_info',
+                'refund_policy',
+                'curriculum',
+                'education_notice',
                 'completion_criteria',
                 'survey_url',
                 'certificate_type',
@@ -135,32 +138,15 @@ class EducationProgramService
             }
 
             // 교육 프로그램 생성
-            $program = EducationProgram::create($data);
-
-            // 교육 일정 저장
-            if ($request->has('schedules') && is_array($request->schedules)) {
-                foreach ($request->schedules as $scheduleData) {
-                    if (!empty($scheduleData['class_name']) || !empty($scheduleData['schedule_start'])) {
-                        EducationSchedule::create([
-                            'education_program_id' => $program->id,
-                            'class_name' => $scheduleData['class_name'] ?? null,
-                            'schedule_start' => $scheduleData['schedule_start'] ?? null,
-                            'schedule_end' => $scheduleData['schedule_end'] ?? null,
-                            'location' => $scheduleData['location'] ?? null,
-                            'capacity' => $scheduleData['capacity'] ?? null,
-                            'note' => $scheduleData['note'] ?? null,
-                        ]);
-                    }
-                }
-            }
+            $program = Education::create($data);
 
             // 첨부파일 저장
             if ($request->hasFile('attachments')) {
                 $order = 0;
                 foreach ($request->file('attachments') as $file) {
-                    $path = $file->store('education_programs/attachments', 'public');
+                    $path = $file->store('educations/attachments', 'public');
                     EducationAttachment::create([
-                        'education_program_id' => $program->id,
+                        'education_id' => $program->id,
                         'path' => Storage::url($path),
                         'name' => $file->getClientOriginalName(),
                         'order' => $order++,
@@ -180,7 +166,7 @@ class EducationProgramService
     /**
      * 교육 프로그램을 수정합니다.
      */
-    public function update(EducationProgram $program, Request $request): EducationProgram
+    public function update(Education $program, Request $request): Education
     {
         DB::beginTransaction();
         try {
@@ -196,7 +182,12 @@ class EducationProgramService
                 'is_accommodation',
                 'location',
                 'target',
-                'content',
+                'education_overview',
+                'education_schedule',
+                'fee_info',
+                'refund_policy',
+                'curriculum',
+                'education_notice',
                 'completion_criteria',
                 'survey_url',
                 'certificate_type',
@@ -265,26 +256,6 @@ class EducationProgramService
             // 교육 프로그램 업데이트
             $program->update($data);
 
-            // 교육 일정 처리 (기존 삭제 후 재생성)
-            if ($request->has('schedules')) {
-                $program->schedules()->delete();
-                if (is_array($request->schedules)) {
-                    foreach ($request->schedules as $scheduleData) {
-                        if (!empty($scheduleData['class_name']) || !empty($scheduleData['schedule_start'])) {
-                            EducationSchedule::create([
-                                'education_program_id' => $program->id,
-                                'class_name' => $scheduleData['class_name'] ?? null,
-                                'schedule_start' => $scheduleData['schedule_start'] ?? null,
-                                'schedule_end' => $scheduleData['schedule_end'] ?? null,
-                                'location' => $scheduleData['location'] ?? null,
-                                'capacity' => $scheduleData['capacity'] ?? null,
-                                'note' => $scheduleData['note'] ?? null,
-                            ]);
-                        }
-                    }
-                }
-            }
-
             // 첨부파일 삭제 처리
             if ($request->has('delete_attachments') && is_array($request->delete_attachments)) {
                 foreach ($request->delete_attachments as $attachmentId) {
@@ -292,7 +263,7 @@ class EducationProgramService
                         continue;
                     }
                     $attachment = EducationAttachment::find($attachmentId);
-                    if ($attachment && $attachment->education_program_id == $program->id) {
+                    if ($attachment && $attachment->education_id == $program->id) {
                         $this->deleteFile($attachment->path);
                         $attachment->delete();
                     }
@@ -304,9 +275,9 @@ class EducationProgramService
                 $maxOrder = $program->attachments()->max('order') ?? -1;
                 $order = $maxOrder + 1;
                 foreach ($request->file('attachments') as $file) {
-                    $path = $file->store('education_programs/attachments', 'public');
+                    $path = $file->store('educations/attachments', 'public');
                     EducationAttachment::create([
-                        'education_program_id' => $program->id,
+                        'education_id' => $program->id,
                         'path' => Storage::url($path),
                         'name' => $file->getClientOriginalName(),
                         'order' => $order++,
@@ -315,7 +286,7 @@ class EducationProgramService
             }
 
             DB::commit();
-            return $program->fresh(['schedules', 'attachments']);
+            return $program->fresh(['attachments']);
         } catch (\Exception $e) {
             DB::rollBack();
             Log::error('교육 프로그램 수정 실패', ['error' => $e->getMessage(), 'program_id' => $program->id]);
@@ -326,7 +297,7 @@ class EducationProgramService
     /**
      * 교육 프로그램을 삭제합니다.
      */
-    public function delete(EducationProgram $program): bool
+    public function delete(Education $program): bool
     {
         DB::beginTransaction();
         try {
@@ -341,7 +312,6 @@ class EducationProgramService
             }
 
             // 관계 데이터 삭제 (cascade로 자동 삭제되지만 명시적으로)
-            $program->schedules()->delete();
             $program->attachments()->delete();
 
             // 프로그램 삭제
@@ -401,10 +371,10 @@ class EducationProgramService
     /**
      * 교육 프로그램 폼에 넘길 데이터를 반환합니다. (MVC: 뷰 로직 제거용)
      */
-    public function getFormData(?EducationProgram $program): array
+    public function getFormData(?Education $program): array
     {
         $isEdit = $program && $program->exists;
-        $program = $program ?? new EducationProgram();
+        $program = $program ?? new Education();
         $attachments = $isEdit ? $program->attachments : collect([]);
 
         $appStart = $program->application_start;

@@ -8,20 +8,20 @@
         @method('PUT')
     @else
         @if($program ?? null)
-            <input type="hidden" name="education_program_id" value="{{ old('education_program_id', $program->id) }}" required>
+            <input type="hidden" name="seminar_training_id" value="{{ old('seminar_training_id', $program->id) }}" required>
         @else
             <div class="member-form-section">
                 <div class="member-form-list">
                     <div class="member-form-row">
                         <label class="member-form-label">교육 프로그램 <span class="required">*</span></label>
                         <div class="member-form-field">
-                            <select name="education_program_id" class="board-form-control @error('education_program_id') is-invalid @enderror" required>
+                            <select name="seminar_training_id" class="board-form-control @error('seminar_training_id') is-invalid @enderror" required>
                                 <option value="">선택해주세요</option>
                                 @foreach($programs ?? [] as $p)
-                                    <option value="{{ $p->id }}" @selected(old('education_program_id') == $p->id)>{{ $p->name }}</option>
+                                    <option value="{{ $p->id }}" @selected(old('seminar_training_id') == $p->id)>{{ $p->name }}</option>
                                 @endforeach
                             </select>
-                            @error('education_program_id')
+                            @error('seminar_training_id')
                                 <div class="invalid-feedback">{{ $message }}</div>
                             @enderror
                         </div>
@@ -451,8 +451,8 @@
             <i class="fas fa-save"></i> 저장
         </button>
         @php
-            $listUrl = $isEdit && $app?->educationProgram
-                ? route('backoffice.seminar-training-applications.show', $app->education_program_id)
+            $listUrl = $isEdit && $app?->program
+                ? route('backoffice.seminar-training-applications.show', $app->program_id)
                 : (($program ?? null) ? route('backoffice.seminar-training-applications.show', $program->id) : route('backoffice.seminar-training-applications.index'));
         @endphp
         <a href="{{ $listUrl }}" class="btn btn-secondary">목록</a>

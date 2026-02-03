@@ -8,20 +8,20 @@
         @method('PUT')
     @else
         @if($program)
-            <input type="hidden" name="education_program_id" value="{{ old('education_program_id', $program->id) }}" required>
+            <input type="hidden" name="online_education_id" value="{{ old('online_education_id', $program->id) }}" required>
         @else
             <div class="member-form-section">
                 <div class="member-form-list">
                     <div class="member-form-row">
                         <label class="member-form-label">교육 프로그램 <span class="required">*</span></label>
                         <div class="member-form-field">
-                            <select name="education_program_id" class="board-form-control @error('education_program_id') is-invalid @enderror" required>
+                            <select name="online_education_id" class="board-form-control @error('online_education_id') is-invalid @enderror" required>
                                 <option value="">선택해주세요</option>
                                 @foreach($programs ?? [] as $p)
-                                    <option value="{{ $p->id }}" @selected(old('education_program_id') == $p->id)>{{ $p->name }}</option>
+                                    <option value="{{ $p->id }}" @selected(old('online_education_id') == $p->id)>{{ $p->name }}</option>
                                 @endforeach
                             </select>
-                            @error('education_program_id')
+                            @error('online_education_id')
                                 <div class="invalid-feedback">{{ $message }}</div>
                             @enderror
                         </div>
@@ -429,6 +429,6 @@
         <button type="submit" class="btn btn-primary">
             <i class="fas fa-save"></i> 저장
         </button>
-        <a href="{{ $isEdit ? route('backoffice.online-education-applications.show', $app?->education_program_id) : ($program ? route('backoffice.online-education-applications.show', $program->id) : route('backoffice.online-education-applications.index')) }}" class="btn btn-secondary">목록</a>
+        <a href="{{ $isEdit ? route('backoffice.online-education-applications.show', $app?->program_id) : ($program ? route('backoffice.online-education-applications.show', $program->id) : route('backoffice.online-education-applications.index')) }}" class="btn btn-secondary">목록</a>
     </div>
 </form>

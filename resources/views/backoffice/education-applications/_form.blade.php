@@ -7,7 +7,7 @@
     @if($isEdit)
         @method('PUT')
     @else
-        <input type="hidden" name="education_program_id" value="{{ old('education_program_id', $program?->id) }}" required>
+        <input type="hidden" name="education_id" value="{{ old('education_id', $program?->id) }}" required>
     @endif
 
     <!-- 신청자 정보 (정기/수시/자격증/세미나) -->
@@ -583,6 +583,6 @@
         <button type="submit" class="btn btn-primary">
             <i class="fas fa-save"></i> 저장
         </button>
-        <a href="{{ $isEdit ? route('backoffice.education-applications.show', $app?->education_program_id) : ($program ? route('backoffice.education-applications.show', $program->id) : route('backoffice.education-applications.index')) }}" class="btn btn-secondary">취소</a>
+        <a href="{{ $isEdit ? route('backoffice.education-applications.show', $app?->program_id) : ($program ? route('backoffice.education-applications.show', $program->id) : route('backoffice.education-applications.index')) }}" class="btn btn-secondary">취소</a>
     </div>
 </form>

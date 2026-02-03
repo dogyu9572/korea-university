@@ -5,7 +5,7 @@ namespace App\Http\Controllers\Backoffice;
 use App\Http\Requests\Backoffice\OnlineEducationStoreRequest;
 use App\Http\Requests\Backoffice\OnlineEducationUpdateRequest;
 use App\Services\Backoffice\OnlineEducationService;
-use App\Models\EducationProgram;
+use App\Models\OnlineEducation;
 use Illuminate\Http\Request;
 
 class OnlineEducationController extends BaseController
@@ -54,12 +54,8 @@ class OnlineEducationController extends BaseController
     /**
      * 온라인 교육 수정 폼을 표시합니다.
      */
-    public function edit(EducationProgram $onlineEducation)
+    public function edit(OnlineEducation $onlineEducation)
     {
-        if ($onlineEducation->education_type !== '온라인교육') {
-            abort(404);
-        }
-
         $onlineEducation->load(['lectures', 'attachments']);
         $formData = $this->onlineEducationService->getFormData($onlineEducation);
         return $this->view('backoffice.online-educations.edit', array_merge(compact('onlineEducation'), $formData));
@@ -68,14 +64,9 @@ class OnlineEducationController extends BaseController
     /**
      * 온라인 교육을 수정합니다.
      */
-    public function update(OnlineEducationUpdateRequest $request, EducationProgram $onlineEducation)
+    public function update(OnlineEducationUpdateRequest $request, OnlineEducation $onlineEducation)
     {
         try {
-            // 온라인 교육인지 확인
-            if ($onlineEducation->education_type !== '온라인교육') {
-                abort(404);
-            }
-            
             $this->onlineEducationService->update($onlineEducation, $request);
             return redirect()->route('backoffice.online-educations.index')
                 ->with('success', '온라인 교육이 수정되었습니다.');
@@ -89,14 +80,9 @@ class OnlineEducationController extends BaseController
     /**
      * 온라인 교육을 삭제합니다.
      */
-    public function destroy(EducationProgram $onlineEducation)
+    public function destroy(OnlineEducation $onlineEducation)
     {
         try {
-            // 온라인 교육인지 확인
-            if ($onlineEducation->education_type !== '온라인교육') {
-                abort(404);
-            }
-            
             $this->onlineEducationService->delete($onlineEducation);
             return redirect()->route('backoffice.online-educations.index')
                 ->with('success', '온라인 교육이 삭제되었습니다.');

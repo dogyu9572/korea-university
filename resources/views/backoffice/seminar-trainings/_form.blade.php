@@ -13,15 +13,15 @@
                 <div class="member-form-field">
                     <div class="board-radio-group">
                         <div class="board-radio-item">
-                            <input type="radio" id="education_type_seminar" name="education_type" value="세미나" class="board-radio-input" @checked(old('education_type', $program->education_type ?? '') == '세미나') required>
-                            <label for="education_type_seminar">세미나</label>
+                            <input type="radio" id="type_seminar" name="type" value="세미나" class="board-radio-input" @checked(old('type', $program->type ?? '') == '세미나') required>
+                            <label for="type_seminar">세미나</label>
                         </div>
                         <div class="board-radio-item">
-                            <input type="radio" id="education_type_overseas" name="education_type" value="해외연수" class="board-radio-input" @checked(old('education_type', $program->education_type ?? '') == '해외연수')>
-                            <label for="education_type_overseas">해외연수</label>
+                            <input type="radio" id="type_overseas" name="type" value="해외연수" class="board-radio-input" @checked(old('type', $program->type ?? '') == '해외연수')>
+                            <label for="type_overseas">해외연수</label>
                         </div>
                     </div>
-                    @error('education_type')
+                    @error('type')
                         <div class="invalid-feedback">{{ $message }}</div>
                     @enderror
                 </div>
@@ -93,10 +93,60 @@
             </div>
 
             <div class="member-form-row">
-                <label class="member-form-label">상세내용</label>
+                <label class="member-form-label">교육 개요</label>
                 <div class="member-form-field">
-                    <textarea class="board-form-control board-form-textarea summernote-editor" id="content" name="content" rows="10">{{ old('content', $program->content ?? '') }}</textarea>
-                    @error('content')
+                    <textarea class="board-form-control board-form-textarea summernote-editor" id="education_overview" name="education_overview" rows="10">{{ old('education_overview', $program->education_overview ?? '') }}</textarea>
+                    @error('education_overview')
+                        <div class="invalid-feedback">{{ $message }}</div>
+                    @enderror
+                </div>
+            </div>
+
+            <div class="member-form-row">
+                <label class="member-form-label">교육일정</label>
+                <div class="member-form-field">
+                    <textarea class="board-form-control board-form-textarea summernote-editor" id="education_schedule" name="education_schedule" rows="10">{{ old('education_schedule', $program->education_schedule ?? '') }}</textarea>
+                    @error('education_schedule')
+                        <div class="invalid-feedback">{{ $message }}</div>
+                    @enderror
+                </div>
+            </div>
+
+            <div class="member-form-row">
+                <label class="member-form-label">참가비 및 납부안내</label>
+                <div class="member-form-field">
+                    <textarea class="board-form-control board-form-textarea summernote-editor" id="fee_info" name="fee_info" rows="10">{{ old('fee_info', $program->fee_info ?? '') }}</textarea>
+                    @error('fee_info')
+                        <div class="invalid-feedback">{{ $message }}</div>
+                    @enderror
+                </div>
+            </div>
+
+            <div class="member-form-row">
+                <label class="member-form-label">취소 및 환불규정</label>
+                <div class="member-form-field">
+                    <textarea class="board-form-control board-form-textarea summernote-editor" id="refund_policy" name="refund_policy" rows="10">{{ old('refund_policy', $program->refund_policy ?? '') }}</textarea>
+                    @error('refund_policy')
+                        <div class="invalid-feedback">{{ $message }}</div>
+                    @enderror
+                </div>
+            </div>
+
+            <div class="member-form-row">
+                <label class="member-form-label">교과내용</label>
+                <div class="member-form-field">
+                    <textarea class="board-form-control board-form-textarea summernote-editor" id="curriculum" name="curriculum" rows="10">{{ old('curriculum', $program->curriculum ?? '') }}</textarea>
+                    @error('curriculum')
+                        <div class="invalid-feedback">{{ $message }}</div>
+                    @enderror
+                </div>
+            </div>
+
+            <div class="member-form-row">
+                <label class="member-form-label">교육안내</label>
+                <div class="member-form-field">
+                    <textarea class="board-form-control board-form-textarea summernote-editor" id="education_notice" name="education_notice" rows="10">{{ old('education_notice', $program->education_notice ?? '') }}</textarea>
+                    @error('education_notice')
                         <div class="invalid-feedback">{{ $message }}</div>
                     @enderror
                 </div>

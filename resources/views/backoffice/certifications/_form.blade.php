@@ -113,10 +113,30 @@
             </div>
 
             <div class="member-form-row">
-                <label class="member-form-label">상세내용</label>
+                <label class="member-form-label">시험개요</label>
                 <div class="member-form-field">
-                    <textarea class="board-form-control board-form-textarea summernote-editor" id="content" name="content" rows="10">{{ old('content', $cert->content) }}</textarea>
-                    @error('content')
+                    <textarea class="board-form-control board-form-textarea summernote-editor" id="exam_overview" name="exam_overview" rows="10">{{ old('exam_overview', $cert->exam_overview) }}</textarea>
+                    @error('exam_overview')
+                        <div class="invalid-feedback">{{ $message }}</div>
+                    @enderror
+                </div>
+            </div>
+
+            <div class="member-form-row">
+                <label class="member-form-label">출제경향</label>
+                <div class="member-form-field">
+                    <textarea class="board-form-control board-form-textarea summernote-editor" id="exam_trend" name="exam_trend" rows="10">{{ old('exam_trend', $cert->exam_trend) }}</textarea>
+                    @error('exam_trend')
+                        <div class="invalid-feedback">{{ $message }}</div>
+                    @enderror
+                </div>
+            </div>
+
+            <div class="member-form-row">
+                <label class="member-form-label">시험장 정보</label>
+                <div class="member-form-field">
+                    <textarea class="board-form-control board-form-textarea summernote-editor" id="exam_venue" name="exam_venue" rows="10">{{ old('exam_venue', $cert->exam_venue) }}</textarea>
+                    @error('exam_venue')
                         <div class="invalid-feedback">{{ $message }}</div>
                     @enderror
                 </div>

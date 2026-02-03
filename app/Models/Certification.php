@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Certification extends Model
 {
@@ -16,7 +17,6 @@ class Certification extends Model
         'exam_method',
         'passing_score',
         'eligibility',
-        'content',
         'thumbnail_path',
         'is_public',
         'application_start',
@@ -27,6 +27,9 @@ class Certification extends Model
         'payment_methods',
         'deposit_account',
         'deposit_deadline_days',
+        'exam_overview',
+        'exam_trend',
+        'exam_venue',
     ];
 
     protected $casts = [
@@ -41,4 +44,20 @@ class Certification extends Model
         'capacity' => 'integer',
         'deposit_deadline_days' => 'integer',
     ];
+
+    /**
+     * 첨부파일 관계
+     */
+    public function attachments(): HasMany
+    {
+        return $this->hasMany(CertificationAttachment::class, 'certification_id')->orderBy('order', 'asc');
+    }
+
+    /**
+     * 자격증 신청 관계
+     */
+    public function applications(): HasMany
+    {
+        return $this->hasMany(EducationApplication::class, 'certification_id');
+    }
 }

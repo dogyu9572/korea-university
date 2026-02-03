@@ -9,16 +9,17 @@
             return;
         }
 
-        const $editor = $('#content');
-        if ($editor.length === 0) {
+        const $editors = $('.summernote-editor');
+        if ($editors.length === 0) {
             return;
         }
 
-        if ($editor.data('summernote')) {
-            $editor.summernote('destroy');
-        }
-
-        $editor.summernote({
+        $editors.each(function() {
+            const $editor = $(this);
+            if ($editor.data('summernote')) {
+                $editor.summernote('destroy');
+            }
+            $editor.summernote({
             height: 400,
             toolbar: [
                 ['style', ['style']],
@@ -36,6 +37,7 @@
                     uploadImage(files[0], this);
                 }
             }
+            });
         });
     }
 
@@ -70,15 +72,17 @@
         if (typeof $ === 'undefined' || typeof $.fn.summernote === 'undefined') {
             return;
         }
-        const $editor = $('#content');
-        if ($editor.length && $editor.summernote) {
-            try {
-                const code = $editor.summernote('code');
-                $editor.val(code != null ? code : '');
-            } catch (e) {
-                console.error('Summernote 동기화 실패:', e);
+        $('.summernote-editor').each(function() {
+            const $editor = $(this);
+            if ($editor.data('summernote')) {
+                try {
+                    const code = $editor.summernote('code');
+                    $editor.val(code != null ? code : '');
+                } catch (e) {
+                    console.error('Summernote 동기화 실패:', e);
+                }
             }
-        }
+        });
     }
 
     // 썸네일 삭제 버튼 처리

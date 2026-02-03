@@ -12,7 +12,10 @@ class EducationApplication extends Model
 
     protected $fillable = [
         'application_number',
-        'education_program_id',
+        'education_id',
+        'online_education_id',
+        'certification_id',
+        'seminar_training_id',
         'member_id',
         'applicant_name',
         'affiliation',
@@ -74,11 +77,54 @@ class EducationApplication extends Model
     ];
 
     /**
-     * 교육 프로그램 관계
+     * 교육 관계 (정기/수시)
      */
-    public function educationProgram(): BelongsTo
+    public function education(): BelongsTo
     {
-        return $this->belongsTo(EducationProgram::class, 'education_program_id');
+        return $this->belongsTo(Education::class, 'education_id');
+    }
+
+    /**
+     * 온라인교육 관계
+     */
+    public function onlineEducation(): BelongsTo
+    {
+        return $this->belongsTo(OnlineEducation::class, 'online_education_id');
+    }
+
+    /**
+     * 자격증 관계
+     */
+    public function certification(): BelongsTo
+    {
+        return $this->belongsTo(Certification::class, 'certification_id');
+    }
+
+    /**
+     * 세미나/해외연수 관계
+     */
+    public function seminarTraining(): BelongsTo
+    {
+        return $this->belongsTo(SeminarTraining::class, 'seminar_training_id');
+    }
+
+    /**
+     * 신청 대상 프로그램 (교육/온라인/자격증/세미나 중 하나)
+     */
+    public function getProgramAttribute()
+    {
+        return $this->education
+            ?? $this->onlineEducation
+            ?? $this->certification
+            ?? $this->seminarTraining;
+    }
+
+    /**
+     * 신청 대상 프로그램 ID (라우트용)
+     */
+    public function getProgramIdAttribute(): ?int
+    {
+        return $this->education_id ?? $this->online_education_id ?? $this->certification_id ?? $this->seminar_training_id;
     }
 
     /**

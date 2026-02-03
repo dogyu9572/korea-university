@@ -9,33 +9,37 @@
             return;
         }
 
-        const $editor = $('#content');
-        if ($editor.length === 0) {
+        const $editors = $('.summernote-editor');
+        if ($editors.length === 0) {
             return;
         }
 
-        if ($editor.data('summernote')) {
-            $editor.summernote('destroy');
-        }
-
-        $editor.summernote({
-            height: 400,
-            toolbar: [
-                ['style', ['style']],
-                ['font', ['bold', 'italic', 'underline', 'clear']],
-                ['fontname', ['fontname']],
-                ['fontsize', ['fontsize']],
-                ['color', ['color']],
-                ['para', ['ul', 'ol', 'paragraph']],
-                ['table', ['table']],
-                ['insert', ['link', 'picture', 'video']],
-                ['view', ['fullscreen', 'codeview', 'help']]
-            ],
-            callbacks: {
-                onImageUpload: function(files) {
-                    uploadImage(files[0], this);
-                }
+        $editors.each(function() {
+            const $editor = $(this);
+            
+            if ($editor.data('summernote')) {
+                $editor.summernote('destroy');
             }
+
+            $editor.summernote({
+                height: 400,
+                toolbar: [
+                    ['style', ['style']],
+                    ['font', ['bold', 'italic', 'underline', 'clear']],
+                    ['fontname', ['fontname']],
+                    ['fontsize', ['fontsize']],
+                    ['color', ['color']],
+                    ['para', ['ul', 'ol', 'paragraph']],
+                    ['table', ['table']],
+                    ['insert', ['link', 'picture', 'video']],
+                    ['view', ['fullscreen', 'codeview', 'help']]
+                ],
+                callbacks: {
+                    onImageUpload: function(files) {
+                        uploadImage(files[0], this);
+                    }
+                }
+            });
         });
     }
 
@@ -70,15 +74,17 @@
         if (typeof $ === 'undefined' || typeof $.fn.summernote === 'undefined') {
             return;
         }
-        const $editor = $('#content');
-        if ($editor.length && $editor.summernote) {
-            try {
-                const code = $editor.summernote('code');
-                $editor.val(code != null ? code : '');
-            } catch (e) {
-                console.error('Summernote 동기화 실패:', e);
+        $('.summernote-editor').each(function() {
+            const $editor = $(this);
+            if ($editor.data('summernote')) {
+                try {
+                    const code = $editor.summernote('code');
+                    $editor.val(code != null ? code : '');
+                } catch (e) {
+                    console.error('Summernote 동기화 실패:', e);
+                }
             }
-        }
+        });
     }
 
     // 참가비/환불규정 금액 필드 - 소수점 제거
@@ -159,13 +165,10 @@
             initDeleteButtons();
         }
 
-        // 폼 제출 전 동기화
-        const $form = $('#educationProgramForm');
-        if ($form.length) {
-            $form.on('submit', function() {
-                syncSummernoteBeforeSubmit();
-            });
-        }
+        // 폼 제출 전 Summernote 동기화
+        $('#educationProgramForm, #onlineEducationForm').on('submit', function() {
+            syncSummernoteBeforeSubmit();
+        });
     }
 
     // jQuery 로드 대기

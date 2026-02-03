@@ -49,9 +49,7 @@
                                 <select id="education_type" name="education_type" class="filter-select">
                                     <option value="">전체</option>
                                     <option value="정기교육" @selected(request('education_type') == '정기교육')>정기교육</option>
-                                    <option value="수시교육" @selected(request('education_type') == '수시교육')>수시교육</option>
-                                    <option value="자격증" @selected(request('education_type') == '자격증')>자격증</option>
-                                    <option value="온라인교육" @selected(request('education_type') == '온라인교육')>온라인교육</option>
+                                    <option value="수시교육" @selected(request('education_type') == '수시교육')>수시교육</option>                                   
                                 </select>
                             </div>
                             <div class="filter-group">

@@ -2,8 +2,16 @@
 
 namespace App\Http\Controllers;
 
+use App\Services\EducationCertificationApplicationService;
+use Illuminate\Http\Request;
+
 class EducationCertificationController extends Controller
 {
+    public function __construct(
+        private EducationCertificationApplicationService $applicationService
+    ) {
+    }
+
     private function menuMeta(): array
     {
         return [
@@ -14,9 +22,16 @@ class EducationCertificationController extends Controller
         ];
     }
 
-    public function application_ec()
+    public function application_ec(Request $request)
     {
-        return view('education_certification.application_ec', $this->menuMeta());
+        $programs = $this->applicationService->getList($request);
+        $tabCounts = $this->applicationService->getTabCounts();
+        $periodYears = $this->applicationService->getPeriodYears();
+
+        return view('education_certification.application_ec', array_merge(
+            $this->menuMeta(),
+            compact('programs', 'tabCounts', 'periodYears')
+        ));
     }
 
     public function application_ec_view()

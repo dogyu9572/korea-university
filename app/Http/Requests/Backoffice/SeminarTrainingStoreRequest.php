@@ -14,7 +14,7 @@ class SeminarTrainingStoreRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'education_type' => 'required|in:세미나,해외연수',
+            'type' => 'required|in:세미나,해외연수',
             'education_class' => 'nullable|string|max:255',
             'is_public' => 'nullable|boolean',
             'application_status' => 'required|in:접수중,접수마감,접수예정,비공개',
@@ -25,7 +25,12 @@ class SeminarTrainingStoreRequest extends FormRequest
             'is_accommodation' => 'nullable|boolean',
             'location' => 'nullable|string|max:255',
             'target' => 'nullable|string|max:500',
-            'content' => 'nullable|string',
+            'education_overview' => 'nullable|string',
+            'education_schedule' => 'nullable|string',
+            'fee_info' => 'nullable|string',
+            'refund_policy' => 'nullable|string',
+            'curriculum' => 'nullable|string',
+            'education_notice' => 'nullable|string',
             'completion_criteria' => 'nullable|string|max:500',
             'survey_url' => 'nullable|url|max:500',
             'certificate_type' => 'required|in:이수증,수료증',
@@ -64,8 +69,8 @@ class SeminarTrainingStoreRequest extends FormRequest
     public function messages(): array
     {
         return [
-            'education_type.required' => '구분을 선택해주세요.',
-            'education_type.in' => '구분은 세미나 또는 해외연수만 선택할 수 있습니다.',
+            'type.required' => '구분을 선택해주세요.',
+            'type.in' => '구분은 세미나 또는 해외연수만 선택할 수 있습니다.',
             'application_status.required' => '접수상태를 선택해주세요.',
             'application_status.in' => '올바른 접수상태를 선택해주세요.',
             'name.required' => '세미나/해외연수명을 입력해주세요.',

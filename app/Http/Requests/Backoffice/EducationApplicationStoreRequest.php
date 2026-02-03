@@ -20,7 +20,10 @@ class EducationApplicationStoreRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'education_program_id' => 'required|exists:education_programs,id',
+            'education_id' => 'required_without_all:online_education_id,certification_id,seminar_training_id|nullable|exists:educations,id',
+            'online_education_id' => 'required_without_all:education_id,certification_id,seminar_training_id|nullable|exists:online_educations,id',
+            'certification_id' => 'required_without_all:education_id,online_education_id,seminar_training_id|nullable|exists:certifications,id',
+            'seminar_training_id' => 'required_without_all:education_id,online_education_id,certification_id|nullable|exists:seminar_trainings,id',
             'member_id' => 'nullable|exists:members,id',
             'applicant_name' => 'required|string|max:50',
             'affiliation' => 'nullable|string|max:100',
@@ -75,8 +78,11 @@ class EducationApplicationStoreRequest extends FormRequest
     public function messages(): array
     {
         return [
-            'education_program_id.required' => '교육 프로그램을 선택해주세요.',
-            'education_program_id.exists' => '존재하지 않는 교육 프로그램입니다.',
+            'education_id.required_without_all' => '교육 프로그램을 선택해주세요.',
+            'education_id.exists' => '존재하지 않는 교육입니다.',
+            'online_education_id.exists' => '존재하지 않는 온라인 교육입니다.',
+            'certification_id.exists' => '존재하지 않는 자격증입니다.',
+            'seminar_training_id.exists' => '존재하지 않는 세미나/해외연수입니다.',
             'member_id.exists' => '존재하지 않는 회원입니다.',
             'applicant_name.required' => '신청자명을 입력해주세요.',
             'applicant_name.max' => '신청자명은 50자를 초과할 수 없습니다.',

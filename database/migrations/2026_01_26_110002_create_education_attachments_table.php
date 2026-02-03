@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('education_attachments', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('education_program_id')->constrained('education_programs')->onDelete('cascade');
+            $table->foreignId('education_id')->constrained('educations')->onDelete('cascade');
             $table->string('path')->comment('저장 경로');
             $table->string('name')->comment('원본 파일명');
             $table->unsignedInteger('order')->default(0)->comment('정렬');
