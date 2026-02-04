@@ -68,7 +68,7 @@
 						</table>
 					</div>
 					<div class="btns_tac">
-						<a href="/education_certification/application_ec" class="btn btn_link btn_wbb">자격 시험 신청하기</a>
+						<a href="{{ route('education_certification.application_ec') }}" class="btn btn_link btn_wbb">자격 시험 신청하기</a>
 					</div>
 				</div><!-- //대학연구행정전문가 1급 -->
 				<div class="cont">
@@ -114,7 +114,7 @@
 						</table>
 					</div>
 					<div class="btns_tac">
-						<a href="/education_certification/application_ec" class="btn btn_link btn_wbb">자격 시험 신청하기</a>
+						<a href="{{ route('education_certification.application_ec') }}" class="btn btn_link btn_wbb">자격 시험 신청하기</a>
 					</div>
 				</div><!-- //대한연구행정전문가 2급 -->
 			</div>

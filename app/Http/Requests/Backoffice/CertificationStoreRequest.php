@@ -43,6 +43,7 @@ class CertificationStoreRequest extends FormRequest
             'payment_methods.*' => 'in:무통장입금,방문카드결제,온라인카드결제',
             'deposit_account' => 'nullable|string|max:500',
             'deposit_deadline_days' => 'nullable|integer|min:1|max:7',
+            'exam_fee' => 'nullable|numeric|min:0',
             'thumbnail' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
         ];
     }

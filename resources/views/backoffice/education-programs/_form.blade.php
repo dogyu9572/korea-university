@@ -1,3 +1,6 @@
+@php
+    $program = $program ?? $educationProgram ?? new \App\Models\Education();
+@endphp
 <form action="{{ $isEdit ? route('backoffice.education-programs.update', $program) : route('backoffice.education-programs.store') }}" method="POST" enctype="multipart/form-data" id="educationProgramForm">
     @csrf
     @if($isEdit)
@@ -423,10 +426,10 @@
                 <label class="member-form-label">입금기한</label>
                 <div class="member-form-field">
                     <div class="input-group input-group-inline">
-                        <select class="board-form-control" id="deposit_deadline_days" name="deposit_deadline_days">
+                        <select class="board-form-control @error('deposit_deadline_days') is-invalid @enderror" id="deposit_deadline_days" name="deposit_deadline_days">
                             <option value="">선택</option>
                             @for($d = 1; $d <= 30; $d++)
-                                <option value="{{ $d }}" @selected(old('deposit_deadline_days', $program->deposit_deadline_days) == $d)>{{ $d }}일</option>
+                                <option value="{{ $d }}" @selected((int) old('deposit_deadline_days', $program->deposit_deadline_days) === $d)>{{ $d }}일</option>
                             @endfor
                         </select>
                         <span class="input-group-text">접수일 기준</span>

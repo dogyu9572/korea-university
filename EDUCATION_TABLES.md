@@ -74,10 +74,17 @@
 | level | string | 1급/2급 |
 | name | string | 자격증명 |
 | exam_date | date | 시험일 |
+| exam_fee | decimal | 응시료 |
 | exam_overview | text | 시험개요 |
 | exam_trend | text | 출제경향 |
 | exam_venue | text | 시험장 정보 |
 | ... | | (기타) |
+
+#### 응시료(exam_fee) 마이그레이션 적용 안내
+
+- 마이그레이션 파일: `database/migrations/2026_02_03_000000_add_exam_fee_to_certifications_table.php`
+- 운영 서버에서는 **백업 및 사용자 확인 후** 마이그레이션을 실행합니다.
+- 마이그레이션 실행은 규칙에 따라 컨테이너 내부에서만 진행합니다.
 
 ### 2-4. seminar_trainings (세미나/해외연수)
 

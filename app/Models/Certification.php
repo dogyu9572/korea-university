@@ -27,6 +27,7 @@ class Certification extends Model
         'payment_methods',
         'deposit_account',
         'deposit_deadline_days',
+        'exam_fee',
         'exam_overview',
         'exam_trend',
         'exam_venue',
@@ -43,6 +44,7 @@ class Certification extends Model
         'passing_score' => 'integer',
         'capacity' => 'integer',
         'deposit_deadline_days' => 'integer',
+        'exam_fee' => 'decimal:2',
     ];
 
     /**

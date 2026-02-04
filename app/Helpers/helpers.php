@@ -43,25 +43,23 @@ function get_application_button_state(string $status, string $programType, int $
 {
     if ($status === '접수중') {
         $routes = [
-            'education' => [route('education_certification.application_ec_apply') . '?education_id=', '신청하기'],
-            'certification' => [route('education_certification.application_ec_receipt') . '?certification_id=', '시험 접수하기'],
-            'online' => [route('education_certification.application_ec_e_learning') . '?online_education_id=', '신청하기'],
+            'education' => route('education_certification.application_ec_apply') . '?education_id=',
+            'certification' => route('education_certification.application_ec_receipt') . '?certification_id=',
+            'online' => route('education_certification.application_ec_e_learning') . '?online_education_id=',
         ];
-        [$url, $text] = $routes[$programType] ?? [route('education_certification.application_ec_apply'), '신청하기'];
+        $url = $routes[$programType] ?? route('education_certification.application_ec_apply') . '?education_id=';
 
         return [
             'class' => 'btn btn_write btn_wbb',
-            'text' => $text,
+            'text' => '신청하기',
             'url' => $url . $id,
         ];
     }
 
     if ($status === '접수마감') {
-        $text = $programType === 'education' || $programType === 'online' ? '수강신청마감' : '접수마감';
-
         return [
             'class' => 'btn btn_end',
-            'text' => $text,
+            'text' => '신청마감',
             'url' => 'javascript:void(0);',
         ];
     }

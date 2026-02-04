@@ -265,6 +265,20 @@
             </div>
 
             <div class="member-form-row">
+                <label class="member-form-label">응시료</label>
+                <div class="member-form-field">
+                    <div class="input-group input-group-inline">
+                        <input type="number" class="board-form-control @error('exam_fee') is-invalid @enderror" id="exam_fee" name="exam_fee"
+                               value="{{ (int) old('exam_fee', $cert->exam_fee ?? 0) }}" min="0" step="1">
+                        <span class="input-group-text">원</span>
+                    </div>
+                    @error('exam_fee')
+                        <div class="invalid-feedback">{{ $message }}</div>
+                    @enderror
+                </div>
+            </div>
+
+            <div class="member-form-row">
                 <label class="member-form-label">입금계좌</label>
                 <div class="member-form-field">
                     <input type="text" class="board-form-control @error('deposit_account') is-invalid @enderror" id="deposit_account" name="deposit_account" value="{{ old('deposit_account', $cert->deposit_account) }}">

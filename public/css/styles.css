@@ -454,6 +454,11 @@
 	label.radio input:checked + i:before {background:#fff;}
 	label.radio input:checked ~ span {color:#1E2124; font-weight:500;}
 	label.radio.solo {display:block; padding-left:0; width:20px; height:20px; margin:0 auto;}
+	/* 표 내 참가비 라디오: 비선택 연하게, 선택만 진하게 */
+	.tbl label.radio span,
+	.tbl label.radio span strong {color:#8D98A4; font-weight:400;}
+	.tbl label.radio input:checked ~ span,
+	.tbl label.radio input:checked ~ span strong {color:#1E2124; font-weight:600;}
 /* 체크박스 */
 	label.check {position:relative; display:inline-block; vertical-align:top; padding-left:28px; line-height:30px;}
 	label.check input {display:none;}

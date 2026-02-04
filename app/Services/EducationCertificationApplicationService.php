@@ -2,13 +2,25 @@
 
 namespace App\Services;
 
-use App\Models\Education;
+use App\Http\Requests\EducationCertification\CertificationApplicationRequest;
+use App\Http\Requests\EducationCertification\EducationProgramApplicationRequest;
+use App\Http\Requests\EducationCertification\OnlineEducationApplicationRequest;
+use App\Models\Category;
 use App\Models\Certification;
+use App\Models\Education;
+use App\Models\EducationApplication;
+use App\Models\EducationApplicationAttachment;
+use App\Models\Member;
 use App\Models\OnlineEducation;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
+use Illuminate\Validation\ValidationException;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 class EducationCertificationApplicationService
 {
@@ -105,7 +117,7 @@ class EducationCertificationApplicationService
             ? format_period_ko($e->period_start, $e->period_end)
             : format_period_ko($e->period_start, null, $e->period_time);
 
-        $btn = get_application_button_state($e->application_status ?? '', 'education', $e->id);
+        $btn = get_application_button_state($this->getEffectiveApplicationStatusForDisplay($e), 'education', $e->id);
 
         return [
             'type_class' => ($e->education_type ?? '') === '수시교육' ? 'c2' : 'c1',
@@ -140,7 +152,7 @@ class EducationCertificationApplicationService
         $appPeriod = format_period_ko($c->application_start, $c->application_end);
         $examDate = format_date_ko($c->exam_date);
 
-        $btn = get_application_button_state($c->application_status ?? '', 'certification', $c->id);
+        $btn = get_application_button_state($this->getEffectiveApplicationStatusForDisplay($c), 'certification', $c->id);
 
         return [
             'name' => $c->name,
@@ -181,7 +193,7 @@ class EducationCertificationApplicationService
 
         $feeText = ($o->is_free ?? false) ? '무료' : ($o->fee ? number_format($o->fee) . '원' : '-');
 
-        $btn = get_application_button_state($o->application_status ?? '', 'online', $o->id);
+        $btn = get_application_button_state($this->getEffectiveApplicationStatusForDisplay($o), 'online', $o->id);
 
         return [
             'name' => $o->name,
@@ -200,6 +212,513 @@ class EducationCertificationApplicationService
             'apply_url' => $btn['url'],
             'thumb' => $o->thumbnail_path ?: '/images/img_application_view_sample.jpg',
         ];
+    }
+
+    /**
+     * 프론트 교육 신청을 저장합니다.
+     */
+    public function submitEducationApplication(EducationProgramApplicationRequest $request, Member $member): EducationApplication
+    {
+        return DB::transaction(function () use ($request, $member) {
+            $program = $this->lockEducationForApplication((int) $request->input('education_id'));
+
+            $this->assertProgramAvailability($program, 'education_id');
+            $this->assertCapacityAvailable('education_id', $program->id, $program->capacity, $program->capacity_unlimited);
+            $this->assertNotDuplicated('education_id', $program->id, $member->id, '이미 해당 교육을 신청하셨습니다.');
+
+            [$feeType, $participationFee] = $this->resolveEducationFee($program, (string) $request->input('fee_type'));
+
+            $billing = $this->extractBillingData($request);
+
+            $data = array_merge(
+                $this->baseApplicationData($member, $request),
+                $billing,
+                [
+                    'education_id' => $program->id,
+                    'participation_fee' => $participationFee,
+                    'fee_type' => $feeType,
+                    'payment_method' => $program->payment_methods ?? null,
+                ]
+            );
+
+            $application = EducationApplication::create($data);
+
+            $this->storeBusinessRegistration($application, $request->file('business_registration'));
+            $this->storeAdditionalAttachments($application, $request->file('attachments', []));
+
+            return $application;
+        });
+    }
+
+    /**
+     * 프론트 자격증 신청을 저장합니다.
+     */
+    public function submitCertificationApplication(CertificationApplicationRequest $request, Member $member): EducationApplication
+    {
+        return DB::transaction(function () use ($request, $member) {
+            $program = $this->lockCertificationForApplication((int) $request->input('certification_id'));
+
+            $this->assertProgramAvailability($program, 'certification_id');
+            $this->assertCapacityAvailable('certification_id', $program->id, $program->capacity, $program->capacity_unlimited);
+            $this->assertNotDuplicated('certification_id', $program->id, $member->id, '이미 해당 자격증을 신청하셨습니다.');
+            $this->assertExamVenueSelectable($program, (int) $request->input('exam_venue_id'));
+
+            if (!$program->exam_fee) {
+                throw ValidationException::withMessages([
+                    'certification_id' => '응시료가 설정되지 않은 자격증입니다. 관리자에게 문의해주세요.',
+                ]);
+            }
+
+            $billing = $this->extractBillingData($request);
+
+            $data = array_merge(
+                $this->baseApplicationData($member, $request),
+                $billing,
+                [
+                    'certification_id' => $program->id,
+                    'participation_fee' => $program->exam_fee,
+                    'fee_type' => 'certification_exam_fee',
+                    'payment_method' => $program->payment_methods ?? null,
+                    'exam_venue_id' => (int) $request->input('exam_venue_id'),
+                    'birth_date' => Carbon::parse($request->input('birth_date'))->format('Y-m-d'),
+                ]
+            );
+
+            $application = EducationApplication::create($data);
+
+            $this->storeIdPhoto($application, $request->file('id_photo'));
+            $this->storeBusinessRegistration($application, $request->file('business_registration'));
+            $this->storeAdditionalAttachments($application, $request->file('attachments', []));
+
+            return $application;
+        });
+    }
+
+    /**
+     * 프론트 온라인 교육 신청을 저장합니다.
+     */
+    public function submitOnlineEducationApplication(OnlineEducationApplicationRequest $request, Member $member): EducationApplication
+    {
+        return DB::transaction(function () use ($request, $member) {
+            $program = $this->lockOnlineEducationForApplication((int) $request->input('online_education_id'));
+
+            $this->assertProgramAvailability($program, 'online_education_id');
+            $this->assertCapacityAvailable('online_education_id', $program->id, $program->capacity, $program->capacity_unlimited);
+            $this->assertNotDuplicated('online_education_id', $program->id, $member->id, '이미 해당 온라인교육을 신청하셨습니다.');
+
+            $billing = $this->extractBillingData($request);
+
+            $participationFee = $program->is_free ? 0 : ($program->fee ?? 0);
+
+            $data = array_merge(
+                $this->baseApplicationData($member, $request),
+                $billing,
+                [
+                    'online_education_id' => $program->id,
+                    'participation_fee' => $participationFee,
+                    'fee_type' => $program->is_free ? null : ($request->input('fee_type') ?: 'default'),
+                    'payment_method' => $program->payment_methods ?? null,
+                    'course_status' => '접수',
+                ]
+            );
+
+            $application = EducationApplication::create($data);
+
+            $this->storeBusinessRegistration($application, $request->file('business_registration'));
+            $this->storeAdditionalAttachments($application, $request->file('attachments', []));
+
+            return $application;
+        });
+    }
+
+    /**
+     * 공통 신청 기본 데이터 생성
+     */
+    private function baseApplicationData(Member $member, Request $request): array
+    {
+        $now = Carbon::now();
+        $name = trim((string) $request->input('applicant_name')) ?: $member->name;
+        $affiliation = trim((string) $request->input('affiliation')) ?: $member->school_name;
+        $phone = trim((string) $request->input('phone_number')) ?: $member->phone_number;
+        $email = trim((string) $request->input('email')) ?: $member->email;
+
+        return [
+            'application_number' => $this->generateApplicationNumber($now),
+            'member_id' => $member->id,
+            'applicant_name' => $name,
+            'affiliation' => $affiliation,
+            'phone_number' => $phone,
+            'email' => $email,
+            'application_date' => $now,
+            'is_completed' => false,
+            'is_survey_completed' => false,
+            'payment_status' => '미입금',
+        ];
+    }
+
+    /**
+     * 교육 프로그램을 조회합니다. (신청용)
+     */
+    public function getEducationProgram(int $id): Education
+    {
+        $program = Education::query()->find($id);
+        if (!$program || !$program->is_public || $program->application_status === '비공개') {
+            throw new NotFoundHttpException();
+        }
+
+        return $program;
+    }
+
+    /**
+     * 자격증 프로그램을 조회합니다. (신청용)
+     */
+    public function getCertificationProgram(int $id): Certification
+    {
+        $program = Certification::query()->find($id);
+        if (!$program || !$program->is_public || $program->application_status === '비공개') {
+            throw new NotFoundHttpException();
+        }
+
+        return $program;
+    }
+
+    /**
+     * 온라인교육 프로그램을 조회합니다. (신청용)
+     */
+    public function getOnlineEducationProgram(int $id): OnlineEducation
+    {
+        $program = OnlineEducation::query()->find($id);
+        if (!$program || !$program->is_public || $program->application_status === '비공개') {
+            throw new NotFoundHttpException();
+        }
+
+        return $program;
+    }
+
+    /**
+     * 교육 신청 가능 여부 확인
+     */
+    public function ensureEducationCanApply(Education $program): void
+    {
+        $this->assertProgramAvailability($program, 'education_id');
+    }
+
+    /**
+     * 자격증 신청 가능 여부 확인
+     */
+    public function ensureCertificationCanApply(Certification $program): void
+    {
+        $this->assertProgramAvailability($program, 'certification_id');
+        if (!$program->exam_fee) {
+            throw ValidationException::withMessages([
+                'certification_id' => '응시료가 설정되지 않아 신청할 수 없습니다.',
+            ]);
+        }
+    }
+
+    /**
+     * 온라인교육 신청 가능 여부 확인
+     */
+    public function ensureOnlineEducationCanApply(OnlineEducation $program): void
+    {
+        $this->assertProgramAvailability($program, 'online_education_id');
+    }
+
+    /**
+     * 자격증 시험장 목록을 반환합니다.
+     */
+    public function getCertificationExamVenues(Certification $program): Collection
+    {
+        $ids = $program->venue_category_ids ?? [];
+        if (empty($ids)) {
+            return collect();
+        }
+
+        return Category::query()
+            ->whereIn('id', $ids)
+            ->active()
+            ->orderBy('name')
+            ->get();
+    }
+
+    /**
+     * 환불/증빙 관련 입력값을 정리합니다.
+     */
+    private function extractBillingData(Request $request): array
+    {
+        $hasCashReceipt = $request->boolean('has_cash_receipt');
+        $hasTaxInvoice = $request->boolean('has_tax_invoice');
+
+        return [
+            'refund_account_holder' => $request->input('refund_account_holder'),
+            'refund_bank_name' => $request->input('refund_bank_name'),
+            'refund_account_number' => $request->input('refund_account_number'),
+            'has_cash_receipt' => $hasCashReceipt,
+            'cash_receipt_purpose' => $hasCashReceipt ? $request->input('cash_receipt_purpose') : null,
+            'cash_receipt_number' => $hasCashReceipt ? $request->input('cash_receipt_number') : null,
+            'has_tax_invoice' => $hasTaxInvoice,
+            'company_name' => $hasTaxInvoice ? $request->input('company_name') : null,
+            'registration_number' => $hasTaxInvoice ? $request->input('registration_number') : null,
+            'contact_person_name' => $hasTaxInvoice ? $request->input('contact_person_name') : null,
+            'contact_person_email' => $hasTaxInvoice ? $request->input('contact_person_email') : null,
+            'contact_person_phone' => $hasTaxInvoice ? $request->input('contact_person_phone') : null,
+        ];
+    }
+
+    /**
+     * 교육 신청 가능 상태를 확인합니다.
+     */
+    private function assertProgramAvailability($program, string $field): void
+    {
+        if (!$program || !$program->is_public || $program->application_status === '비공개') {
+            throw ValidationException::withMessages([
+                $field => '신청 가능한 프로그램이 아닙니다.',
+            ]);
+        }
+
+        $now = Carbon::now();
+
+        if ($program->application_status !== '접수중') {
+            throw ValidationException::withMessages([
+                $field => '현재는 신청 기간이 아닙니다.',
+            ]);
+        }
+
+        if ($program->application_start && $now->lt($program->application_start)) {
+            throw ValidationException::withMessages([
+                $field => '신청 시작 전입니다.',
+            ]);
+        }
+
+        if ($program->application_end && $now->gt($program->application_end)) {
+            throw ValidationException::withMessages([
+                $field => '신청 기간이 종료되었습니다.',
+            ]);
+        }
+    }
+
+    /**
+     * 목록/상세 버튼 표시용. 퍼블 기준 3종: 신청하기(신청 가능) / 신청마감(기간 끝 or 정원 마감) / 개설예정(기간 전).
+     */
+    private function getEffectiveApplicationStatusForDisplay($program): string
+    {
+        $status = $program->application_status ?? '';
+        if ($status !== '접수중') {
+            return $status ?: '접수예정';
+        }
+        $now = Carbon::now();
+        if ($program->application_start && $now->lt($program->application_start)) {
+            return '접수예정';
+        }
+        if ($program->application_end && $now->gt($program->application_end)) {
+            return '접수마감';
+        }
+        $capacity = (int) ($program->capacity ?? 0);
+        $capacityUnlimited = (bool) ($program->capacity_unlimited ?? false);
+        $enrolled = (int) ($program->applications_count ?? 0);
+        if (!$capacityUnlimited && $capacity > 0 && $enrolled >= $capacity) {
+            return '접수마감';
+        }
+        return '접수중';
+    }
+
+    /**
+     * 정원 확인
+     */
+    private function assertCapacityAvailable(string $column, int $programId, ?int $capacity, bool $unlimited): void
+    {
+        if ($unlimited || !$capacity) {
+            return;
+        }
+
+        $count = EducationApplication::query()
+            ->where($column, $programId)
+            ->lockForUpdate()
+            ->count();
+
+        if ($count >= $capacity) {
+            throw ValidationException::withMessages([
+                $column => '모집 정원이 마감되었습니다.',
+            ]);
+        }
+    }
+
+    /**
+     * 중복 신청 여부 확인
+     */
+    private function assertNotDuplicated(string $column, int $programId, int $memberId, string $message): void
+    {
+        $exists = EducationApplication::query()
+            ->where($column, $programId)
+            ->where('member_id', $memberId)
+            ->lockForUpdate()
+            ->exists();
+
+        if ($exists) {
+            throw ValidationException::withMessages([
+                $column => $message,
+            ]);
+        }
+    }
+
+    /**
+     * 교육 참가비 유형을 해석합니다.
+     */
+    private function resolveEducationFee(Education $program, string $feeType): array
+    {
+        $mapping = [
+            'member_twin' => 'fee_member_twin',
+            'member_single' => 'fee_member_single',
+            'member_no_stay' => 'fee_member_no_stay',
+            'guest_twin' => 'fee_guest_twin',
+            'guest_single' => 'fee_guest_single',
+            'guest_no_stay' => 'fee_guest_no_stay',
+        ];
+
+        if (!array_key_exists($feeType, $mapping)) {
+            throw ValidationException::withMessages([
+                'fee_type' => '올바르지 않은 참가비 유형입니다.',
+            ]);
+        }
+
+        $column = $mapping[$feeType];
+        $amount = $program->{$column};
+
+        if ($amount === null) {
+            throw ValidationException::withMessages([
+                'fee_type' => '선택한 참가비 유형은 신청할 수 없습니다.',
+            ]);
+        }
+
+        return [$feeType, $amount];
+    }
+
+    /**
+     * 교육 데이터를 잠금하고 조회합니다.
+     */
+    private function lockEducationForApplication(int $id): ?Education
+    {
+        return Education::query()
+            ->withCount('applications as applications_count')
+            ->whereKey($id)
+            ->lockForUpdate()
+            ->first();
+    }
+
+    /**
+     * 자격증 데이터를 잠금하고 조회합니다.
+     */
+    private function lockCertificationForApplication(int $id): ?Certification
+    {
+        return Certification::query()
+            ->withCount('applications as applications_count')
+            ->whereKey($id)
+            ->lockForUpdate()
+            ->first();
+    }
+
+    /**
+     * 온라인교육 데이터를 잠금하고 조회합니다.
+     */
+    private function lockOnlineEducationForApplication(int $id): ?OnlineEducation
+    {
+        return OnlineEducation::query()
+            ->withCount('applications as applications_count')
+            ->whereKey($id)
+            ->lockForUpdate()
+            ->first();
+    }
+
+    /**
+     * 시험장 선택이 가능한지 확인합니다.
+     */
+    private function assertExamVenueSelectable(Certification $program, int $venueId): void
+    {
+        $allowed = collect($program->venue_category_ids ?? [])->contains($venueId);
+
+        if (!$allowed) {
+            throw ValidationException::withMessages([
+                'exam_venue_id' => '선택할 수 없는 시험장입니다.',
+            ]);
+        }
+    }
+
+    /**
+     * 신청번호를 생성합니다. (KUCRA-연도-일련번호)
+     */
+    private function generateApplicationNumber(Carbon $date): string
+    {
+        $year = $date->format('Y');
+
+        $lastNumber = EducationApplication::query()
+            ->whereYear('created_at', $year)
+            ->whereNotNull('application_number')
+            ->where('application_number', 'like', 'KUCRA-' . $year . '-%')
+            ->orderByDesc('id')
+            ->value('application_number');
+
+        $sequence = 1;
+        if ($lastNumber && preg_match('/KUCRA-\d{4}-(\d{4})/', $lastNumber, $matches)) {
+            $sequence = (int) $matches[1] + 1;
+        }
+
+        return 'KUCRA-' . $year . '-' . str_pad((string) $sequence, 4, '0', STR_PAD_LEFT);
+    }
+
+    /**
+     * 사업자등록증 첨부를 저장합니다.
+     */
+    private function storeBusinessRegistration(EducationApplication $application, $file): void
+    {
+        if (!$file) {
+            return;
+        }
+
+        $this->storeAttachment($application, $file, 'business_registration', 0);
+    }
+
+    /**
+     * 추가 첨부파일을 저장합니다.
+     *
+     * @param array<int, \Illuminate\Http\UploadedFile|null> $files
+     */
+    private function storeAdditionalAttachments(EducationApplication $application, array $files): void
+    {
+        $order = 1;
+        foreach ($files as $file) {
+            if ($file) {
+                $this->storeAttachment($application, $file, 'attachment', $order++);
+            }
+        }
+    }
+
+    /**
+     * 첨부파일 저장 공통 처리
+     */
+    private function storeAttachment(EducationApplication $application, $file, string $type, int $order): void
+    {
+        $path = $file->store('education_applications/' . $type, 'public');
+
+        EducationApplicationAttachment::create([
+            'education_application_id' => $application->id,
+            'path' => Storage::url($path),
+            'name' => $file->getClientOriginalName(),
+            'type' => $type,
+            'order' => $order,
+        ]);
+    }
+
+    /**
+     * 자격증 증명사진을 저장합니다.
+     */
+    private function storeIdPhoto(EducationApplication $application, $file): void
+    {
+        if (!$file) {
+            return;
+        }
+
+        $path = $file->store('education_applications/id_photos', 'public');
+        $application->update(['id_photo_path' => Storage::url($path)]);
     }
 
     /**
@@ -229,7 +748,7 @@ class EducationCertificationApplicationService
             'education_class' => $e->education_class ?? '-',
             'location' => $e->location ?? '-',
             'fee_text' => format_education_fee($e),
-            'btn' => get_application_button_state($e->application_status ?? '', 'education', $e->id),
+            'btn' => get_application_button_state($this->getEffectiveApplicationStatusForDisplay($e), 'education', $e->id),
             'view_url' => route('education_certification.application_ec_view', $e->id),
             'thumb' => $e->thumbnail_path ?: '/images/img_application_ec_sample.jpg',
         ];
@@ -254,7 +773,7 @@ class EducationCertificationApplicationService
             'capacity_unlimited' => $capacityUnlimited,
             'capacity_text' => $capacityUnlimited ? '무제한' : $capacity . '명',
             'has_remain' => $capacityUnlimited || $enrolled < $capacity,
-            'btn' => get_application_button_state($c->application_status ?? '', 'certification', $c->id),
+            'btn' => get_application_button_state($this->getEffectiveApplicationStatusForDisplay($c), 'certification', $c->id),
             'view_url' => route('education_certification.application_ec_view_type2', $c->id),
             'thumb' => $c->thumbnail_path ?: '/images/img_application_ec_sample2.jpg',
         ];
@@ -285,7 +804,7 @@ class EducationCertificationApplicationService
             'capacity_unlimited' => $capacityUnlimited,
             'capacity_text' => $capacityUnlimited ? '무제한' : $capacity . '명',
             'has_remain' => $capacityUnlimited || $enrolled < $capacity,
-            'btn' => get_application_button_state($o->application_status ?? '', 'online', $o->id),
+            'btn' => get_application_button_state($this->getEffectiveApplicationStatusForDisplay($o), 'online', $o->id),
             'view_url' => route('education_certification.application_ec_view_online', $o->id),
             'thumb' => $o->thumbnail_path ?: '/images/img_application_ec_sample.jpg',
         ];

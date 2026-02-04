@@ -275,11 +275,12 @@
                     <label class="member-form-label">응시료</label>
                     <div class="member-form-field">
                         <div class="board-form-control readonly-field">
-                            자동 입력
+                            @if($isEdit && $app?->participation_fee !== null)
+                                {{ number_format($app->participation_fee) }}원
+                            @else
+                                자동 입력
+                            @endif
                         </div>
-                        @if($isEdit && $app?->participation_fee !== null)
-                            <span class="text-muted small">({{ number_format($app->participation_fee) }}원)</span>
-                        @endif
                     </div>
                 </div>
                 <div class="member-form-inline-item">
