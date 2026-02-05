@@ -1,28 +1,23 @@
 <?php
 
-namespace App\Http\Requests\EducationCertification;
+namespace App\Http\Requests\SeminarTraining;
 
 use Illuminate\Foundation\Http\FormRequest;
 
-class EducationProgramApplicationRequest extends FormRequest
+class SeminarTrainingApplicationRequest extends FormRequest
 {
-    /**
-     * Determine if the user is authorized to make this request.
-     */
     public function authorize(): bool
     {
         return $this->user('member') !== null;
     }
 
     /**
-     * Get the validation rules that apply to the request.
-     *
      * @return array<string, mixed>
      */
     public function rules(): array
     {
         return [
-            'education_id' => ['required', 'integer', 'exists:educations,id'],
+            'seminar_training_id' => ['required', 'integer', 'exists:seminar_trainings,id'],
             'fee_type' => ['required', 'string', 'max:50'],
             'applicant_name' => ['nullable', 'string', 'max:50'],
             'affiliation' => ['nullable', 'string', 'max:100'],
@@ -42,12 +37,19 @@ class EducationProgramApplicationRequest extends FormRequest
             'contact_person_phone' => ['nullable', 'string', 'max:20'],
             'business_registration' => ['nullable', 'file', 'mimes:pdf,jpg,jpeg,png', 'max:2048'],
             'attachments.*' => ['nullable', 'file', 'mimes:pdf,jpg,jpeg,png', 'max:2048'],
+            'roommate_member_id' => ['nullable', 'integer', 'exists:members,id'],
+            'roommate_name' => ['nullable', 'string', 'max:100'],
+            'roommate_phone' => ['nullable', 'string', 'max:20'],
         ];
     }
 
+    /**
+     * @return array<string, string>
+     */
     public function attributes(): array
     {
         return [
+            'seminar_training_id' => '세미나·해외연수 프로그램',
             'fee_type' => '참가비 유형',
             'refund_account_holder' => '환불 계좌 예금주명',
             'refund_bank_name' => '환불 계좌 은행명',
@@ -60,6 +62,9 @@ class EducationProgramApplicationRequest extends FormRequest
             'contact_person_email' => '담당자 이메일',
             'contact_person_phone' => '담당자 연락처',
             'business_registration' => '사업자등록증',
+            'roommate_member_id' => '룸메이트 회원',
+            'roommate_name' => '룸메이트 이름',
+            'roommate_phone' => '룸메이트 휴대폰',
         ];
     }
 

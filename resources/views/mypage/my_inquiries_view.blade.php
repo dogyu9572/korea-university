@@ -4,48 +4,59 @@
     
 	<div class="board_view">
 		<div class="tit gbox">
-			<div class="types"><span class="type end">답변완료</span></div>
-			<strong>문의 제목이 들어갈 공간입니다. 문의 제목이 들어갈 공간입니다. </strong>
+			<div class="types"><span class="type {{ $inquiry->status === '답변완료' ? 'end' : 'ing' }}">{{ $inquiry->status === '답변완료' ? '답변완료' : '미답변' }}</span></div>
+			<strong>{{ $inquiry->title }}</strong>
 			<div class="flex">
-				<dl class="typebox"><dt>분류</dt><dd>연구비 사용</dd></dl>
-				<dl class="date"><dt>등록일</dt><dd>2025.03.07</dd></dl>
+				<dl class="typebox"><dt>분류</dt><dd>{{ $inquiry->category }}</dd></dl>
+				<dl class="date"><dt>등록일</dt><dd>{{ $inquiry->created_at->format('Y.m.d') }}</dd></dl>
 			</div>
 		</div>
 		
 		<div class="con">
-			내용입니다. 내용입니다. 내용입니다. 내용입니다. 내용입니다.<br/>
-			내용입니다. 내용입니다. 내용입니다. 내용입니다. 내용입니다.<br/>
-			내용입니다. 내용입니다. 내용입니다. 내용입니다. 내용입니다.<br/>
-			내용입니다. 내용입니다. 내용입니다. 내용입니다. 내용입니다.<br/>
-			내용입니다. 내용입니다. 내용입니다. 내용입니다. 내용입니다.<br/>
-			내용입니다. 내용입니다. 내용입니다. 내용입니다. 내용입니다.
+			{!! nl2br(e($inquiry->content)) !!}
 		</div>
 		
+		@if($inquiry->files && $inquiry->files->count() > 0)
 		<div class="download_area type_gbox">
-			<a href="#this">첨부파일 파일명입니다.</a>
-			<a href="#this">첨부파일 파일명입니다.</a>
-			<a href="#this">첨부파일 파일명입니다.</a>
+			@foreach($inquiry->files as $file)
+			<a href="{{ asset('storage/' . $file->file_path) }}" download="{{ $file->file_name }}">{{ $file->file_name }}</a>
+			@endforeach
 		</div>
+		@endif
 
+		@if($inquiry->reply)
 		<div class="reply_wrap">
 			<div class="box">
 				<div class="tit flex">
 					<dl class="writer"><dt>분류</dt><dd>관리자</dd></dl>
-					<dl class="date"><dt>등록일</dt><dd>2025.03.07</dd></dl>
+					<dl class="date"><dt>등록일</dt><dd>{{ $inquiry->reply->reply_date ? $inquiry->reply->reply_date->format('Y.m.d') : $inquiry->reply->created_at->format('Y.m.d') }}</dd></dl>
 				</div>
 				<div class="con">
-					안녕하세요. 관리자입니다.<br/>
-					문의주신 내용 답변 드립니다.<br/>
-					답변 내용입니다. 답변 내용입니다. 답변 내용입니다. 답변 내용입니다. 답변 내용입니다. 답변 내용입니다. 답변 내용입니다.<br/>
-					감사합니다.
+					{!! $inquiry->reply->content !!}
 				</div>
+				@if($inquiry->reply->files && $inquiry->reply->files->count() > 0)
+				<div class="download_area type_gbox">
+					@foreach($inquiry->reply->files as $file)
+					<a href="{{ asset('storage/' . $file->file_path) }}" download="{{ $file->file_name }}">{{ $file->file_name }}</a>
+					@endforeach
+				</div>
+				@endif
 			</div>
 		</div>
+		@endif
 		
 		<div class="board_btm btns_tac mt80">
-			<a href="#this" class="arrow prev"><strong>이전 글</strong><p>이전 글 제목입니다.</p></a>
-			<a href="#this" class="arrow next"><strong>다음 글</strong><p>다음 글 제목입니다.</p></a>
-			<a href="/mypage/my_inquiries" class="btn btn_list">목록</a>
+			@if($prevNext['prev'])
+			<a href="{{ route('mypage.my_inquiries_view', $prevNext['prev']->id) }}" class="arrow prev"><strong>이전 글</strong><p>{{ $prevNext['prev']->title }}</p></a>
+			@else
+			<span class="arrow prev"><strong>이전 글</strong><p>이전 글이 없습니다.</p></span>
+			@endif
+			@if($prevNext['next'])
+			<a href="{{ route('mypage.my_inquiries_view', $prevNext['next']->id) }}" class="arrow next"><strong>다음 글</strong><p>{{ $prevNext['next']->title }}</p></a>
+			@else
+			<span class="arrow next"><strong>다음 글</strong><p>다음 글이 없습니다.</p></span>
+			@endif
+			<a href="{{ route('mypage.my_inquiries') }}" class="btn btn_list">목록</a>
 		</div>
 	</div>
 	

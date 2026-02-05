@@ -326,4 +326,117 @@ class InquiryService
     {
         return $this->deleteInquiries([$id]);
     }
+
+    /**
+     * 회원별 문의 목록 조회 (마이페이지)
+     */
+    public function getInquiriesByMember(int $memberId, array $filters = [], int $perPage = 20)
+    {
+        $query = Inquiry::where('member_id', $memberId)->with('reply');
+
+        if (isset($filters['category']) && $filters['category'] && $filters['category'] !== '전체') {
+            $query->byCategory($filters['category']);
+        }
+
+        if (isset($filters['status']) && $filters['status'] && $filters['status'] !== '전체') {
+            $query->byStatus($filters['status']);
+        }
+
+        if (isset($filters['start_date']) || isset($filters['end_date'])) {
+            $query->byDateRange($filters['start_date'] ?? null, $filters['end_date'] ?? null);
+        }
+
+        $query->orderBy('created_at', 'desc');
+
+        return $query->paginate($perPage)->withQueryString();
+    }
+
+    /**
+     * 회원 본인 문의 상세 조회 (마이페이지, 조회수 증가)
+     */
+    public function getInquiryForMember(int $id, int $memberId)
+    {
+        $inquiry = Inquiry::where('id', $id)
+            ->where('member_id', $memberId)
+            ->with(['files', 'reply.files'])
+            ->firstOrFail();
+
+        $inquiry->incrementViews();
+
+        return $inquiry;
+    }
+
+    /**
+     * 이전/다음 문의 조회 (마이페이지 상세 하단용)
+     */
+    public function getPrevNextForMember(int $inquiryId, int $memberId): array
+    {
+        $current = Inquiry::where('member_id', $memberId)->find($inquiryId);
+        if (!$current) {
+            return ['prev' => null, 'next' => null];
+        }
+
+        $prev = Inquiry::where('member_id', $memberId)
+            ->where('created_at', '>', $current->created_at)
+            ->orderBy('created_at', 'asc')
+            ->first();
+
+        $next = Inquiry::where('member_id', $memberId)
+            ->where('created_at', '<', $current->created_at)
+            ->orderBy('created_at', 'desc')
+            ->first();
+
+        return ['prev' => $prev, 'next' => $next];
+    }
+
+    /**
+     * 문의 등록 (마이페이지, 첨부파일 최대 3개·10MB)
+     */
+    public function createInquiry(int $memberId, array $data, $files = null)
+    {
+        return DB::transaction(function () use ($memberId, $data, $files) {
+            $inquiry = Inquiry::create([
+                'member_id' => $memberId,
+                'category' => $data['category'],
+                'title' => $data['title'],
+                'content' => $data['content'],
+                'status' => '답변대기',
+            ]);
+
+            if ($files && is_array($files)) {
+                $count = 0;
+                foreach ($files as $file) {
+                    if ($count >= 3) {
+                        break;
+                    }
+                    if (!$file || !$file->isValid()) {
+                        continue;
+                    }
+                    if ($file->getSize() > 10 * 1024 * 1024) {
+                        continue;
+                    }
+                    $path = $file->store('inquiries', 'public');
+                    InquiryFile::create([
+                        'inquiry_id' => $inquiry->id,
+                        'file_path' => $path,
+                        'file_name' => $file->getClientOriginalName(),
+                        'file_size' => $file->getSize(),
+                    ]);
+                    $count++;
+                }
+            } elseif ($files && is_object($files) && $files->isValid()) {
+                if ($files->getSize() <= 10 * 1024 * 1024) {
+                    $path = $files->store('inquiries', 'public');
+                    InquiryFile::create([
+                        'inquiry_id' => $inquiry->id,
+                        'file_path' => $path,
+                        'file_name' => $files->getClientOriginalName(),
+                        'file_size' => $files->getSize(),
+                    ]);
+                }
+            }
+
+            return $inquiry;
+        });
+    }
 }

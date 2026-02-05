@@ -2,7 +2,12 @@
     $app = $application ?? null;
     $isEdit = $isEdit ?? false;
 @endphp
-<form action="{{ $isEdit ? route('backoffice.seminar-training-applications.update', $app) : route('backoffice.seminar-training-applications.store') }}" method="POST" enctype="multipart/form-data" id="applicationForm">
+<form action="{{ $isEdit ? route('backoffice.seminar-training-applications.update', $app) : route('backoffice.seminar-training-applications.store') }}" method="POST" enctype="multipart/form-data" id="applicationForm"
+    @if($isEdit && ($app->seminar_training_id ?? null))
+        data-roommate-requests-url="{{ route('backoffice.seminar-training-applications.roommate-requests', $app) }}"
+        data-roommate-requests-approve-url="{{ route('backoffice.seminar-training-applications.roommate-requests.approve', $app) }}"
+        data-roommate-requests-reject-url="{{ route('backoffice.seminar-training-applications.roommate-requests.reject', $app) }}"
+    @endif>
     @csrf
     @if($isEdit)
         @method('PUT')
@@ -438,7 +443,7 @@
                             <span class="sub-label" style="margin-bottom:0;">사업자등록증</span>
                             <input type="file" class="board-form-control form-field-flex-300" name="attachments[]" multiple accept=".pdf,.jpg,.jpeg,.png">
                             <button type="button" class="btn btn-outline-secondary btn-sm ml-1">추가</button>
-                            <button type="button" class="btn btn-outline-danger btn-sm ml-1">삭제</button>
+                            <button type="button" class="btn btn-outline-danger btn-sm ml-1" data-action="clear-attachment-files">삭제</button>
                         </div>
                     </div>
                 </div>

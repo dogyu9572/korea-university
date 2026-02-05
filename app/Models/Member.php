@@ -23,7 +23,9 @@ class Member extends Model implements AuthenticatableContract
         'school_name',
         'is_school_representative',
         'email_marketing_consent',
+        'email_marketing_consent_at',
         'kakao_marketing_consent',
+        'kakao_marketing_consent_at',
         'sms_marketing_consent',
         'terms_agreed_at',
         'withdrawn_at',
@@ -35,6 +37,8 @@ class Member extends Model implements AuthenticatableContract
         'kakao_marketing_consent' => 'boolean',
         'sms_marketing_consent' => 'boolean',
         'terms_agreed_at' => 'datetime',
+        'kakao_marketing_consent_at' => 'datetime',
+        'email_marketing_consent_at' => 'datetime',
         'withdrawn_at' => 'datetime',
     ];
 

@@ -62,6 +62,7 @@ class SeminarTrainingService
             $data = $request->only([
                 'type',
                 'education_class',
+                'total_sessions_class',
                 'is_public',
                 'application_status',
                 'name',
@@ -162,6 +163,7 @@ class SeminarTrainingService
             $data = $request->only([
                 'type',
                 'education_class',
+                'total_sessions_class',
                 'is_public',
                 'application_status',
                 'name',

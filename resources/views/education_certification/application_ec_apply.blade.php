@@ -3,17 +3,6 @@
 <main class="sub_wrap inner">
 	<div class="stitle tal bdb">교육 · 자격증 신청</div>
 
-	@if ($errors->any())
-		<div class="alert alert-danger mb30">
-			<strong>입력값을 다시 확인해주세요.</strong>
-			<ul class="mt10">
-				@foreach ($errors->all() as $error)
-					<li>{{ $error }}</li>
-				@endforeach
-			</ul>
-		</div>
-	@endif
-
 	<form method="POST" action="{{ route('education_certification.application_ec_apply.store') }}" enctype="multipart/form-data" class="application_form">
 		@csrf
 		<input type="hidden" name="education_id" value="{{ $education->id }}">
@@ -74,7 +63,7 @@
 				<dd class="colm">
 					<input type="text" name="refund_account_holder" class="text w1 @error('refund_account_holder') is-invalid @enderror" placeholder="예금주명을 입력해주세요." value="{{ old('refund_account_holder') }}">
 					@error('refund_account_holder')
-						<p class="invalid-feedback">{{ $message }}</p>
+						<p class="join_field_error" style="color:#c00;font-size:0.875rem;margin-top:0.25rem;">{{ $message }}</p>
 					@enderror
 					<select name="refund_bank_name" class="text w1 @error('refund_bank_name') is-invalid @enderror">
 						<option value="">은행을 선택해주세요.</option>
@@ -83,11 +72,11 @@
 						@endforeach
 					</select>
 					@error('refund_bank_name')
-						<p class="invalid-feedback">{{ $message }}</p>
+						<p class="join_field_error" style="color:#c00;font-size:0.875rem;margin-top:0.25rem;">{{ $message }}</p>
 					@enderror
 					<input type="text" name="refund_account_number" class="text w1 @error('refund_account_number') is-invalid @enderror" placeholder="계좌번호를 입력해주세요." value="{{ old('refund_account_number') }}">
 					@error('refund_account_number')
-						<p class="invalid-feedback">{{ $message }}</p>
+						<p class="join_field_error" style="color:#c00;font-size:0.875rem;margin-top:0.25rem;">{{ $message }}</p>
 					@enderror
 				</dd>
 			</dl>
@@ -143,7 +132,7 @@
 				</table>
 			@endif
 			@error('fee_type')
-				<p class="invalid-feedback mt10">{{ $message }}</p>
+				<p class="join_field_error" style="color:#c00;font-size:0.875rem;margin-top:0.25rem;">{{ $message }}</p>
 			@enderror
 		</div>
 		
@@ -241,10 +230,7 @@
 				<dl>
 					<dt>발행번호</dt>
 					<dd>
-						<input type="text" name="cash_receipt_number" class="w1 @error('cash_receipt_number') is-invalid @enderror" value="{{ old('cash_receipt_number', $member->phone_number) }}" placeholder="휴대폰번호 또는 사업자등록번호">
-						@error('cash_receipt_number')
-							<p class="invalid-feedback">{{ $message }}</p>
-						@enderror
+						<input type="text" name="cash_receipt_number" class="w1" value="{{ old('cash_receipt_number', $member->phone_number) }}" placeholder="휴대폰번호 또는 사업자등록번호">
 					</dd>
 				</dl>
 			</div>
@@ -267,30 +253,21 @@
 				<dl>
 					<dt>사업자등록번호</dt>
 					<dd>
-						<input type="text" name="registration_number" class="w1 @error('registration_number') is-invalid @enderror" placeholder="사업자등록번호를 입력해주세요." value="{{ old('registration_number') }}">
-						@error('registration_number')
-							<p class="invalid-feedback">{{ $message }}</p>
-						@enderror
+						<input type="text" name="registration_number" class="w1" placeholder="사업자등록번호를 입력해주세요." value="{{ old('registration_number') }}">
 					</dd>
 				</dl>
 				<dl>
 					<dt>상호명</dt>
 					<dd>
-						<input type="text" name="company_name" class="w1 @error('company_name') is-invalid @enderror" placeholder="상호명을 입력해주세요." value="{{ old('company_name') }}">
-						@error('company_name')
-							<p class="invalid-feedback">{{ $message }}</p>
-						@enderror
+						<input type="text" name="company_name" class="w1" placeholder="상호명을 입력해주세요." value="{{ old('company_name') }}">
 					</dd>
 				</dl>
 				<dl>
 					<dt>담당자 정보</dt>
 					<dd class="colm">
-						<input type="text" name="contact_person_name" class="w1 @error('contact_person_name') is-invalid @enderror" placeholder="담당자명 입력해주세요." value="{{ old('contact_person_name') }}">
-						<input type="text" name="contact_person_email" class="w1 @error('contact_person_email') is-invalid @enderror" placeholder="이메일을 입력해주세요." value="{{ old('contact_person_email') }}" inputmode="email">
-						<input type="text" name="contact_person_phone" class="w1 @error('contact_person_phone') is-invalid @enderror" placeholder="연락처를 입력해주세요." value="{{ old('contact_person_phone') }}">
-						@error('contact_person_name')<p class="invalid-feedback">{{ $message }}</p>@enderror
-						@error('contact_person_email')<p class="invalid-feedback">{{ $message }}</p>@enderror
-						@error('contact_person_phone')<p class="invalid-feedback">{{ $message }}</p>@enderror
+						<input type="text" name="contact_person_name" class="w1" placeholder="담당자명 입력해주세요." value="{{ old('contact_person_name') }}">
+						<input type="text" name="contact_person_email" class="w1" placeholder="이메일을 입력해주세요." value="{{ old('contact_person_email') }}" inputmode="email">
+						<input type="text" name="contact_person_phone" class="w1" placeholder="연락처를 입력해주세요." value="{{ old('contact_person_phone') }}">
 					</dd>
 				</dl>
 				<dl>
@@ -301,9 +278,6 @@
 							<span>파일선택</span>
 						</label>
 						<div class="file_input">선택된 파일 없음</div>
-						@error('business_registration')
-							<p class="invalid-feedback mt10">{{ $message }}</p>
-						@enderror
 					</dd>
 				</dl>
 			</div>

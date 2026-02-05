@@ -1,25 +1,26 @@
 @extends('layouts.app')
 @section('content')
 <main class="sub_wrap inner">
-    
+	@php
+		$categoryLabels = ['전체' => '전체'] + array_combine($categories, $categories);
+		$currentCategory = $filters['category'] ?? '전체';
+	@endphp
+
 	<div class="mo_select_box">
-		<button type="button" class="btn_select mo_vw">전체(20개)</button>
+		<button type="button" class="btn_select mo_vw">{{ $currentCategory }}({{ $inquiries->total() }}개)</button>
 		<ul class="round_tabs mb80">
-			<li class="on"><a href="#this">전체</a></li>
-			<li><a href="#this">교육</a></li>
-			<li><a href="#this">자격증</a></li>
-			<li><a href="#this">세미나</a></li>
-			<li><a href="#this">해외연수</a></li>
-			<li><a href="#this">기타</a></li>
+			@foreach($categoryLabels as $value => $label)
+			<li class="{{ $currentCategory === $value ? 'on' : '' }}"><a href="{{ route('mypage.my_inquiries', $value === '전체' ? [] : ['category' => $value]) }}">{{ $label }}</a></li>
+			@endforeach
 		</ul>
 	</div>
 
 	<div class="board_top mt80">
 		<div class="left">
-			<p>TOTAL <strong>20</strong></p>
+			<p>TOTAL <strong>{{ $inquiries->total() }}</strong></p>
 		</div>
 		<div class="right right_btns">
-			<a href="/mypage/my_inquiries_write" class="btn btn_write btn_wbb flex_center">글쓰기</a>
+			<a href="{{ route('mypage.my_inquiries_write') }}" class="btn btn_write btn_wbb flex_center">글쓰기</a>
 		</div>
 	</div>
 
@@ -42,93 +43,25 @@
 				</tr>
 			</thead>
 			<tbody>
+				@forelse($inquiries as $index => $inquiry)
 				<tr>
-					<td class="num">10</td>
-					<td class="type">교육</td>
-					<td class="tit tal"><a href="/mypage/my_inquiries_view">문의제목입니다. 문의제목입니다. 문의제목입니다. 문의제목입니다.</a></td>
-					<td class="date">2025.11.11</td>
-					<td class="state"><i class="answer_ing">미답변</i></td>
+					<td class="num">{{ $inquiries->total() - ($inquiries->currentPage() - 1) * $inquiries->perPage() - $index }}</td>
+					<td class="type">{{ $inquiry->category }}</td>
+					<td class="tit tal"><a href="{{ route('mypage.my_inquiries_view', $inquiry->id) }}">{{ $inquiry->title }}</a></td>
+					<td class="date">{{ $inquiry->created_at->format('Y.m.d') }}</td>
+					<td class="state">@if($inquiry->status === '답변완료')<i class="answer_end">답변완료</i>@else<i class="answer_ing">미답변</i>@endif</td>
 				</tr>
+				@empty
 				<tr>
-					<td class="num">9</td>
-					<td class="type">기타</td>
-					<td class="tit tal"><a href="/mypage/my_inquiries_view">문의제목입니다. 문의제목입니다. 문의제목입니다. 문의제목입니다.</a></td>
-					<td class="date">2025.11.11</td>
-					<td class="state"><i class="answer_end">답변완료</i></td>
+					<td colspan="5" class="tac" style="padding:40px 0; color:#6D7882;">등록된 문의가 없습니다.</td>
 				</tr>
-				<tr>
-					<td class="num">8</td>
-					<td class="type">자격증</td>
-					<td class="tit tal"><a href="/mypage/my_inquiries_view">문의제목입니다. 문의제목입니다. 문의제목입니다. 문의제목입니다.</a></td>
-					<td class="date">2025.11.11</td>
-					<td class="state"><i class="answer_end">답변완료</i></td>
-				</tr>
-				<tr>
-					<td class="num">7</td>
-					<td class="type">해외연수</td>
-					<td class="tit tal"><a href="/mypage/my_inquiries_view">문의제목입니다. 문의제목입니다. 문의제목입니다. 문의제목입니다.</a></td>
-					<td class="date">2025.11.11</td>
-					<td class="state"><i class="answer_end">답변완료</i></td>
-				</tr>
-				<tr>
-					<td class="num">6</td>
-					<td class="type">해외연수</td>
-					<td class="tit tal"><a href="/mypage/my_inquiries_view">문의제목입니다. 문의제목입니다. 문의제목입니다. 문의제목입니다.</a></td>
-					<td class="date">2025.11.11</td>
-					<td class="state"><i class="answer_end">답변완료</i></td>
-				</tr>
-				<tr>
-					<td class="num">5</td>
-					<td class="type">해외연수</td>
-					<td class="tit tal"><a href="/mypage/my_inquiries_view">문의제목입니다. 문의제목입니다. 문의제목입니다. 문의제목입니다.</a></td>
-					<td class="date">2025.11.11</td>
-					<td class="state"><i class="answer_end">답변완료</i></td>
-				</tr>
-				<tr>
-					<td class="num">4</td>
-					<td class="type">해외연수</td>
-					<td class="tit tal"><a href="/mypage/my_inquiries_view">문의제목입니다. 문의제목입니다. 문의제목입니다. 문의제목입니다.</a></td>
-					<td class="date">2025.11.11</td>
-					<td class="state"><i class="answer_end">답변완료</i></td>
-				</tr>
-				<tr>
-					<td class="num">3</td>
-					<td class="type">해외연수</td>
-					<td class="tit tal"><a href="/mypage/my_inquiries_view">문의제목입니다. 문의제목입니다. 문의제목입니다. 문의제목입니다.</a></td>
-					<td class="date">2025.11.11</td>
-					<td class="state"><i class="answer_end">답변완료</i></td>
-				</tr>
-				<tr>
-					<td class="num">2</td>
-					<td class="type">해외연수</td>
-					<td class="tit tal"><a href="/mypage/my_inquiries_view">문의제목입니다. 문의제목입니다. 문의제목입니다. 문의제목입니다.</a></td>
-					<td class="date">2025.11.11</td>
-					<td class="state"><i class="answer_end">답변완료</i></td>
-				</tr>
-				<tr>
-					<td class="num">1</td>
-					<td class="type">해외연수</td>
-					<td class="tit tal"><a href="/mypage/my_inquiries_view">문의제목입니다. 문의제목입니다. 문의제목입니다. 문의제목입니다.</a></td>
-					<td class="date">2025.11.11</td>
-					<td class="state"><i class="answer_end">답변완료</i></td>
-				</tr>
+				@endforelse
 			</tbody>
 		</table>
 	</div>
 
-	<div class="board_bottom">
-		<div class="paging">
-			<a href="#this" class="arrow two first">맨끝</a>
-			<a href="#this" class="arrow one prev">이전</a>
-			<a href="#this" class="on">1</a>
-			<a href="#this">2</a>
-			<a href="#this">3</a>
-			<a href="#this">4</a>
-			<a href="#this">5</a>
-			<a href="#this" class="arrow one next">다음</a>
-			<a href="#this" class="arrow two last">맨끝</a>
-		</div>
-	</div> <!-- //board_bottom -->
+	@php $posts = $inquiries; @endphp
+	@include('notice.partials.pagination')
 
 </main>
 

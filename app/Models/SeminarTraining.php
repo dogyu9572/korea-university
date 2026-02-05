@@ -12,6 +12,7 @@ class SeminarTraining extends Model
     protected $fillable = [
         'type',
         'education_class',
+        'total_sessions_class',
         'is_public',
         'application_status',
         'name',

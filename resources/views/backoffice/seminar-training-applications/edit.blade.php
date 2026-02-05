@@ -1,6 +1,6 @@
 @extends('backoffice.layouts.app')
 
-@section('title', '세미나/해외연수 신청내역 (수정)')
+@section('title', '세미나/해외연수 신청내역')
 
 @section('styles')
 <link rel="stylesheet" href="{{ asset('css/backoffice/members.css') }}">
@@ -46,6 +46,7 @@
 </div>
 
 @include('backoffice.education-applications._member_search_modal')
+@include('backoffice.seminar-training-applications._roommate_requests_modal')
 @endsection
 
 @section('scripts')

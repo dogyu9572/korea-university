@@ -405,6 +405,15 @@ function initMemberSearchForm() {
 
 // create/edit 페이지: 회원 검색 버튼 바인딩
 function initCreateEditPageHandlers() {
+    const clearAttachmentBtn = document.querySelector('[data-action="clear-attachment-files"]');
+    if (clearAttachmentBtn) {
+        clearAttachmentBtn.addEventListener('click', function () {
+            if (!confirm('사업자등록증 선택 파일을 삭제하시겠습니까?')) return;
+            const row = this.closest('.form-row-inline');
+            const fileInput = row && row.querySelector('input[type="file"][name="attachments[]"]');
+            if (fileInput) fileInput.value = '';
+        });
+    }
     const openSearchBtn = document.querySelector('[data-action="open-member-search"]');
     if (openSearchBtn) {
         openSearchBtn.addEventListener('click', function () {
@@ -420,9 +429,105 @@ function initCreateEditPageHandlers() {
     const openRoommateRequestsBtn = document.querySelector('[data-action="open-roommate-requests"]');
     if (openRoommateRequestsBtn) {
         openRoommateRequestsBtn.addEventListener('click', function () {
-            alert('룸메이트 요청 내역 기능은 준비 중입니다.');
+            const form = document.getElementById('applicationForm');
+            const listUrl = form?.getAttribute('data-roommate-requests-url');
+            if (!listUrl) return;
+            const modal = document.getElementById('roommateRequestsModal');
+            const tbody = document.getElementById('roommateRequestsResults');
+            if (!modal || !tbody) return;
+            tbody.innerHTML = '<tr><td colspan="6" class="text-center">요청 내역을 불러오는 중입니다.</td></tr>';
+            $(modal).modal('show');
+            fetch(listUrl, { method: 'GET', headers: { 'Accept': 'application/json', 'X-Requested-With': 'XMLHttpRequest' } })
+                .then(function (res) { return res.json(); })
+                .then(function (data) {
+                    const list = (data && data.list) ? data.list : [];
+                    if (list.length === 0) {
+                        tbody.innerHTML = '<tr><td colspan="6" class="text-center text-muted">받은 룸메이트 요청이 없습니다.</td></tr>';
+                        return;
+                    }
+                    tbody.innerHTML = list.map(function (row) {
+                        return '<tr>' +
+                            '<td>' + (row.no || '') + '</td>' +
+                            '<td>' + (row.login_id || '') + '</td>' +
+                            '<td>' + (row.name || '') + '</td>' +
+                            '<td>' + (row.phone_number || '') + '</td>' +
+                            '<td><button type="button" class="btn btn-primary btn-sm" data-roommate-approve="' + row.application_id + '">승인</button></td>' +
+                            '<td><button type="button" class="btn btn-outline-secondary btn-sm" data-roommate-reject="' + row.application_id + '">거절</button></td>' +
+                            '</tr>';
+                    }).join('');
+                })
+                .catch(function () {
+                    tbody.innerHTML = '<tr><td colspan="6" class="text-center text-danger">요청 내역을 불러오지 못했습니다.</td></tr>';
+                });
         });
     }
+    document.addEventListener('click', function (e) {
+        const approveBtn = e.target.closest('[data-roommate-approve]');
+        const rejectBtn = e.target.closest('[data-roommate-reject]');
+        const form = document.getElementById('applicationForm');
+        const listUrl = form?.getAttribute('data-roommate-requests-url');
+        const approveUrl = form?.getAttribute('data-roommate-requests-approve-url');
+        const rejectUrl = form?.getAttribute('data-roommate-requests-reject-url');
+        const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content');
+        if (approveBtn && approveUrl && csrfToken) {
+            e.preventDefault();
+            const applicationId = approveBtn.getAttribute('data-roommate-approve');
+            if (!applicationId) return;
+            approveBtn.disabled = true;
+            fetch(approveUrl, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': csrfToken, 'Accept': 'application/json', 'X-Requested-With': 'XMLHttpRequest' },
+                body: JSON.stringify({ requesting_application_id: applicationId })
+            })
+                .then(function (res) { return res.json(); })
+                .then(function (data) {
+                    if (data && data.success) {
+                        if (data.roommate) {
+                            const idEl = document.getElementById('roommate_member_id');
+                            const nameEl = document.getElementById('roommate_name');
+                            const phoneEl = document.getElementById('roommate_phone');
+                            const displayEl = document.getElementById('roommate_display');
+                            if (idEl) idEl.value = data.roommate.member_id || '';
+                            if (nameEl) nameEl.value = data.roommate.name || '';
+                            if (phoneEl) phoneEl.value = data.roommate.phone || '';
+                            if (displayEl) displayEl.value = (data.roommate.name && data.roommate.phone) ? data.roommate.name + ' / ' + data.roommate.phone : (data.roommate.name || data.roommate.phone || '');
+                        }
+                        $('#roommateRequestsModal').modal('hide');
+                        alert(data.message || '승인 완료되었습니다.');
+                    } else {
+                        alert(data.message || '처리 중 오류가 발생했습니다.');
+                    }
+                })
+                .catch(function () { alert('처리 중 오류가 발생했습니다.'); })
+                .finally(function () { approveBtn.disabled = false; });
+            return;
+        }
+        if (rejectBtn && rejectUrl && csrfToken) {
+            e.preventDefault();
+            const applicationId = rejectBtn.getAttribute('data-roommate-reject');
+            if (!applicationId) return;
+            if (!confirm('해당 룸메이트 요청을 거절하시겠습니까?')) return;
+            rejectBtn.disabled = true;
+            fetch(rejectUrl, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': csrfToken, 'Accept': 'application/json', 'X-Requested-With': 'XMLHttpRequest' },
+                body: JSON.stringify({ requesting_application_id: applicationId })
+            })
+                .then(function (res) { return res.json(); })
+                .then(function (data) {
+                    if (data && data.success) {
+                        alert('거절하였습니다.');
+                        var openBtn = document.querySelector('[data-action="open-roommate-requests"]');
+                        if (openBtn) openBtn.click();
+                    } else {
+                        alert(data.message || '처리 중 오류가 발생했습니다.');
+                    }
+                })
+                .catch(function () { alert('처리 중 오류가 발생했습니다.'); })
+                .finally(function () { rejectBtn.disabled = false; });
+            return;
+        }
+    });
     // 세미나/해외연수: 참가비 타입 동기화 (회원교/비회원교 + 2인1실/1인실/비숙박 -> fee_type)
     const feeTypeEl = document.getElementById('fee_type');
     const feeSchoolRadios = document.querySelectorAll('input[name="fee_school_type"]');

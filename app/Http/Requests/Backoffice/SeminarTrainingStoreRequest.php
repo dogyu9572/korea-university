@@ -16,6 +16,7 @@ class SeminarTrainingStoreRequest extends FormRequest
         return [
             'type' => 'required|in:세미나,해외연수',
             'education_class' => 'nullable|string|max:255',
+            'total_sessions_class' => 'nullable|string|max:255',
             'is_public' => 'nullable|boolean',
             'application_status' => 'required|in:접수중,접수마감,접수예정,비공개',
             'name' => 'required|string|max:255',

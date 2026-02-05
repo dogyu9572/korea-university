@@ -90,6 +90,12 @@ class MemberJoinRequest extends FormRequest
         $data['is_school_representative'] = (bool) ($data['is_school_representative'] ?? false);
         $data['email_marketing_consent'] = (bool) ($data['email_marketing_consent'] ?? false);
         $data['kakao_marketing_consent'] = (bool) ($data['kakao_marketing_consent'] ?? false);
+        if ($data['kakao_marketing_consent']) {
+            $data['kakao_marketing_consent_at'] = now();
+        }
+        if ($data['email_marketing_consent']) {
+            $data['email_marketing_consent_at'] = now();
+        }
         return $data;
     }
 }

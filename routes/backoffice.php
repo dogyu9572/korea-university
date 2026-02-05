@@ -359,6 +359,12 @@ Route::prefix('backoffice')->middleware(['backoffice'])->group(function () {
         ->name('backoffice.seminar-training-applications.update');
     Route::delete('seminar-training-applications/{education_application}', [EducationApplicationController::class, 'destroy'])
         ->name('backoffice.seminar-training-applications.destroy');
+    Route::get('seminar-training-applications/{education_application}/roommate-requests', [EducationApplicationController::class, 'roommateRequests'])
+        ->name('backoffice.seminar-training-applications.roommate-requests');
+    Route::post('seminar-training-applications/{education_application}/roommate-requests/approve', [EducationApplicationController::class, 'approveRoommateRequest'])
+        ->name('backoffice.seminar-training-applications.roommate-requests.approve');
+    Route::post('seminar-training-applications/{education_application}/roommate-requests/reject', [EducationApplicationController::class, 'rejectRoommateRequest'])
+        ->name('backoffice.seminar-training-applications.roommate-requests.reject');
     Route::put('seminar-training-applications/{program}/status', [EducationApplicationController::class, 'updateStatus'])
         ->name('backoffice.seminar-training-applications.update-status');
     Route::post('seminar-training-applications/{program}/export', [EducationApplicationController::class, 'export'])

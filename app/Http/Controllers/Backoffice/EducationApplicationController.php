@@ -495,6 +495,108 @@ class EducationApplicationController extends BaseController
     }
 
     /**
+     * 받은 룸메이트 요청 목록 (세미나/해외연수 신청 수정 시)
+     * 같은 세미나에서 이 신청자를 룸메이트로 선택한 다른 신청 목록
+     */
+    public function roommateRequests(EducationApplication $education_application)
+    {
+        if (!$education_application->seminar_training_id || !$education_application->member_id) {
+            return response()->json(['list' => []]);
+        }
+
+        $list = EducationApplication::query()
+            ->where('seminar_training_id', $education_application->seminar_training_id)
+            ->where('roommate_member_id', $education_application->member_id)
+            ->where('id', '!=', $education_application->id)
+            ->with('member:id,login_id,name,phone_number')
+            ->orderBy('id')
+            ->get()
+            ->map(function ($row, $index) {
+                $m = $row->member;
+                return [
+                    'application_id' => $row->id,
+                    'member_id' => $row->member_id,
+                    'login_id' => $m ? $m->login_id : '',
+                    'name' => $m ? $m->name : $row->applicant_name,
+                    'phone_number' => $m ? $m->phone_number : $row->phone_number,
+                    'no' => $index + 1,
+                ];
+            })
+            ->values()
+            ->all();
+
+        return response()->json(['list' => $list]);
+    }
+
+    /**
+     * 룸메이트 요청 승인: 이 신청서의 룸메이트를 선택한 요청자로 설정, 나머지 요청은 거절 처리
+     */
+    public function approveRoommateRequest(Request $request, EducationApplication $education_application)
+    {
+        if (!$education_application->seminar_training_id) {
+            return response()->json(['success' => false, 'message' => '세미나/해외연수 신청이 아닙니다.'], 400);
+        }
+
+        $request->validate(['requesting_application_id' => 'required|integer|exists:education_applications,id']);
+
+        $requesting = EducationApplication::query()
+            ->where('id', $request->requesting_application_id)
+            ->where('seminar_training_id', $education_application->seminar_training_id)
+            ->where('roommate_member_id', $education_application->member_id)
+            ->with('member:id,name,phone_number')
+            ->first();
+
+        if (!$requesting) {
+            return response()->json(['success' => false, 'message' => '해당 요청을 찾을 수 없습니다.'], 400);
+        }
+
+        $roommate = $requesting->member;
+        $education_application->update([
+            'roommate_member_id' => $roommate ? $roommate->id : $requesting->member_id,
+            'roommate_name' => $roommate ? $roommate->name : $requesting->applicant_name,
+            'roommate_phone' => $roommate ? $roommate->phone_number : $requesting->phone_number,
+        ]);
+
+        EducationApplication::query()
+            ->where('seminar_training_id', $education_application->seminar_training_id)
+            ->where('roommate_member_id', $education_application->member_id)
+            ->where('id', '!=', $request->requesting_application_id)
+            ->update(['roommate_member_id' => null, 'roommate_name' => null, 'roommate_phone' => null]);
+
+        return response()->json([
+            'success' => true,
+            'message' => '승인 완료되었습니다.',
+            'roommate' => [
+                'member_id' => $education_application->roommate_member_id,
+                'name' => $education_application->roommate_name,
+                'phone' => $education_application->roommate_phone,
+            ],
+        ]);
+    }
+
+    /**
+     * 룸메이트 요청 거절: 해당 신청서의 룸메이트 선택 해제
+     */
+    public function rejectRoommateRequest(Request $request, EducationApplication $education_application)
+    {
+        $request->validate(['requesting_application_id' => 'required|integer|exists:education_applications,id']);
+
+        $requesting = EducationApplication::query()
+            ->where('id', $request->requesting_application_id)
+            ->where('seminar_training_id', $education_application->seminar_training_id)
+            ->where('roommate_member_id', $education_application->member_id)
+            ->first();
+
+        if (!$requesting) {
+            return response()->json(['success' => false, 'message' => '해당 요청을 찾을 수 없습니다.'], 400);
+        }
+
+        $requesting->update(['roommate_member_id' => null, 'roommate_name' => null, 'roommate_phone' => null]);
+
+        return response()->json(['success' => true, 'message' => '거절하였습니다.']);
+    }
+
+    /**
      * 신청 삭제
      */
     public function destroy(EducationApplication $education_application)

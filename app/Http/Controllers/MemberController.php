@@ -35,28 +35,30 @@ class MemberController extends Controller
         return redirect()->route('member.join_end')->with('success', '회원가입이 완료되었습니다.');
     }
 
-    /** 이메일 중복 확인 (AJAX) */
+    /** 이메일 중복 확인 (AJAX) - 로그인 회원이면 본인 제외 */
     public function checkEmail(Request $request, MemberService $memberService)
     {
         $email = $request->input('email');
         if (!$email) {
             return response()->json(['available' => false, 'message' => '이메일을 입력해 주세요.'], 400);
         }
-        $exists = $memberService->checkDuplicateEmail($email, null);
+        $excludeId = $request->input('exclude_id') ?? Auth::guard('member')->id();
+        $exists = $memberService->checkDuplicateEmail($email, $excludeId);
         return response()->json([
             'available' => !$exists,
             'message' => $exists ? '이미 사용 중인 이메일입니다.' : '사용 가능한 이메일입니다.',
         ]);
     }
 
-    /** 휴대폰 중복 확인 (AJAX) */
+    /** 휴대폰 중복 확인 (AJAX) - 로그인 회원이면 본인 제외 */
     public function checkPhone(Request $request, MemberService $memberService)
     {
         $phone = $request->input('phone');
         if (!$phone) {
             return response()->json(['available' => false, 'message' => '휴대폰번호를 입력해 주세요.'], 400);
         }
-        $exists = $memberService->checkDuplicatePhone($phone, null);
+        $excludeId = $request->input('exclude_id') ?? Auth::guard('member')->id();
+        $exists = $memberService->checkDuplicatePhone($phone, $excludeId);
         return response()->json([
             'available' => !$exists,
             'message' => $exists ? '이미 사용 중인 휴대폰번호입니다.' : '사용 가능한 휴대폰번호입니다.',

@@ -50,9 +50,14 @@ Route::prefix('seminars_training')->name('seminars_training.')->group(function (
     Route::get('/seminar', [SubController::class, 'seminar'])->name('seminar');
     Route::get('/overseas_training', [SubController::class, 'overseas_training'])->name('overseas_training');
     Route::get('/application_st', [SeminarTrainingController::class, 'application_st'])->name('application_st');
-    Route::get('/application_st_view', [SeminarTrainingController::class, 'application_st_view'])->name('application_st_view');
-    Route::get('/application_st_apply', [SeminarTrainingController::class, 'application_st_apply'])->name('application_st_apply');
-    Route::get('/application_st_apply_end', [SeminarTrainingController::class, 'application_st_apply_end'])->name('application_st_apply_end');
+    Route::get('/application_st_view/{id}', [SeminarTrainingController::class, 'application_st_view'])->name('application_st_view')->whereNumber('id');
+
+    Route::middleware('member')->group(function () {
+        Route::get('/application_st_apply', [SeminarTrainingController::class, 'application_st_apply'])->name('application_st_apply');
+        Route::post('/application_st_apply', [SeminarTrainingController::class, 'storeSeminarTrainingApplication'])->name('application_st_apply.store');
+        Route::get('/application_st_apply_end', [SeminarTrainingController::class, 'application_st_apply_end'])->name('application_st_apply_end');
+        Route::get('/roommate_check', [SeminarTrainingController::class, 'checkRoommateMember'])->name('roommate_check');
+    });
 });
 
 // 알림마당 (게시판 연동) - NoticeController
@@ -96,9 +101,12 @@ Route::prefix('mypage')->name('mypage.')->middleware('member')->group(function (
     Route::get('/my_qualification', [MypageController::class, 'my_qualification'])->name('my_qualification');
     Route::get('/my_qualification_view', [MypageController::class, 'my_qualification_view'])->name('my_qualification_view');
     Route::get('/my_inquiries', [MypageController::class, 'my_inquiries'])->name('my_inquiries');
-    Route::get('/my_inquiries_view', [MypageController::class, 'my_inquiries_view'])->name('my_inquiries_view');
+    Route::post('/my_inquiries', [MypageController::class, 'my_inquiries_store'])->name('my_inquiries.store');
+    Route::get('/my_inquiries_view/{id}', [MypageController::class, 'my_inquiries_view'])->name('my_inquiries_view');
     Route::get('/my_inquiries_write', [MypageController::class, 'my_inquiries_write'])->name('my_inquiries_write');
     Route::get('/edit_member_information', [MypageController::class, 'edit_member_information'])->name('edit_member_information');
+    Route::put('/edit_member_information', [MypageController::class, 'update_member_information'])->name('edit_member_information.update');
+    Route::post('/secession', [MypageController::class, 'secession'])->name('secession');
 });
 
 // 회원 (로그인/가입/ID·PW 찾기) - MemberController

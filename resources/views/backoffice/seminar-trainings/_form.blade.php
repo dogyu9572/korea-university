@@ -79,6 +79,13 @@
             </div>
 
             <div class="member-form-row">
+                <label class="member-form-label">총차시/기수</label>
+                <div class="member-form-field">
+                    <input type="text" class="board-form-control" name="total_sessions_class" value="{{ old('total_sessions_class', $program->total_sessions_class ?? '') }}">
+                </div>
+            </div>
+
+            <div class="member-form-row">
                 <label class="member-form-label">교육장소</label>
                 <div class="member-form-field">
                     <input type="text" class="board-form-control" name="location" value="{{ old('location', $program->location ?? '') }}">

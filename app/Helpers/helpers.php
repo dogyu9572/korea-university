@@ -46,6 +46,7 @@ function get_application_button_state(string $status, string $programType, int $
             'education' => route('education_certification.application_ec_apply') . '?education_id=',
             'certification' => route('education_certification.application_ec_receipt') . '?certification_id=',
             'online' => route('education_certification.application_ec_e_learning') . '?online_education_id=',
+            'seminar_training' => route('seminars_training.application_st_apply') . '?seminar_training_id=',
         ];
         $url = $routes[$programType] ?? route('education_certification.application_ec_apply') . '?education_id=';
 
@@ -85,4 +86,25 @@ function format_education_fee(object $education): string
     }
 
     return implode(', ', $parts) ?: '';
+}
+
+/**
+ * 참가비를 옵션 명칭과 함께 반환합니다. (예: 750,000원(2인 1실), 990,000원(1인실))
+ * fee_member_* / fee_guest_* 컬럼을 타입별(2인1실/1인실/비숙박)로 하나씩 표시합니다.
+ */
+function format_fee_with_option_names(object $program): string
+{
+    $groups = [
+        ['fee_member_twin', 'fee_guest_twin', '2인 1실'],
+        ['fee_member_single', 'fee_guest_single', '1인실'],
+        ['fee_member_no_stay', 'fee_guest_no_stay', '비숙박'],
+    ];
+    $parts = [];
+    foreach ($groups as [$memberCol, $guestCol, $label]) {
+        $amount = $program->$memberCol ?? $program->$guestCol;
+        if ($amount !== null && $amount !== '') {
+            $parts[] = number_format((float) $amount) . '원(' . $label . ')';
+        }
+    }
+    return implode(', ', $parts);
 }
