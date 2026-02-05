@@ -198,4 +198,32 @@ class EducationApplication extends Model
         }
         return '';
     }
+
+    /**
+     * 자격증 신청 목록/상세용 표시상태 (접수완료/합격/불합격)
+     * score 미입력 시 접수완료, score >= passing_score 시 합격, 그 외 불합격
+     */
+    public function getQualificationDisplayStatusAttribute(): string
+    {
+        if (!$this->certification_id) {
+            return '접수완료';
+        }
+        $cert = $this->relationLoaded('certification') ? $this->certification : $this->certification()->first();
+        if (!$cert) {
+            return '접수완료';
+        }
+        $passing = (int) ($cert->passing_score ?? 0);
+        if ($this->score === null) {
+            return '접수완료';
+        }
+        return $this->score >= $passing ? '합격' : '불합격';
+    }
+
+    /**
+     * 자격증 신청 합격 여부 (합격확인서/자격증 발급 조건)
+     */
+    public function getIsQualificationPassedAttribute(): bool
+    {
+        return $this->qualification_display_status === '합격';
+    }
 }

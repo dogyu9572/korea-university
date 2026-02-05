@@ -102,8 +102,11 @@ Route::prefix('mypage')->name('mypage.')->middleware('member')->group(function (
     Route::get('/print/receipt/{id}', [MypageController::class, 'printReceipt'])->name('print.receipt')->whereNumber('id');
     Route::get('/print/certificate_completion/{id}', [MypageController::class, 'printCertificateCompletion'])->name('print.certificate_completion')->whereNumber('id');
     Route::get('/print/certificate_finish/{id}', [MypageController::class, 'printCertificateFinish'])->name('print.certificate_finish')->whereNumber('id');
+    Route::get('/print/admission_ticket/{id}', [MypageController::class, 'printAdmissionTicket'])->name('print.admission_ticket')->whereNumber('id');
+    Route::get('/print/certificate_qualification/{id}', [MypageController::class, 'printCertificateQualification'])->name('print.certificate_qualification')->whereNumber('id');
+    Route::get('/print/qualification_certificate/{id}', [MypageController::class, 'printQualificationCertificate'])->name('print.qualification_certificate')->whereNumber('id');
     Route::get('/my_qualification', [MypageController::class, 'my_qualification'])->name('my_qualification');
-    Route::get('/my_qualification_view', [MypageController::class, 'my_qualification_view'])->name('my_qualification_view');
+    Route::get('/my_qualification_view/{id}', [MypageController::class, 'my_qualification_view'])->name('my_qualification_view')->whereNumber('id');
     Route::get('/my_inquiries', [MypageController::class, 'my_inquiries'])->name('my_inquiries');
     Route::post('/my_inquiries', [MypageController::class, 'my_inquiries_store'])->name('my_inquiries.store');
     Route::get('/my_inquiries_view/{id}', [MypageController::class, 'my_inquiries_view'])->name('my_inquiries_view');

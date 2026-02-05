@@ -17,10 +17,18 @@
 			<label class="select"><input type="radio" name="print" data-url="/print/certificate_finish"><span>이수증 출력</span></label>
 			@endif
 			@if(isset($gNum) && $gNum == '05' && $sNum == '02')
-			<label class="select"><input type="radio" name="print" data-url="/print/admission_ticket"><span>수험표 출력</span></label>
-			<label class="select"><input type="radio" name="print" data-url="/print/receipt"><span>영수증 출력</span></label>
-			<label class="select"><input type="radio" name="print" data-url="/print/certificate"><span>자격증 출력</span></label>
-			<label class="select"><input type="radio" name="print" data-url="/print/certificate_qualification"><span>합격확인서 출력</span></label>
+			@if(isset($application) && $application->certification_id)
+			<label class="select"><input type="radio" name="print" data-url="{{ route('mypage.print.admission_ticket', $application->id) }}"><span>수험표 출력</span></label>
+			@if($application->payment_status === '입금완료')
+			<label class="select"><input type="radio" name="print" data-url="{{ route('mypage.print.receipt', $application->id) }}"><span>영수증 출력</span></label>
+			@endif
+			@if($application->is_qualification_passed)
+			<label class="select"><input type="radio" name="print" data-url="{{ route('mypage.print.certificate_qualification', $application->id) }}"><span>합격확인서 출력</span></label>
+			<label class="select"><input type="radio" name="print" data-url="{{ route('mypage.print.qualification_certificate', $application->id) }}"><span>자격증 출력</span></label>
+			@endif
+			@else
+			<div class="print_select" id="popPrintQualificationOptions"></div>
+			@endif
 			@endif
 		</div>
 		<div class="btns_tac mt0">

@@ -1,246 +1,88 @@
 @extends('layouts.app')
 @section('content')
 <main class="sub_wrap inner">
-	
+
 	<div class="stitle tal">나의 자격 현황</div>
-	
+
 	<div class="board_top">
 		<div class="left">
-			<p>TOTAL <strong>20</strong></p>
+			<p>TOTAL <strong>{{ $applications->total() }}</strong></p>
 		</div>
-	</div>
-	
-	<ul class="application_list">
- 		<li>
-			<a href="/mypage/my_qualification_view" class="link">
-				<span class="statebox"><i class="state pend">신청대기</i></span>
-				<span class="tit">대학연구행정전문가 2급 대학연구행정전문가 2급 대학연구행정전문가 2급대학연구행정전문가 2급 대학연구행정전문가 2급 대학연구행정전문가 2급</span>
-				<dl>
-					<dt>시험일자</dt>
-					<dd>2025-01-20 10:00</dd>
-				</dl>
-				<dl>
-					<dt>유효기간</dt>
-					<dd>2031-01-10</dd>
-				</dl>
-			</a>
-			<div class="btns">
-				<button type="button" class="btn btn_wbb btn_print" onclick="layerSlideShow('popPrint')">출력</button>
-				<button type="button" class="btn btn_cancel" onclick="layerShow('classCancel')">수강취소</button>
-			</div>
-		</li>
-		<li>
-			<a href="/mypage/my_qualification_view" class="link">
-				<span class="statebox"><i class="state complete">접수완료</i></span>
-				<span class="tit">대학연구행정전문가 2급</span>
-				<dl>
-					<dt>시험일자</dt>
-					<dd>2025-01-20 10:00</dd>
-				</dl>
-				<dl>
-					<dt>유효기간</dt>
-					<dd>2031-01-10</dd>
-				</dl>
-			</a>
-			<div class="btns">
-				<button type="button" class="btn btn_wbb btn_print" onclick="layerSlideShow('popPrint')">출력</button>
-				<button type="button" class="btn btn_cancel" onclick="layerShow('classCancel')">수강취소</button>
-			</div>
-		</li>
-		<li>
-			<a href="/mypage/my_qualification_view" class="link">
-				<span class="statebox"><i class="state pass">합격</i></span>
-				<span class="tit">대학연구행정전문가 2급</span>
-				<dl>
-					<dt>시험일자</dt>
-					<dd>2025-01-20 10:00</dd>
-				</dl>
-				<dl>
-					<dt>유효기간</dt>
-					<dd>2031-01-10</dd>
-				</dl>
-			</a>
-			<div class="btns">
-				<button type="button" class="btn btn_wbb btn_print" onclick="layerSlideShow('popPrint')">출력</button>
-				<button type="button" class="btn btn_cancel" onclick="layerShow('classCancel')">수강취소</button>
-			</div>
-		</li>
-		<li>
-			<a href="/mypage/my_qualification_view" class="link">
-				<span class="statebox"><i class="state fail">불합격</i></span>
-				<span class="tit">대학연구행정전문가 2급</span>
-				<dl>
-					<dt>시험일자</dt>
-					<dd>2025-01-20 10:00</dd>
-				</dl>
-				<dl>
-					<dt>유효기간</dt>
-					<dd>2031-01-10</dd>
-				</dl>
-			</a>
-			<div class="btns">
-				<button type="button" class="btn btn_wbb btn_print" onclick="layerSlideShow('popPrint')">출력</button>
-				<button type="button" class="btn btn_cancel" onclick="layerShow('classCancel')">수강취소</button>
-			</div>
-		</li>
-		<li>
-			<a href="/mypage/my_qualification_view" class="link">
-				<span class="statebox"><i class="state pend">신청대기</i></span>
-				<span class="tit">대학연구행정전문가 2급 대학연구행정전문가 2급 대학연구행정전문가 2급대학연구행정전문가 2급 대학연구행정전문가 2급 대학연구행정전문가 2급</span>
-				<dl>
-					<dt>시험일자</dt>
-					<dd>2025-01-20 10:00</dd>
-				</dl>
-				<dl>
-					<dt>유효기간</dt>
-					<dd>2031-01-10</dd>
-				</dl>
-			</a>
-			<div class="btns">
-				<button type="button" class="btn btn_wbb btn_print" onclick="layerSlideShow('popPrint')">출력</button>
-				<button type="button" class="btn btn_cancel" onclick="layerShow('classCancel')">수강취소</button>
-			</div>
-		</li>
-		<li>
-			<a href="/mypage/my_qualification_view" class="link">
-				<span class="statebox"><i class="state complete">접수완료</i></span>
-				<span class="tit">대학연구행정전문가 2급</span>
-				<dl>
-					<dt>시험일자</dt>
-					<dd>2025-01-20 10:00</dd>
-				</dl>
-				<dl>
-					<dt>유효기간</dt>
-					<dd>2031-01-10</dd>
-				</dl>
-			</a>
-			<div class="btns">
-				<button type="button" class="btn btn_wbb btn_print" onclick="layerSlideShow('popPrint')">출력</button>
-				<button type="button" class="btn btn_cancel" onclick="layerShow('classCancel')">수강취소</button>
-			</div>
-		</li>
-		<li>
-			<a href="/mypage/my_qualification_view" class="link">
-				<span class="statebox"><i class="state pass">합격</i></span>
-				<span class="tit">대학연구행정전문가 2급</span>
-				<dl>
-					<dt>시험일자</dt>
-					<dd>2025-01-20 10:00</dd>
-				</dl>
-				<dl>
-					<dt>유효기간</dt>
-					<dd>2031-01-10</dd>
-				</dl>
-			</a>
-			<div class="btns">
-				<button type="button" class="btn btn_wbb btn_print" onclick="layerSlideShow('popPrint')">출력</button>
-				<button type="button" class="btn btn_cancel" onclick="layerShow('classCancel')">수강취소</button>
-			</div>
-		</li>
-		<li>
-			<a href="/mypage/my_qualification_view" class="link">
-				<span class="statebox"><i class="state fail">불합격</i></span>
-				<span class="tit">대학연구행정전문가 2급</span>
-				<dl>
-					<dt>시험일자</dt>
-					<dd>2025-01-20 10:00</dd>
-				</dl>
-				<dl>
-					<dt>유효기간</dt>
-					<dd>2031-01-10</dd>
-				</dl>
-			</a>
-			<div class="btns">
-				<button type="button" class="btn btn_wbb btn_print" onclick="layerSlideShow('popPrint')">출력</button>
-				<button type="button" class="btn btn_cancel" onclick="layerShow('classCancel')">수강취소</button>
-			</div>
-		</li>
-		<li>
-			<a href="/mypage/my_qualification_view" class="link">
-				<span class="statebox"><i class="state pend">신청대기</i></span>
-				<span class="tit">대학연구행정전문가 2급 대학연구행정전문가 2급 대학연구행정전문가 2급대학연구행정전문가 2급 대학연구행정전문가 2급 대학연구행정전문가 2급</span>
-				<dl>
-					<dt>시험일자</dt>
-					<dd>2025-01-20 10:00</dd>
-				</dl>
-				<dl>
-					<dt>유효기간</dt>
-					<dd>2031-01-10</dd>
-				</dl>
-			</a>
-			<div class="btns">
-				<button type="button" class="btn btn_wbb btn_print" onclick="layerSlideShow('popPrint')">출력</button>
-				<button type="button" class="btn btn_cancel" onclick="layerShow('classCancel')">수강취소</button>
-			</div>
-		</li>
-	</ul>
 	</div>
 
-	<div class="board_bottom">
-		<div class="paging">
-			<a href="#this" class="arrow two first">맨끝</a>
-			<a href="#this" class="arrow one prev">이전</a>
-			<a href="#this" class="on">1</a>
-			<a href="#this">2</a>
-			<a href="#this">3</a>
-			<a href="#this">4</a>
-			<a href="#this">5</a>
-			<a href="#this" class="arrow one next">다음</a>
-			<a href="#this" class="arrow two last">맨끝</a>
-		</div>
-	</div> <!-- //board_bottom -->
-	
-	<!-- 신청취소 -->
-	<div class="popup" id="ClassCancel">
-		<div class="dm" onclick="layerHide('ClassCancel')"></div>
-		<div class="inbox">
-			<button type="button" class="btn_close" onclick="layerHide('ClassCancel')">닫기</button>
-			<div class="tit">신청취소</div>
-			<div class="con gbox">
-				<dl>
-					<dt>교육명</dt>
-					<dd>대학연구행정전문가 2급 대학연구행정전문가 2급 대학연구행정전문가 2급</dd>
-				</dl>
+	<ul class="application_list">
+		@forelse($applications as $item)
+		@php
+			$cert = $item->certification;
+			$stateClass = match($item->qualification_display_status) {
+				'접수완료' => 'complete',
+				'합격' => 'pass',
+				'불합격' => 'fail',
+				default => 'complete',
+			};
+			$examDateStr = $cert && $cert->exam_date ? $cert->exam_date->format('Y-m-d H:i') : '';
+			$admissionUrl = route('mypage.print.admission_ticket', $item->id);
+			$receiptUrl = $item->payment_status === '입금완료' ? route('mypage.print.receipt', $item->id) : '';
+			$passCertUrl = $item->is_qualification_passed ? route('mypage.print.certificate_qualification', $item->id) : '';
+			$qualCertUrl = $item->is_qualification_passed ? route('mypage.print.qualification_certificate', $item->id) : '';
+		@endphp
+		<li data-admission-ticket-url="{{ $admissionUrl }}"
+			data-receipt-url="{{ $receiptUrl }}"
+			data-certificate-qualification-url="{{ $passCertUrl }}"
+			data-qualification-certificate-url="{{ $qualCertUrl }}">
+			<a href="{{ route('mypage.my_qualification_view', $item->id) }}" class="link">
+				<span class="statebox"><i class="state {{ $stateClass }}">{{ $item->qualification_display_status }}</i></span>
+				<span class="tit">{{ $cert ? $cert->name : '' }}</span>
 				<dl>
 					<dt>시험일자</dt>
-					<dd>2025-01-20 10:00</dd>
+					<dd>{{ $examDateStr }}</dd>
 				</dl>
 				<dl>
-					<dt>환불금액</dt>
-					<dd>360,000원</dd>
+					<dt>유효기간</dt>
+					<dd>-</dd>
 				</dl>
+			</a>
+			<div class="btns">
+				<button type="button" class="btn btn_wbb btn_print">출력</button>
 			</div>
-			<div class="btns_tac">
-				<button type="button" class="btn btn_wbb">취소하기</button>
-			</div>
-		</div>
-	</div>
-	
+		</li>
+		@empty
+		<li class="empty">자격증 신청 내역이 없습니다.</li>
+		@endforelse
+	</ul>
+
+	@if($applications->hasPages())
+	@php $posts = $applications; @endphp
+	@include('notice.partials.pagination')
+	@endif
+
 	<!-- 출력 -->
 	@include('print.pop_print')
-    
+
 </main>
 
 <script>
-$(".filter_opcl .btn_opcl").click(function(){
-	$(this).next(".con").slideToggle("fast").parent().toggleClass("on");
-});
-$('.btn_reset').on('click', function () {
-	const $wrap = $(this).closest('.search_wrap');
-	$wrap.find('input[type="text"]').val('');
-	$wrap.find('.con select').each(function () {
-		this.selectedIndex = 0;
+document.querySelectorAll('.application_list .btn_print').forEach(function(btn) {
+	btn.addEventListener('click', function() {
+		var li = this.closest('li');
+		if (!li) return;
+		var options = document.getElementById('popPrintQualificationOptions');
+		if (!options) return;
+		var items = [
+			{ url: li.dataset.admissionTicketUrl, label: '수험표 출력' },
+			{ url: li.dataset.receiptUrl, label: '영수증 출력' },
+			{ url: li.dataset.certificateQualificationUrl, label: '합격확인서 출력' },
+			{ url: li.dataset.qualificationCertificateUrl, label: '자격증 출력' }
+		];
+		var html = '';
+		items.forEach(function(it) {
+			if (it.url) {
+				html += '<label class="select"><input type="radio" name="print" data-url="' + it.url + '"><span>' + it.label + '</span></label>';
+			}
+		});
+		options.innerHTML = html || '<p class="msg_error">발급 가능한 증빙이 없습니다.</p>';
+		if (typeof layerSlideShow === 'function') layerSlideShow('popPrint');
 	});
-	$wrap.find('.con input[type="checkbox"], .con input[type="radio"]').prop('checked', false);
 });
-
-//팝업
-function layerShow(id) {
-	$("#" + id).fadeIn(300);
-}
-function layerHide(id) {
-	$("#" + id).fadeOut(300);
-}
 </script>
-
 @endsection

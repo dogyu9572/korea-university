@@ -9,6 +9,7 @@ use App\Models\EducationApplication;
 use App\Services\ApplicationStatusService;
 use App\Services\Backoffice\InquiryService;
 use App\Services\Backoffice\MemberService;
+use App\Services\QualificationStatusService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
@@ -94,13 +95,17 @@ class MypageController extends Controller
         ];
     }
 
-    public function printReceipt(int $id, ApplicationStatusService $applicationStatusService)
+    public function printReceipt(int $id, ApplicationStatusService $applicationStatusService, QualificationStatusService $qualificationStatusService)
     {
         $memberId = Auth::guard('member')->id();
         try {
             $application = $applicationStatusService->getDetailForOfflineMember($id, $memberId);
         } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
-            throw new NotFoundHttpException('해당 신청 내역을 찾을 수 없습니다.', $e);
+            try {
+                $application = $qualificationStatusService->getDetailForQualificationMember($id, $memberId);
+            } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e2) {
+                throw new NotFoundHttpException('해당 신청 내역을 찾을 수 없습니다.', $e2);
+            }
         }
         if ($application->payment_status !== '입금완료') {
             throw new NotFoundHttpException('영수증은 입금 완료 후 발급할 수 있습니다.');
@@ -136,14 +141,67 @@ class MypageController extends Controller
         return view('print.certificate_finish', $this->printViewData($application, '이수증'));
     }
 
-    public function my_qualification()
+    public function my_qualification(Request $request, QualificationStatusService $qualificationStatusService)
     {
-        return view('mypage.my_qualification', $this->menuMeta('02', '나의 자격 현황'));
+        $memberId = Auth::guard('member')->id();
+        $applications = $qualificationStatusService->getListForMember($memberId, $request);
+        return view('mypage.my_qualification', array_merge(
+            $this->menuMeta('02', '나의 자격 현황'),
+            compact('applications')
+        ));
     }
 
-    public function my_qualification_view()
+    public function my_qualification_view(int $id, QualificationStatusService $qualificationStatusService)
     {
-        return view('mypage.my_qualification_view', $this->menuMeta('02', '나의 자격 현황'));
+        $memberId = Auth::guard('member')->id();
+        try {
+            $application = $qualificationStatusService->getDetailForQualificationMember($id, $memberId);
+        } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
+            throw new NotFoundHttpException('해당 신청 내역을 찾을 수 없습니다.', $e);
+        }
+        return view('mypage.my_qualification_view', array_merge(
+            $this->menuMeta('02', '나의 자격 현황'),
+            compact('application')
+        ));
+    }
+
+    public function printAdmissionTicket(int $id, QualificationStatusService $qualificationStatusService)
+    {
+        $memberId = Auth::guard('member')->id();
+        try {
+            $application = $qualificationStatusService->getDetailForQualificationMember($id, $memberId);
+        } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
+            throw new NotFoundHttpException('해당 신청 내역을 찾을 수 없습니다.', $e);
+        }
+        return view('print.admission_ticket', $this->printViewData($application, '수험표'));
+    }
+
+    public function printCertificateQualification(int $id, QualificationStatusService $qualificationStatusService)
+    {
+        $memberId = Auth::guard('member')->id();
+        try {
+            $application = $qualificationStatusService->getDetailForQualificationMember($id, $memberId);
+        } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
+            throw new NotFoundHttpException('해당 신청 내역을 찾을 수 없습니다.', $e);
+        }
+        if (!$application->is_qualification_passed) {
+            throw new NotFoundHttpException('합격 확인서는 합격 후 발급할 수 있습니다.');
+        }
+        return view('print.certificate_qualification', $this->printViewData($application, '합격확인서'));
+    }
+
+    public function printQualificationCertificate(int $id, QualificationStatusService $qualificationStatusService)
+    {
+        $memberId = Auth::guard('member')->id();
+        try {
+            $application = $qualificationStatusService->getDetailForQualificationMember($id, $memberId);
+        } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
+            throw new NotFoundHttpException('해당 신청 내역을 찾을 수 없습니다.', $e);
+        }
+        if (!$application->is_qualification_passed) {
+            throw new NotFoundHttpException('자격증은 합격 후 발급할 수 있습니다.');
+        }
+        return view('print.certificate', $this->printViewData($application, '자격증'));
     }
 
     public function my_inquiries(Request $request, InquiryService $inquiryService)
