@@ -374,6 +374,14 @@ Route::prefix('backoffice')->middleware(['backoffice'])->group(function () {
     Route::get('seminar-training-applications/{program}', [EducationApplicationController::class, 'seminarTrainingShow'])
         ->name('backoffice.seminar-training-applications.show');
 
+    // 증빙 출력 (영수증/수료증/이수증) - 신청 ID 기준
+    Route::get('print/receipt/{education_application}', [EducationApplicationController::class, 'printReceipt'])
+        ->name('backoffice.print.receipt');
+    Route::get('print/certificate_completion/{education_application}', [EducationApplicationController::class, 'printCertificateCompletion'])
+        ->name('backoffice.print.certificate_completion');
+    Route::get('print/certificate_finish/{education_application}', [EducationApplicationController::class, 'printCertificateFinish'])
+        ->name('backoffice.print.certificate_finish');
+
     // 온라인 교육 관리
     Route::resource('online-educations', OnlineEducationController::class, [
         'names' => 'backoffice.online-educations'

@@ -5,10 +5,13 @@ namespace App\Http\Controllers;
 use App\Http\Requests\MypageInquiryStoreRequest;
 use App\Http\Requests\MypageMemberUpdateRequest;
 use App\Http\Requests\MypageSecessionRequest;
+use App\Models\EducationApplication;
+use App\Services\ApplicationStatusService;
 use App\Services\Backoffice\InquiryService;
 use App\Services\Backoffice\MemberService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 class MypageController extends Controller
 {
@@ -22,19 +25,115 @@ class MypageController extends Controller
         ];
     }
 
-    public function application_status()
+    public function application_status(Request $request, ApplicationStatusService $applicationStatusService)
     {
-        return view('mypage.application_status', $this->menuMeta('01', '교육 신청 현황'));
+        $memberId = Auth::guard('member')->id();
+        $applications = $applicationStatusService->getListForMember($memberId, $request);
+        $filters = $request->only(['name', 'education_type', 'period_year', 'period_month', 'status']);
+        $educationTypeOptions = ['전체', '정기교육', '수시교육', '온라인교육', '세미나', '해외연수'];
+        $statusOptions = ['전체', '신청완료', '수료', '미수료'];
+
+        return view('mypage.application_status', array_merge(
+            $this->menuMeta('01', '교육 신청 현황'),
+            compact('applications', 'filters', 'educationTypeOptions', 'statusOptions')
+        ));
     }
 
-    public function application_status_view()
+    public function application_status_cancel(Request $request, ApplicationStatusService $applicationStatusService)
     {
-        return view('mypage.application_status_view', $this->menuMeta('01', '교육 신청 현황'));
+        $request->validate([
+            'application_id' => 'required|integer|exists:education_applications,id',
+        ]);
+
+        $memberId = Auth::guard('member')->id();
+
+        try {
+            $applicationStatusService->cancelApplication((int) $request->application_id, $memberId);
+            return redirect()->route('mypage.application_status')->with('success', '수강이 취소되었습니다.');
+        } catch (\InvalidArgumentException $e) {
+            return redirect()->route('mypage.application_status')->with('error', $e->getMessage());
+        }
     }
 
-    public function application_status_view2()
+    public function application_status_view(int $id, ApplicationStatusService $applicationStatusService)
     {
-        return view('mypage.application_status_view2', $this->menuMeta('01', '교육 신청 현황'));
+        $memberId = Auth::guard('member')->id();
+        try {
+            $application = $applicationStatusService->getDetailForOfflineMember($id, $memberId);
+        } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
+            throw new NotFoundHttpException('해당 신청 내역을 찾을 수 없습니다.', $e);
+        }
+        return view('mypage.application_status_view', array_merge(
+            $this->menuMeta('01', '교육 신청 현황'),
+            ['application' => $application]
+        ));
+    }
+
+    public function application_status_view2(int $id, ApplicationStatusService $applicationStatusService)
+    {
+        $memberId = Auth::guard('member')->id();
+        try {
+            $application = $applicationStatusService->getDetailForOnlineMember($id, $memberId);
+        } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
+            throw new NotFoundHttpException('해당 신청 내역을 찾을 수 없습니다.', $e);
+        }
+        return view('mypage.application_status_view2', array_merge(
+            $this->menuMeta('01', '교육 신청 현황'),
+            ['application' => $application]
+        ));
+    }
+
+    private function printViewData(EducationApplication $application, string $sName): array
+    {
+        return [
+            'gNum' => '99',
+            'sNum' => '00',
+            'gName' => '인쇄',
+            'sName' => $sName,
+            'application' => $application,
+        ];
+    }
+
+    public function printReceipt(int $id, ApplicationStatusService $applicationStatusService)
+    {
+        $memberId = Auth::guard('member')->id();
+        try {
+            $application = $applicationStatusService->getDetailForOfflineMember($id, $memberId);
+        } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
+            throw new NotFoundHttpException('해당 신청 내역을 찾을 수 없습니다.', $e);
+        }
+        if ($application->payment_status !== '입금완료') {
+            throw new NotFoundHttpException('영수증은 입금 완료 후 발급할 수 있습니다.');
+        }
+        return view('print.receipt', $this->printViewData($application, '영수증'));
+    }
+
+    public function printCertificateCompletion(int $id, ApplicationStatusService $applicationStatusService)
+    {
+        $memberId = Auth::guard('member')->id();
+        try {
+            $application = $applicationStatusService->getDetailForOfflineMember($id, $memberId);
+        } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
+            throw new NotFoundHttpException('해당 신청 내역을 찾을 수 없습니다.', $e);
+        }
+        if (!$application->is_completed || !$application->is_survey_completed) {
+            throw new NotFoundHttpException('수료증은 이수 완료 및 설문 조사 완료 후 발급할 수 있습니다.');
+        }
+        return view('print.certificate_completion', $this->printViewData($application, '수료증'));
+    }
+
+    public function printCertificateFinish(int $id, ApplicationStatusService $applicationStatusService)
+    {
+        $memberId = Auth::guard('member')->id();
+        try {
+            $application = $applicationStatusService->getDetailForOfflineMember($id, $memberId);
+        } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
+            throw new NotFoundHttpException('해당 신청 내역을 찾을 수 없습니다.', $e);
+        }
+        if (!$application->is_completed || !$application->is_survey_completed) {
+            throw new NotFoundHttpException('이수증은 이수 완료 및 설문 조사 완료 후 발급할 수 있습니다.');
+        }
+        return view('print.certificate_finish', $this->printViewData($application, '이수증'));
     }
 
     public function my_qualification()

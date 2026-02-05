@@ -616,4 +616,40 @@ class EducationApplicationController extends BaseController
         return redirect()->route($showRoute, $programId)
             ->with('success', '신청 내역이 삭제되었습니다.');
     }
+
+    private function printDocument(EducationApplication $education_application, string $view, string $sName)
+    {
+        $education_application->load(['education', 'onlineEducation', 'seminarTraining', 'member', 'roommate']);
+        return view($view, [
+            'gNum' => '99',
+            'sNum' => '00',
+            'gName' => '인쇄',
+            'sName' => $sName,
+            'application' => $education_application,
+        ]);
+    }
+
+    /**
+     * 영수증 출력 (백오피스)
+     */
+    public function printReceipt(EducationApplication $education_application)
+    {
+        return $this->printDocument($education_application, 'print.receipt', '영수증');
+    }
+
+    /**
+     * 수료증 출력 (백오피스)
+     */
+    public function printCertificateCompletion(EducationApplication $education_application)
+    {
+        return $this->printDocument($education_application, 'print.certificate_completion', '수료증');
+    }
+
+    /**
+     * 이수증 출력 (백오피스)
+     */
+    public function printCertificateFinish(EducationApplication $education_application)
+    {
+        return $this->printDocument($education_application, 'print.certificate_finish', '이수증');
+    }
 }

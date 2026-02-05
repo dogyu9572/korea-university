@@ -255,24 +255,7 @@
                                                 </div>
                                             </div>
                                         </td>
-                                        <td>
-                                            @if($application->certificate_number)
-                                                <button type="button" class="btn btn-sm btn-success" data-action="issue-certificate" data-application-id="{{ $application->id }}">
-                                                    발급
-                                                </button>
-                                            @else
-                                                <span class="text-muted">-</span>
-                                            @endif
-                                        </td>
-                                        <td>
-                                            @if($application->receipt_number)
-                                                <button type="button" class="btn btn-sm btn-info" data-action="issue-receipt" data-application-id="{{ $application->id }}">
-                                                    발급
-                                                </button>
-                                            @else
-                                                <span class="text-muted">-</span>
-                                            @endif
-                                        </td>
+                                        @include('backoffice.education-applications.partials.print_links', ['application' => $application])
                                         <td>
                                             <div class="board-btn-group">
                                                 <a href="{{ route('backoffice.seminar-training-applications.edit', $application) }}" class="btn btn-primary btn-sm">

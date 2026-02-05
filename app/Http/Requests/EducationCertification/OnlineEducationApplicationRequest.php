@@ -48,6 +48,7 @@ class OnlineEducationApplicationRequest extends FormRequest
     public function attributes(): array
     {
         return [
+            'online_education_id' => '온라인교육',
             'fee_type' => '참가비 유형',
             'refund_account_holder' => '환불 계좌 예금주명',
             'refund_bank_name' => '환불 계좌 은행명',
@@ -60,6 +61,27 @@ class OnlineEducationApplicationRequest extends FormRequest
             'contact_person_email' => '담당자 이메일',
             'contact_person_phone' => '담당자 연락처',
             'business_registration' => '사업자등록증',
+        ];
+    }
+
+    /**
+     * 검증 메시지 (한글, 영어 노출 방지)
+     *
+     * @return array<string, string>
+     */
+    public function messages(): array
+    {
+        return [
+            'required' => ':attribute을(를) 입력해주세요.',
+            'required_if' => ':attribute을(를) 입력해주세요.',
+            'email' => ':attribute 형식이 올바르지 않습니다.',
+            'max.string' => ':attribute은(는) :max자 이하여야 합니다.',
+            'integer' => '선택한 :attribute이(가) 올바르지 않습니다.',
+            'exists' => '선택한 :attribute이(가) 올바르지 않습니다.',
+            'in' => '선택한 :attribute이(가) 올바르지 않습니다.',
+            'mimes' => ':attribute은(는) :values 형식만 가능합니다.',
+            'max.file' => ':attribute은(는) 2MB 이하여야 합니다.',
+            'file' => ':attribute은(는) 올바른 파일을 선택해주세요.',
         ];
     }
 }

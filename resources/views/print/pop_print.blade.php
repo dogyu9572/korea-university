@@ -3,7 +3,15 @@
 	<div class="inbox">
 		<div class="tit">출력</div>
 		<div class="con print_select">
-			@if(isset($gNum) && $gNum == '05' && $sNum == '01')
+			@if(isset($application))
+			@if($application->payment_status === '입금완료')
+			<label class="select"><input type="radio" name="print" data-url="{{ route('mypage.print.receipt', $application->id) }}"><span>영수증 출력</span></label>
+			@endif
+			@if($application->is_completed && $application->is_survey_completed)
+			<label class="select"><input type="radio" name="print" data-url="{{ route('mypage.print.certificate_completion', $application->id) }}"><span>수료증 출력</span></label>
+			<label class="select"><input type="radio" name="print" data-url="{{ route('mypage.print.certificate_finish', $application->id) }}"><span>이수증 출력</span></label>
+			@endif
+			@elseif(isset($gNum) && $gNum == '05' && $sNum == '01')
 			<label class="select"><input type="radio" name="print" data-url="/print/receipt"><span>영수증 출력</span></label>
 			<label class="select"><input type="radio" name="print" data-url="/print/certificate_completion"><span>수료증 출력</span></label>
 			<label class="select"><input type="radio" name="print" data-url="/print/certificate_finish"><span>이수증 출력</span></label>

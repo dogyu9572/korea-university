@@ -60,6 +60,7 @@ class EducationApplication extends Model
         'roommate_member_id',
         'roommate_name',
         'roommate_phone',
+        'cancelled_at',
     ];
 
     protected $casts = [
@@ -74,6 +75,7 @@ class EducationApplication extends Model
         'attendance_rate' => 'decimal:2',
         'score' => 'integer',
         'birth_date' => 'date',
+        'cancelled_at' => 'datetime',
     ];
 
     /**
@@ -157,5 +159,43 @@ class EducationApplication extends Model
     public function examVenue(): BelongsTo
     {
         return $this->belongsTo(Category::class, 'exam_venue_id');
+    }
+
+    /**
+     * 목록 표시용 진행상태 (신청완료/수료/미수료)
+     * 수료=이수상태 Y, 미수료=교육기간 지남+이수 N, 그 외=신청완료(신청시)
+     */
+    public function getDisplayStatusAttribute(): string
+    {
+        if ($this->is_completed) {
+            return '수료';
+        }
+        $program = $this->program;
+        if ($program && $program->period_end) {
+            $endOfPeriod = $program->period_end instanceof \Carbon\Carbon
+                ? $program->period_end->endOfDay()
+                : \Carbon\Carbon::parse($program->period_end)->endOfDay();
+            if ($endOfPeriod->isPast()) {
+                return '미수료';
+            }
+        }
+        return '신청완료';
+    }
+
+    /**
+     * 목록 표시용 교육구분 (정기교육/수시교육/온라인교육/세미나/해외연수)
+     */
+    public function getEducationTypeLabelAttribute(): string
+    {
+        if ($this->education_id && $this->relationLoaded('education') && $this->education) {
+            return $this->education->education_type ?? '';
+        }
+        if ($this->online_education_id) {
+            return '온라인교육';
+        }
+        if ($this->seminar_training_id && $this->relationLoaded('seminarTraining') && $this->seminarTraining) {
+            return $this->seminarTraining->type ?? '';
+        }
+        return '';
     }
 }
