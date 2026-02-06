@@ -282,6 +282,18 @@ class AdminMenuSeeder extends Seeder
                 'permission_key' => null,
             ],
             [
+                'id' => 70,
+                'parent_id' => 41,
+                'name' => '자격증 통계',
+                'url' => '/backoffice/certification-statistics',
+                'icon' => null,
+                'order' => 5,
+                'is_active' => 1,
+                'created_at' => now()->format('Y-m-d H:i:s'),
+                'updated_at' => now()->format('Y-m-d H:i:s'),
+                'permission_key' => null,
+            ],
+            [
                 'id' => 45,
                 'parent_id' => 21,
                 'name' => '조직도 관리',
@@ -356,7 +368,7 @@ class AdminMenuSeeder extends Seeder
             [
                 'id' => 51,
                 'parent_id' => 47,
-                'name' => '회원 문의(리스트)',
+                'name' => '회원 문의',
                 'url' => '/backoffice/inquiries',
                 'icon' => null,
                 'order' => 3,

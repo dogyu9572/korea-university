@@ -9,22 +9,32 @@ class SubController extends Controller
     public function education()
     {
         $gNum = "01"; $sNum = "01"; $gName = "교육 · 자격증"; $sName = "교육 안내";
-        return view('education_certification.education', compact('gNum', 'sNum', 'gName', 'sName'));
+        $contents = \App\Models\EducationContent::first();
+        $education_guide = $contents ? ($contents->education_guide ?? '') : '';
+        return view('education_certification.education', compact('gNum', 'sNum', 'gName', 'sName', 'education_guide'));
     }
     public function certification()
     {
         $gNum = "01"; $sNum = "02"; $gName = "교육 · 자격증"; $sName = "자격증 안내";
-        return view('education_certification.certification', compact('gNum', 'sNum', 'gName', 'sName'));
+        $contents = \App\Models\EducationContent::first();
+        $certification_guide = $contents ? ($contents->certification_guide ?? '') : '';
+        $expert_level_1 = $contents ? ($contents->expert_level_1 ?? '') : '';
+        $expert_level_2 = $contents ? ($contents->expert_level_2 ?? '') : '';
+        return view('education_certification.certification', compact('gNum', 'sNum', 'gName', 'sName', 'certification_guide', 'expert_level_1', 'expert_level_2'));
     }
     public function seminar()
     {
         $gNum = "02"; $sNum = "01"; $gName = "세미나 · 해외연수"; $sName = "세미나 안내";
-        return view('seminars_training.seminar', compact('gNum', 'sNum', 'gName', 'sName'));
+        $contents = \App\Models\EducationContent::first();
+        $seminar_guide = $contents ? ($contents->seminar_guide ?? '') : '';
+        return view('seminars_training.seminar', compact('gNum', 'sNum', 'gName', 'sName', 'seminar_guide'));
     }
     public function overseas_training()
     {
         $gNum = "02"; $sNum = "02"; $gName = "세미나 · 해외연수"; $sName = "해외연수 안내";
-        return view('seminars_training.overseas_training', compact('gNum', 'sNum', 'gName', 'sName'));
+        $contents = \App\Models\EducationContent::first();
+        $overseas_training_guide = $contents ? ($contents->overseas_training_guide ?? '') : '';
+        return view('seminars_training.overseas_training', compact('gNum', 'sNum', 'gName', 'sName', 'overseas_training_guide'));
     }
     public function establishment()
     {

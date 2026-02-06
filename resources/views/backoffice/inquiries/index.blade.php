@@ -1,6 +1,6 @@
 @extends('backoffice.layouts.app')
 
-@section('title', '회원 문의(리스트)')
+@section('title', '회원 문의')
 
 @section('styles')
 <link rel="stylesheet" href="{{ asset('css/backoffice/boards.css') }}">

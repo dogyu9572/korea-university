@@ -18,6 +18,7 @@ use App\Http\Controllers\Backoffice\BannerController;
 use App\Http\Controllers\Backoffice\PopupController;
 use App\Http\Controllers\Backoffice\AccessStatisticsController;
 use App\Http\Controllers\Backoffice\EducationStatisticsController;
+use App\Http\Controllers\Backoffice\CertificationStatisticsController;
 use App\Http\Controllers\Backoffice\OrganizationalController;
 use App\Http\Controllers\Backoffice\HistoryController;
 use App\Http\Controllers\Backoffice\MemberController;
@@ -133,6 +134,10 @@ Route::prefix('backoffice')->middleware(['backoffice'])->group(function () {
         ->name('backoffice.education-statistics');
     Route::get('education-statistics/export', [EducationStatisticsController::class, 'export'])
         ->name('backoffice.education-statistics.export');
+    Route::get('certification-statistics', [CertificationStatisticsController::class, 'index'])
+        ->name('backoffice.certification-statistics');
+    Route::get('certification-statistics/export', [CertificationStatisticsController::class, 'export'])
+        ->name('backoffice.certification-statistics.export');
 
     // 관리자 계정 관리
     Route::post('admins/bulk-destroy', [AdminController::class, 'bulkDestroy'])
