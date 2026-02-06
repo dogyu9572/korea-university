@@ -57,6 +57,30 @@ class BoardPostService
     }
 
     /**
+     * 최신글 조회 (메인 등용)
+     * @param bool $forPublic 사용자 페이지용이면 true(삭제/비활성 제외)
+     */
+    public function getLatestPosts(string $slug, int $limit = 4, bool $forPublic = true): \Illuminate\Support\Collection
+    {
+        $query = DB::table($this->getTableName($slug));
+
+        if ($forPublic) {
+            $query->whereNull('deleted_at')->where('is_active', 1);
+        }
+
+        $items = $query->orderBy('created_at', 'desc')->limit($limit)->get();
+
+        return collect($items)->transform(function ($post) {
+            foreach (['created_at', 'updated_at'] as $dateField) {
+                if (isset($post->$dateField) && is_string($post->$dateField)) {
+                    $post->$dateField = Carbon::parse($post->$dateField);
+                }
+            }
+            return $post;
+        });
+    }
+
+    /**
      * 검색 필터 적용
      */
     private function applySearchFilters($query, Request $request): void

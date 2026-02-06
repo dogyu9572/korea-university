@@ -46,60 +46,33 @@
 			<div class="mtit">교육<i></i>자격증 <a href="/education_certification/education" class="more">교육·자격증으로 이동</a></div>
 			<p>산학협력단 직원의 역량 강화를 위한 <br class="mo_vw">다양한 교육 프로그램을 제공합니다.</p>
 			<div class="mc01_slide">
-				<a href="#this">
-					<span class="imgfit"><img src="/images/img_mc01_sample.jpg" alt=""></span>
+				@forelse($educationSlides ?? [] as $slide)
+				@php
+					$imgSrc = $slide->image_url;
+					$imgFallback = asset('images/img_mc01_sample.jpg');
+				@endphp
+				<a href="{{ $slide->url ?? '#' }}">
+					<span class="imgfit"><img src="{{ $imgSrc }}" alt="{{ $slide->title }}" onerror="this.onerror=null;this.src='{{ $imgFallback }}';"></span>
+					<span class="txt">
+						<span class="type {{ $slide->type_class ?? 'c1' }}">{{ $slide->type_label ?? '교육' }}</span>
+						<span class="tit">{{ $slide->title }}</span>
+						@if(!empty($slide->info_label_1) || !empty($slide->info_value_1))
+						<dl class="i1"><dt>{{ $slide->info_label_1 ?? '' }}</dt><dd>{{ $slide->info_value_1 ?? '' }}</dd></dl>
+						@endif
+						@if(!empty($slide->info_label_2) || !empty($slide->info_value_2))
+						<dl class="i2"><dt>{{ $slide->info_label_2 ?? '' }}</dt><dd>{{ $slide->info_value_2 ?? '' }}</dd></dl>
+						@endif
+					</span>
+				</a>
+				@empty
+				<a href="{{ route('education_certification.education') }}">
+					<span class="imgfit"><img src="{{ asset('images/img_mc01_sample.jpg') }}" alt=""></span>
 					<span class="txt">
 						<span class="type c1">교육</span>
-						<span class="tit">2025년 산학협력단 직원 전문 강좌</span>
-						<dl class="i1"><dt>신청기간</dt><dd>25.09.25~25.10.02</dd></dl>
-						<dl class="i2"><dt>교육기간</dt><dd>25.10.23~25.10.24</dd></dl>
+						<span class="tit">등록된 프로그램이 없습니다.</span>
 					</span>
 				</a>
-				<a href="#this">
-					<span class="imgfit"><img src="/images/img_mc01_sample.jpg" alt=""></span>
-					<span class="txt">
-						<span class="type c3">자격증</span>
-						<span class="tit">2026년 대학연구행정전문가 1급 시험 접수 안내 </span>
-						<dl class="i1"><dt>신청기간</dt><dd>26.11.18~26.11.29</dd></dl>
-						<dl class="i2"><dt>시험일</dt><dd>26.12.07</dd></dl>
-					</span>
-				</a>
-				<a href="#this">
-					<span class="imgfit"><img src="/images/img_mc01_sample.jpg" alt=""></span>
-					<span class="txt">
-						<span class="type c4">온라인 교육</span>
-						<span class="tit">2026년 산학협력 실무 역량강화 온라인 교육</span>
-						<dl class="i1"><dt>신청기간</dt><dd>26.05.01~26.05.12</dd></dl>
-						<dl class="i2"><dt>교육기간</dt><dd>26.05.19~25.05.30</dd></dl>
-					</span>
-				</a>
-				<a href="#this">
-					<span class="imgfit"><img src="/images/img_mc01_sample.jpg" alt=""></span>
-					<span class="txt">
-						<span class="type c1">교육</span>
-						<span class="tit">2025년 산학협력단 직원 전문 강좌</span>
-						<dl class="i1"><dt>신청기간</dt><dd>25.09.25~25.10.02</dd></dl>
-						<dl class="i2"><dt>교육기간</dt><dd>25.10.23~25.10.24</dd></dl>
-					</span>
-				</a>
-				<a href="#this">
-					<span class="imgfit"><img src="/images/img_mc01_sample.jpg" alt=""></span>
-					<span class="txt">
-						<span class="type c3">자격증</span>
-						<span class="tit">2026년 대학연구행정전문가 1급 시험 접수 안내 </span>
-						<dl class="i1"><dt>신청기간</dt><dd>26.11.18~26.11.29</dd></dl>
-						<dl class="i2"><dt>시험일</dt><dd>26.12.07</dd></dl>
-					</span>
-				</a>
-				<a href="#this">
-					<span class="imgfit"><img src="/images/img_mc01_sample.jpg" alt=""></span>
-					<span class="txt">
-						<span class="type c4">온라인 교육</span>
-						<span class="tit">2026년 산학협력 실무 역량강화 온라인 교육</span>
-						<dl class="i1"><dt>신청기간</dt><dd>26.05.01~26.05.12</dd></dl>
-						<dl class="i2"><dt>교육기간</dt><dd>26.05.19~25.05.30</dd></dl>
-					</span>
-				</a>
+				@endforelse
 			</div>
 		</div>
 	</div>
@@ -109,60 +82,33 @@
 			<div class="mtit">세미나<i></i>해외연수 <a href="/seminars_training/seminar" class="more">세미나·해외연수로 이동</a></div>
 			<p>산학협력단 직원의 역량 강화를 위한 <br class="mo_vw">다양한 세미나 및 해외연수 프로그램을 제공합니다.</p>
 			<div class="mc01_slide">
-				<a href="#this">
-					<span class="imgfit"><img src="/images/img_mc01_sample.jpg" alt=""></span>
+				@forelse($seminarTrainingSlides ?? [] as $slide)
+				@php
+					$stImgSrc = $slide->image_url;
+					$stImgFallback = asset('images/img_mc01_sample.jpg');
+				@endphp
+				<a href="{{ $slide->url ?? '#' }}">
+					<span class="imgfit"><img src="{{ $stImgSrc }}" alt="{{ $slide->title }}" onerror="this.onerror=null;this.src='{{ $stImgFallback }}';"></span>
 					<span class="txt">
-						<span class="type c1">교육</span>
-						<span class="tit">2025년 산학협력단 직원 전문 강좌</span>
-						<dl class="i1"><dt>신청기간</dt><dd>25.09.25~25.10.02</dd></dl>
-						<dl class="i2"><dt>교육기간</dt><dd>25.10.23~25.10.24</dd></dl>
+						<span class="type {{ $slide->type_class ?? 'c5' }}">{{ $slide->type_label ?? '세미나' }}</span>
+						<span class="tit">{{ $slide->title }}</span>
+						@if(!empty($slide->info_label_1) || !empty($slide->info_value_1))
+						<dl class="i1"><dt>{{ $slide->info_label_1 ?? '' }}</dt><dd>{{ $slide->info_value_1 ?? '' }}</dd></dl>
+						@endif
+						@if(!empty($slide->info_label_2) || !empty($slide->info_value_2))
+						<dl class="i2"><dt>{{ $slide->info_label_2 ?? '' }}</dt><dd>{{ $slide->info_value_2 ?? '' }}</dd></dl>
+						@endif
 					</span>
 				</a>
-				<a href="#this">
-					<span class="imgfit"><img src="/images/img_mc01_sample.jpg" alt=""></span>
+				@empty
+				<a href="{{ route('seminars_training.seminar') }}">
+					<span class="imgfit"><img src="{{ asset('images/img_mc01_sample.jpg') }}" alt=""></span>
 					<span class="txt">
-						<span class="type c2">자격증</span>
-						<span class="tit">2026년 대학연구행정전문가 1급 시험 접수 안내 </span>
-						<dl class="i1"><dt>신청기간</dt><dd>26.11.18~26.11.29</dd></dl>
-						<dl class="i2"><dt>시험일</dt><dd>26.12.07</dd></dl>
+						<span class="type c5">세미나</span>
+						<span class="tit">등록된 프로그램이 없습니다.</span>
 					</span>
 				</a>
-				<a href="#this">
-					<span class="imgfit"><img src="/images/img_mc01_sample.jpg" alt=""></span>
-					<span class="txt">
-						<span class="type c1">온라인 교육</span>
-						<span class="tit">2026년 산학협력 실무 역량강화 온라인 교육</span>
-						<dl class="i1"><dt>신청기간</dt><dd>26.05.01~26.05.12</dd></dl>
-						<dl class="i2"><dt>교육기간</dt><dd>26.05.19~25.05.30</dd></dl>
-					</span>
-				</a>
-				<a href="#this">
-					<span class="imgfit"><img src="/images/img_mc01_sample.jpg" alt=""></span>
-					<span class="txt">
-						<span class="type c1">교육</span>
-						<span class="tit">2025년 산학협력단 직원 전문 강좌</span>
-						<dl class="i1"><dt>신청기간</dt><dd>25.09.25~25.10.02</dd></dl>
-						<dl class="i2"><dt>교육기간</dt><dd>25.10.23~25.10.24</dd></dl>
-					</span>
-				</a>
-				<a href="#this">
-					<span class="imgfit"><img src="/images/img_mc01_sample.jpg" alt=""></span>
-					<span class="txt">
-						<span class="type c2">자격증</span>
-						<span class="tit">2026년 대학연구행정전문가 1급 시험 접수 안내 </span>
-						<dl class="i1"><dt>신청기간</dt><dd>26.11.18~26.11.29</dd></dl>
-						<dl class="i2"><dt>시험일</dt><dd>26.12.07</dd></dl>
-					</span>
-				</a>
-				<a href="#this">
-					<span class="imgfit"><img src="/images/img_mc01_sample.jpg" alt=""></span>
-					<span class="txt">
-						<span class="type c1">온라인 교육</span>
-						<span class="tit">2026년 산학협력 실무 역량강화 온라인 교육</span>
-						<dl class="i1"><dt>신청기간</dt><dd>26.05.01~26.05.12</dd></dl>
-						<dl class="i2"><dt>교육기간</dt><dd>26.05.19~25.05.30</dd></dl>
-					</span>
-				</a>
+				@endforelse
 			</div>
 		</div>
 	</div>
@@ -180,21 +126,23 @@
 					</ul>
 					<div class="jq_cont">
 						<div class="cont">
-							<a href="/notice/notice" class="more">공지사항으로 이동</a>
+							<a href="{{ route('notice.notice') }}" class="more">공지사항으로 이동</a>
 							<ul>
-								<li><a href="#this">공지사항 제목입니다. 제목입니다. 제목입니다. 제목입니다. 제목입니다. 제목입니다. 제목입니다. 제목입니다. 제목입니다. 제목입니다. <p>2025-10-31</p></a></li>
-								<li><a href="#this">제목입니다. 제목입니다. 제목입니다. 제목입니다. 제목입니다. 제목입니다. 제목입니다. 제목입니다. 제목입니다. 제목입니다. <p>2025-10-31</p></a></li>
-								<li><a href="#this">제목입니다. 제목입니다. 제목입니다. 제목입니다. 제목입니다. 제목입니다. 제목입니다. 제목입니다. 제목입니다. 제목입니다. <p>2025-10-31</p></a></li>
-								<li><a href="#this">제목입니다. 제목입니다. 제목입니다. 제목입니다. 제목입니다. 제목입니다. 제목입니다. 제목입니다. 제목입니다. 제목입니다. <p>2025-10-31</p></a></li>
+								@forelse($noticePosts ?? [] as $post)
+								<li><a href="{{ $post->url }}">{{ $post->title }} <p>{{ $post->created_at ? $post->created_at->format('Y-m-d') : '' }}</p></a></li>
+								@empty
+								<li><a href="{{ route('notice.notice') }}">등록된 공지사항이 없습니다.</a></li>
+								@endforelse
 							</ul>
 						</div><!-- //공지사항 -->
 						<div class="cont">
-							<a href="/notice/notice" class="more">자료실로 이동</a>
+							<a href="{{ route('notice.data_room') }}" class="more">자료실로 이동</a>
 							<ul>
-								<li><a href="#this">자료실 제목입니다. 제목입니다. 제목입니다. 제목입니다. 제목입니다. 제목입니다. 제목입니다. 제목입니다. 제목입니다. 제목입니다. <p>2025-10-31</p></a></li>
-								<li><a href="#this">제목입니다. 제목입니다. 제목입니다. 제목입니다. 제목입니다. 제목입니다. 제목입니다. 제목입니다. 제목입니다. 제목입니다. <p>2025-10-31</p></a></li>
-								<li><a href="#this">제목입니다. 제목입니다. 제목입니다. 제목입니다. 제목입니다. 제목입니다. 제목입니다. 제목입니다. 제목입니다. 제목입니다. <p>2025-10-31</p></a></li>
-								<li><a href="#this">제목입니다. 제목입니다. 제목입니다. 제목입니다. 제목입니다. 제목입니다. 제목입니다. 제목입니다. 제목입니다. 제목입니다. <p>2025-10-31</p></a></li>
+								@forelse($dataRoomPosts ?? [] as $post)
+								<li><a href="{{ $post->url }}">{{ $post->title }} <p>{{ $post->created_at ? $post->created_at->format('Y-m-d') : '' }}</p></a></li>
+								@empty
+								<li><a href="{{ route('notice.data_room') }}">등록된 자료가 없습니다.</a></li>
+								@endforelse
 							</ul>
 						</div><!-- //자료실 -->
 					</div>

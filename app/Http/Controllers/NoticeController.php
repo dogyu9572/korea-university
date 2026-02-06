@@ -117,7 +117,7 @@ class NoticeController extends Controller
 
         return view("notice.{$detailRoute}", array_merge(
             $this->menuMeta($gNum, $sNum, $gName, $sName),
-            ['post' => $post, 'board' => $board, 'listRoute' => $listRoute, 'prevPost' => $prevPost, 'nextPost' => $nextPost]
+            ['post' => $post, 'board' => $board, 'listRoute' => $listRoute, 'detailRoute' => $detailRoute, 'prevPost' => $prevPost, 'nextPost' => $nextPost]
         ));
     }
 }
