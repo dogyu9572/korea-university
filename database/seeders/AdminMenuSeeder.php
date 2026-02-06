@@ -270,6 +270,18 @@ class AdminMenuSeeder extends Seeder
                 'permission_key' => null,
             ],
             [
+                'id' => 69,
+                'parent_id' => 41,
+                'name' => '교육 통계',
+                'url' => '/backoffice/education-statistics',
+                'icon' => null,
+                'order' => 4,
+                'is_active' => 1,
+                'created_at' => now()->format('Y-m-d H:i:s'),
+                'updated_at' => now()->format('Y-m-d H:i:s'),
+                'permission_key' => null,
+            ],
+            [
                 'id' => 45,
                 'parent_id' => 21,
                 'name' => '조직도 관리',
