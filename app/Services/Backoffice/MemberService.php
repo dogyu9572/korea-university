@@ -77,9 +77,11 @@ class MemberService
             $data['terms_agreed_at'] = now();
         }
 
-        // 휴대폰번호 숫자만 저장
+        // 휴대폰번호: 소셜 전용 값(sns_로 시작)은 그대로 저장, 그 외 숫자만 저장
         if (isset($data['phone_number'])) {
-            $data['phone_number'] = Member::normalizePhone($data['phone_number']);
+            if (!str_starts_with((string) $data['phone_number'], 'sns_')) {
+                $data['phone_number'] = Member::normalizePhone($data['phone_number']);
+            }
         }
 
         return Member::create($data);
@@ -102,9 +104,11 @@ class MemberService
         // password_confirmation은 저장하지 않음
         unset($data['password_confirmation']);
 
-        // 휴대폰번호 숫자만 저장
+        // 휴대폰번호: 소셜 전용 값(sns_로 시작)은 그대로 저장, 그 외 숫자만 저장
         if (isset($data['phone_number'])) {
-            $data['phone_number'] = Member::normalizePhone($data['phone_number']);
+            if (!str_starts_with((string) $data['phone_number'], 'sns_')) {
+                $data['phone_number'] = Member::normalizePhone($data['phone_number']);
+            }
         }
 
         $member->update($data);

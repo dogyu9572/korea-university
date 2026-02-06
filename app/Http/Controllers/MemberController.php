@@ -15,6 +15,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Cookie;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Log;
 use Laravel\Socialite\Facades\Socialite;
 
 class MemberController extends Controller
@@ -142,7 +143,7 @@ class MemberController extends Controller
         return redirect()->intended(route('mypage.application_status'));
     }
 
-    /** 카카오 로그인 redirect */
+    /** 카카오 로그인 redirect (동의 항목 설정 시 scopes(['profile_nickname','account_email']) 추가 가능) */
     public function redirectToKakao()
     {
         return Socialite::driver('kakao')->redirect();
@@ -151,9 +152,19 @@ class MemberController extends Controller
     /** 카카오 로그인 callback */
     public function handleKakaoCallback(MemberAuthService $memberAuthService)
     {
+        if (request()->has('error')) {
+            $message = request('error_description', request('error', '사용자가 로그인을 취소했거나 카카오에서 오류가 반환되었습니다.'));
+            return redirect()->route('member.login')->withErrors(['social' => $message]);
+        }
+
         try {
             $providerUser = Socialite::driver('kakao')->user();
         } catch (\Exception $e) {
+            Log::channel('single')->warning('카카오 로그인 콜백 실패', [
+                'message' => $e->getMessage(),
+                'exception' => get_class($e),
+                'trace' => $e->getTraceAsString(),
+            ]);
             return redirect()->route('member.login')->withErrors(['social' => '카카오 로그인에 실패했습니다. 다시 시도해 주세요.']);
         }
 

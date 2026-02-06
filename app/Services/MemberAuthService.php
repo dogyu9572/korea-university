@@ -57,7 +57,8 @@ class MemberAuthService
             'login_id' => $loginId,
             'password' => null,
             'name' => $name ?: '회원',
-            'phone_number' => null,
+            'phone_number' => 'sns_' . $provider . '_' . $providerUser->getId(),
+            'school_name' => '',
             'terms_agreed_at' => now(),
         ];
 
