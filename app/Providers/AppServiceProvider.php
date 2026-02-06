@@ -3,12 +3,14 @@
 namespace App\Providers;
 
 use App\Models\AdminMenu;
+use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\View;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Support\Facades\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\URL;
+use SocialiteProviders\Manager\SocialiteWasCalled;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -63,5 +65,11 @@ class AppServiceProvider extends ServiceProvider
                 );
             });
         }
+
+        // Socialite 네이버/카카오 프로바이더 등록
+        Event::listen(function (SocialiteWasCalled $event) {
+            $event->extendSocialite('naver', \SocialiteProviders\Naver\Provider::class);
+            $event->extendSocialite('kakao', \SocialiteProviders\Kakao\KakaoProvider::class);
+        });
     }
 }

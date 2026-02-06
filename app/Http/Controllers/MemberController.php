@@ -10,10 +10,12 @@ use App\Http\Requests\MemberLoginRequest;
 use App\Models\Member;
 use App\Services\Backoffice\MemberService;
 use App\Services\Backoffice\SchoolService;
+use App\Services\MemberAuthService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Cookie;
 use Illuminate\Support\Facades\Hash;
+use Laravel\Socialite\Facades\Socialite;
 
 class MemberController extends Controller
 {
@@ -116,6 +118,50 @@ class MemberController extends Controller
         }
 
         return $redirect;
+    }
+
+    /** 네이버 로그인 redirect */
+    public function redirectToNaver()
+    {
+        return Socialite::driver('naver')->redirect();
+    }
+
+    /** 네이버 로그인 callback */
+    public function handleNaverCallback(MemberAuthService $memberAuthService)
+    {
+        try {
+            $providerUser = Socialite::driver('naver')->user();
+        } catch (\Exception $e) {
+            return redirect()->route('member.login')->withErrors(['social' => '네이버 로그인에 실패했습니다. 다시 시도해 주세요.']);
+        }
+
+        $member = $memberAuthService->findOrCreateMemberFromNaver($providerUser);
+        Auth::guard('member')->login($member, false);
+        request()->session()->regenerate();
+
+        return redirect()->intended(route('mypage.application_status'));
+    }
+
+    /** 카카오 로그인 redirect */
+    public function redirectToKakao()
+    {
+        return Socialite::driver('kakao')->redirect();
+    }
+
+    /** 카카오 로그인 callback */
+    public function handleKakaoCallback(MemberAuthService $memberAuthService)
+    {
+        try {
+            $providerUser = Socialite::driver('kakao')->user();
+        } catch (\Exception $e) {
+            return redirect()->route('member.login')->withErrors(['social' => '카카오 로그인에 실패했습니다. 다시 시도해 주세요.']);
+        }
+
+        $member = $memberAuthService->findOrCreateMemberFromKakao($providerUser);
+        Auth::guard('member')->login($member, false);
+        request()->session()->regenerate();
+
+        return redirect()->intended(route('mypage.application_status'));
     }
 
     /** 로그아웃 */

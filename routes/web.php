@@ -120,6 +120,10 @@ Route::prefix('mypage')->name('mypage.')->middleware('member')->group(function (
 Route::prefix('member')->name('member.')->group(function () {
     Route::get('/login', [MemberController::class, 'login'])->name('login');
     Route::post('/login', [MemberController::class, 'postLogin'])->name('login.post');
+    Route::get('/login/naver', [MemberController::class, 'redirectToNaver'])->name('login.naver');
+    Route::get('/login/naver/callback', [MemberController::class, 'handleNaverCallback'])->name('login.naver.callback');
+    Route::get('/login/kakao', [MemberController::class, 'redirectToKakao'])->name('login.kakao');
+    Route::get('/login/kakao/callback', [MemberController::class, 'handleKakaoCallback'])->name('login.kakao.callback');
     Route::post('/logout', [MemberController::class, 'logout'])->name('logout');
     Route::get('/join', [MemberController::class, 'join'])->name('join');
     Route::post('/join', [MemberController::class, 'store'])->name('join.store');

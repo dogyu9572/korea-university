@@ -16,6 +16,7 @@
 						<button type="button" class="btn_trans_text">인풋 문구 보기</button>
 					</div>
 					@error('password')<p class="join_field_error" style="color:#c00;font-size:0.875rem;margin-top:0.25rem;">{{ $message }}</p>@enderror
+					@error('social')<p class="join_field_error" style="color:#c00;font-size:0.875rem;margin-top:0.25rem;">{{ $message }}</p>@enderror
 					<div class="btm">
 						<label class="check"><input type="checkbox" name="remember" value="1" @checked(old('remember', !empty($remembered_email_value)))><i></i><span>이메일 저장</span></label>
 						<div class="btns">
@@ -30,8 +31,8 @@
 					<div class="sns mt40">
 						<div class="tt flex_center"><span>SNS 로그인</span></div>
 						<div class="btns flex_center">
-							<a href="{{ route('member.join_easy') }}" class="btn naver"></a>
-							<a href="{{ route('member.join_easy') }}" class="btn kakao"></a>
+							<a href="{{ route('member.login.naver') }}" class="btn naver" aria-label="네이버 로그인"></a>
+							<a href="{{ route('member.login.kakao') }}" class="btn kakao" aria-label="카카오 로그인"></a>
 						</div>
 					</div>
 				</div>
