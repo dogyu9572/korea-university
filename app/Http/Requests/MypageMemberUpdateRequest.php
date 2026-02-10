@@ -55,12 +55,36 @@ class MypageMemberUpdateRequest extends FormRequest
     public function withValidator($validator)
     {
         $validator->after(function ($validator) {
+            $email = $this->input('email');
+            if (is_string($email) && $email !== '' && str_contains($email, '@')) {
+                $domain = strtolower(explode('@', $email)[1] ?? '');
+                $blocked = [
+                    'example.com', 'example.org', 'example.net', 'example.edu',
+                    'test.com', 'test.org', 'test.net',
+                    'aaa.com', 'bbb.com', 'ccc.com',
+                    'asdf.com', 'qwerty.com', 'sample.com', 'domain.com',
+                    'localhost', 'homepage.com', 'temp.com', 'fake.com',
+                ];
+                if ($domain !== '' && in_array($domain, $blocked, true)) {
+                    $validator->errors()->add('email', '유효하지 않은 메일주소입니다.');
+                }
+            }
+
             $password = $this->input('password');
             if ($password) {
                 $current = $this->input('current_password');
                 $member = Auth::guard('member')->user();
                 if (!$current || !Hash::check($current, $member->password)) {
                     $validator->errors()->add('current_password', '현재 비밀번호가 일치하지 않습니다.');
+                }
+            }
+            if (is_string($password) && strlen($password) >= 8 && strlen($password) <= 10) {
+                $hasLetter = preg_match('/[a-zA-Z]/', $password);
+                $hasDigit = preg_match('/[0-9]/', $password);
+                $hasSpecial = preg_match('/[^a-zA-Z0-9]/', $password);
+                $types = ($hasLetter ? 1 : 0) + ($hasDigit ? 1 : 0) + ($hasSpecial ? 1 : 0);
+                if ($types < 2) {
+                    $validator->errors()->add('password', '비밀번호는 영문/숫자/특수문자 중 두 가지 이상 조합, 8~10자로 입력해 주세요.');
                 }
             }
 

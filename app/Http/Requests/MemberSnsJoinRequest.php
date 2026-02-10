@@ -5,19 +5,31 @@ namespace App\Http\Requests;
 use App\Models\Member;
 use Illuminate\Foundation\Http\FormRequest;
 
-class MemberJoinRequest extends FormRequest
+class MemberSnsJoinRequest extends FormRequest
 {
     public function authorize(): bool
     {
+        $snsData = session('sns_join_data');
+        if (!$snsData || !isset($snsData['join_type'], $snsData['login_id'])) {
+            return false;
+        }
+        $joinType = $this->input('join_type');
+        $loginId = $this->input('login_id');
+        if (!in_array($joinType, ['naver', 'kakao'])) {
+            return false;
+        }
+        if ($loginId !== ($snsData['login_id'] ?? '')) {
+            return false;
+        }
         return true;
     }
 
     public function rules(): array
     {
         return [
+            'join_type' => 'required|in:naver,kakao',
+            'login_id' => 'required|string|max:255|unique:members,login_id',
             'email' => 'required|email|unique:members,email',
-            'password' => 'required|string|min:8|max:10|confirmed',
-            'password_confirmation' => 'required|string|same:password',
             'phone_number' => 'required|string',
             'name' => 'required|string|max:8',
             'address_postcode' => 'nullable|string',
@@ -35,18 +47,15 @@ class MemberJoinRequest extends FormRequest
     public function messages(): array
     {
         return [
+            'join_type.required' => '가입 유형 정보가 없습니다. SNS 로그인을 다시 시도해 주세요.',
+            'join_type.in' => '올바르지 않은 가입 유형입니다.',
+            'login_id.required' => '로그인 ID 정보가 없습니다. SNS 로그인을 다시 시도해 주세요.',
+            'login_id.unique' => '이미 등록된 SNS 계정입니다.',
             'email.required' => '이메일은 필수 입력 항목입니다.',
             'email.email' => '올바른 이메일 형식이 아닙니다.',
             'email.unique' => '이미 사용 중인 이메일입니다.',
-            'email_verified.in' => '이메일 중복확인을 해 주세요.',
-            'password.required' => '비밀번호는 필수 입력 항목입니다.',
-            'password.min' => '비밀번호는 최소 8자 이상이어야 합니다.',
-            'password.max' => '비밀번호는 최대 10자까지 입력 가능합니다.',
-            'password.confirmed' => '비밀번호와 비밀번호 확인이 일치하지 않습니다.',
-            'password_confirmation.same' => '비밀번호와 비밀번호 확인이 일치하지 않습니다.',
             'phone_number.required' => '휴대폰번호는 필수 입력 항목입니다.',
             'phone_number.unique' => '이미 사용 중인 휴대폰번호입니다.',
-            'phone_verified.in' => '휴대폰번호 중복확인을 해 주세요.',
             'name.required' => '이름은 필수 입력 항목입니다.',
             'name.max' => '이름은 최대 8자까지 입력 가능합니다.',
             'school_name.required' => '학교명은 필수 입력 항목입니다.',
@@ -57,9 +66,6 @@ class MemberJoinRequest extends FormRequest
         ];
     }
 
-    /**
-     * 학교당 대표자 1명 제한: 해당 학교에 이미 대표자가 있으면 에러
-     */
     public function withValidator($validator)
     {
         $validator->after(function ($validator) {
@@ -78,19 +84,8 @@ class MemberJoinRequest extends FormRequest
                 }
             }
 
-            $password = $this->input('password');
-            if (is_string($password) && strlen($password) >= 8 && strlen($password) <= 10) {
-                $hasLetter = preg_match('/[a-zA-Z]/', $password);
-                $hasDigit = preg_match('/[0-9]/', $password);
-                $hasSpecial = preg_match('/[^a-zA-Z0-9]/', $password);
-                $types = ($hasLetter ? 1 : 0) + ($hasDigit ? 1 : 0) + ($hasSpecial ? 1 : 0);
-                if ($types < 2) {
-                    $validator->errors()->add('password', '비밀번호는 영문/숫자/특수문자 중 두 가지 이상 조합, 8~10자로 입력해 주세요.');
-                }
-            }
-
             $phone = $this->input('phone_number');
-            if (is_string($phone) && $phone !== '') {
+            if (is_string($phone) && $phone !== '' && !str_starts_with($phone, 'sns_')) {
                 $normalized = Member::normalizePhone($phone);
                 if ($normalized !== '' && Member::where('phone_number', $normalized)->exists()) {
                     $validator->errors()->add('phone_number', '이미 사용 중인 휴대폰번호입니다.');
@@ -112,14 +107,11 @@ class MemberJoinRequest extends FormRequest
         });
     }
 
-    /**
-     * MemberService createMember에 넘길 데이터 (join_type=email 고정)
-     */
     public function getMemberData(): array
     {
         $data = $this->validated();
-        unset($data['password_confirmation'], $data['terms_privacy'], $data['terms_service'], $data['email_verified'], $data['phone_verified']);
-        $data['join_type'] = 'email';
+        unset($data['terms_privacy'], $data['terms_service']);
+        $data['password'] = null;
         $data['terms_agreed_at'] = now();
         $data['is_school_representative'] = (bool) ($data['is_school_representative'] ?? false);
         $data['email_marketing_consent'] = (bool) ($data['email_marketing_consent'] ?? false);

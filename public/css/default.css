@@ -129,11 +129,13 @@ html.fancybox-lock, html.fancybox-lock body {touch-action:none; overflow-scrolli
 /* layout */
 input[type="text"],
 input[type="password"],
+input[type="email"],
 input[type="date"],
 select,
 textarea {border:#ddd 1px solid; max-width:100%; border-radius:6px;}
 input[type="text"],
 input[type="password"],
+input[type="email"],
 input[type="date"],
 select {height:50px; padding:0 16px; font-size:inherit;}
 select {-webkit-appearance:none; -moz-appearance:none; appearance:none; background:#fff url('/images/arrow_select.svg') no-repeat right 16px center / 18px;}

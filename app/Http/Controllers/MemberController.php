@@ -7,12 +7,16 @@ use App\Http\Requests\MemberFindPwRequest;
 use App\Http\Requests\MemberFindPwResetRequest;
 use App\Http\Requests\MemberJoinRequest;
 use App\Http\Requests\MemberLoginRequest;
+use App\Http\Requests\MemberSnsJoinRequest;
 use App\Models\Member;
+use Illuminate\Auth\Access\AuthorizationException;
 use App\Services\Backoffice\MemberService;
 use App\Services\Backoffice\SchoolService;
 use App\Services\MemberAuthService;
 use Illuminate\Http\Request;
+use Illuminate\Routing\Redirector;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Validation\ValidationException;
 use Illuminate\Support\Facades\Cookie;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Log;
@@ -32,9 +36,37 @@ class MemberController extends Controller
     }
 
     /** 회원가입 처리 */
-    public function store(MemberJoinRequest $request, MemberService $memberService)
+    public function store(Request $request, MemberService $memberService)
     {
-        $memberService->createMember($request->getMemberData());
+        $joinType = $request->input('join_type', 'email');
+
+        if (in_array($joinType, ['naver', 'kakao'])) {
+            try {
+                $snsRequest = MemberSnsJoinRequest::createFrom($request)->replace($request->all());
+                $snsRequest->setContainer(app())->setRedirector(app()->make(Redirector::class));
+                $snsRequest->validateResolved();
+            } catch (ValidationException $e) {
+                return redirect()->back()->withInput()->withErrors($e->errors());
+            } catch (AuthorizationException $e) {
+                return redirect()->back()->withInput()->withErrors([
+                    'join_type' => '세션이 만료되었습니다. SNS 로그인을 다시 시도해 주세요.',
+                ]);
+            }
+            $member = $memberService->createMember($snsRequest->getMemberData());
+            session()->forget('sns_join_data');
+            Auth::guard('member')->login($member, false);
+            $request->session()->regenerate();
+            return redirect()->route('member.join_end')->with('success', '회원가입이 완료되었습니다.');
+        }
+
+        try {
+            $memberJoinRequest = MemberJoinRequest::createFrom($request)->replace($request->all());
+            $memberJoinRequest->setContainer(app())->setRedirector(app()->make(Redirector::class));
+            $memberJoinRequest->validateResolved();
+        } catch (ValidationException $e) {
+            return redirect()->back()->withInput($request->except('_token'))->withErrors($e->errors());
+        }
+        $memberService->createMember($memberJoinRequest->getMemberData());
         return redirect()->route('member.join_end')->with('success', '회원가입이 완료되었습니다.');
     }
 
@@ -135,18 +167,26 @@ class MemberController extends Controller
         } catch (\Exception $e) {
             return redirect()->route('member.login')->withErrors(['social' => '네이버 로그인에 실패했습니다. 다시 시도해 주세요.']);
         }
+        Log::debug('SNS raw data', ['provider' => 'naver', 'raw' => $providerUser->getRaw()]);
 
-        $member = $memberAuthService->findOrCreateMemberFromNaver($providerUser);
-        Auth::guard('member')->login($member, false);
-        request()->session()->regenerate();
+        $member = $memberAuthService->findMemberFromSocial('naver', $providerUser);
+        if ($member) {
+            Auth::guard('member')->login($member, false);
+            request()->session()->regenerate();
+            return redirect()->intended(route('mypage.application_status'));
+        }
 
-        return redirect()->intended(route('mypage.application_status'));
+        $snsJoinData = $memberAuthService->getSnsJoinData('naver', $providerUser);
+        session(['sns_join_data' => $snsJoinData]);
+        return redirect()->route('member.join')->withInput($snsJoinData);
     }
 
-    /** 카카오 로그인 redirect (동의 항목 설정 시 scopes(['profile_nickname','account_email']) 추가 가능) */
+    /** 카카오 로그인 redirect (이름·이메일·전화번호 동의 요청, 동의항목 ID: name, account_email, phone_number) */
     public function redirectToKakao()
     {
-        return Socialite::driver('kakao')->redirect();
+        return Socialite::driver('kakao')
+            ->scopes(['name', 'account_email', 'phone_number'])
+            ->redirect();
     }
 
     /** 카카오 로그인 callback */
@@ -167,12 +207,18 @@ class MemberController extends Controller
             ]);
             return redirect()->route('member.login')->withErrors(['social' => '카카오 로그인에 실패했습니다. 다시 시도해 주세요.']);
         }
+        Log::debug('SNS raw data', ['provider' => 'kakao', 'raw' => $providerUser->getRaw()]);
 
-        $member = $memberAuthService->findOrCreateMemberFromKakao($providerUser);
-        Auth::guard('member')->login($member, false);
-        request()->session()->regenerate();
+        $member = $memberAuthService->findMemberFromSocial('kakao', $providerUser);
+        if ($member) {
+            Auth::guard('member')->login($member, false);
+            request()->session()->regenerate();
+            return redirect()->intended(route('mypage.application_status'));
+        }
 
-        return redirect()->intended(route('mypage.application_status'));
+        $snsJoinData = $memberAuthService->getSnsJoinData('kakao', $providerUser);
+        session(['sns_join_data' => $snsJoinData]);
+        return redirect()->route('member.join')->withInput($snsJoinData);
     }
 
     /** 로그아웃 */
@@ -187,7 +233,10 @@ class MemberController extends Controller
 
     public function join()
     {
-        return view('member.join', $this->memberMenuMeta('회원가입'));
+        $snsJoinData = session('sns_join_data');
+        return view('member.join', array_merge($this->memberMenuMeta('회원가입'), [
+            'snsJoinData' => $snsJoinData,
+        ]));
     }
 
     public function join_easy()

@@ -18,9 +18,9 @@
 					@csrf
 					<div class="inputs">
 						<input type="text" name="phone_number" class="text w100p" placeholder="휴대폰번호를 입력해 주세요." value="{{ \App\Models\Member::formatPhoneForDisplay(old('phone_number')) }}" autocomplete="tel">
-						@error('phone_number')<p class="join_field_error" style="color:#c00;font-size:0.875rem;margin-top:0.25rem;">{{ $message }}</p>@enderror
 						<input type="text" name="name" class="text w100p" placeholder="이름을 입력해주세요." value="{{ old('name') }}" maxlength="8" autocomplete="name">
-						@error('name')<p class="join_field_error" style="color:#c00;font-size:0.875rem;margin-top:0.25rem;">{{ $message }}</p>@enderror
+						@error('name')<p class="join_field_error" style="color:#c00;font-size:1rem;margin-top:0.25rem;">{{ $message }}</p>@enderror
+						@error('phone_number')<p class="join_field_error" style="color:#c00;font-size:1rem;margin-top:0.25rem;">{{ $message }}</p>@enderror
 					</div>
 
 					<div class="btns_tac colm mt40">

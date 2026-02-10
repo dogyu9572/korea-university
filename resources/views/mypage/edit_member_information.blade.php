@@ -1,10 +1,10 @@
 @extends('layouts.app')
 @section('content')
-<main class="sub_wrap inner" @if($errors->has('secession_agreed')) data-secession-errors="1" @endif @if(session('success')) data-success-message="{{ e(session('success')) }}" @endif>
+<main class="sub_wrap inner" @if($errors->has('secession_agreed')) data-secession-errors="1" @endif @if($errors->any()) data-join-errors="1" @endif @if(session('success')) data-success-message="{{ e(session('success')) }}" @endif>
 
 	<div class="stitle tal bdb">회원정보 수정</div>
 
-	<form action="{{ route('mypage.edit_member_information.update') }}" method="POST" id="mypageMemberForm">
+	<form action="{{ route('mypage.edit_member_information.update') }}" method="POST" id="mypageMemberForm" novalidate>
 		@csrf
 		@method('PUT')
 
@@ -13,32 +13,35 @@
 			<dl>
 				<dt>이메일</dt>
 				<dd><input type="text" class="w1" name="email" value="{{ old('email', $member->email) }}" readonly></dd>
-				@error('email')<dd class="join_field_error" style="color:#c00;font-size:0.875rem;margin-top:0.25rem;">{{ $message }}</dd>@enderror
+				@error('email')<dd class="join_field_error" style="color:#c00;font-size:1rem;margin-top:0.25rem;">{{ $message }}</dd>@enderror
 			</dl>
 			<dl>
 				<dt>현재 비밀번호</dt>
 				<dd><input type="password" class="w1" name="current_password" placeholder="비밀번호 변경 시에만 입력"></dd>
-				@error('current_password')<dd class="join_field_error" style="color:#c00;font-size:0.875rem;margin-top:0.25rem;">{{ $message }}</dd>@enderror
+				<dd id="currentPasswordCheckMsg" class="join_field_error" style="color:#c00;font-size:1rem;margin-top:0.25rem;display:none;"></dd>
+				@error('current_password')<dd class="join_field_error" style="color:#c00;font-size:1rem;margin-top:0.25rem;">{{ $message }}</dd>@enderror
 			</dl>
 			<dl>
 				<dt>새 비밀번호</dt>
 				<dd><input type="password" class="w1" name="password" placeholder="영문/숫자/특수문자 조합 두가지 이상(8~10자 이내 입력)"></dd>
-				@error('password')<dd class="join_field_error" style="color:#c00;font-size:0.875rem;margin-top:0.25rem;">{{ $message }}</dd>@enderror
+				<dd id="passwordCheckMsg" class="join_field_error" style="color:#c00;font-size:1rem;margin-top:0.25rem;display:none;"></dd>
+				@error('password')<dd class="join_field_error" style="color:#c00;font-size:1rem;margin-top:0.25rem;">{{ $message }}</dd>@enderror
 			</dl>
 			<dl>
 				<dt>새 비밀번호 확인</dt>
 				<dd><input type="password" class="w1" name="password_confirmation" placeholder="비밀번호를 한 번 더 입력해주세요."></dd>
-				@error('password_confirmation')<dd class="join_field_error" style="color:#c00;font-size:0.875rem;margin-top:0.25rem;">{{ $message }}</dd>@enderror
+				<dd id="passwordConfirmCheckMsg" class="join_field_error" style="color:#c00;font-size:1rem;margin-top:0.25rem;display:none;"></dd>
+				@error('password_confirmation')<dd class="join_field_error" style="color:#c00;font-size:1rem;margin-top:0.25rem;">{{ $message }}</dd>@enderror
 			</dl>
 			<dl>
 				<dt>휴대폰번호</dt>
 				<dd><input type="text" class="w1" name="phone_number" value="{{ \App\Models\Member::formatPhoneForDisplay(old('phone_number', $member->phone_number)) }}" readonly></dd>
-				@error('phone_number')<dd class="join_field_error" style="color:#c00;font-size:0.875rem;margin-top:0.25rem;">{{ $message }}</dd>@enderror
+				@error('phone_number')<dd class="join_field_error" style="color:#c00;font-size:1rem;margin-top:0.25rem;">{{ $message }}</dd>@enderror
 			</dl>
 			<dl>
 				<dt>이름</dt>
 				<dd><input type="text" class="w1" name="name" value="{{ old('name', $member->name) }}" maxlength="8" readonly></dd>
-				@error('name')<dd class="join_field_error" style="color:#c00;font-size:0.875rem;margin-top:0.25rem;">{{ $message }}</dd>@enderror
+				@error('name')<dd class="join_field_error" style="color:#c00;font-size:1rem;margin-top:0.25rem;">{{ $message }}</dd>@enderror
 			</dl>
 			<dl>
 				<dt>주소</dt>
@@ -76,14 +79,15 @@
 					</div>
 					<div style="margin-top:8px;"><input type="text" class="w1" id="school_name_direct" placeholder="학교명을 직접 입력해주세요." @if(old('school_name', $member->school_name)) disabled @endif></div>
 				</dd>
-				@error('school_name')<dd class="join_field_error" style="color:#c00;font-size:0.875rem;margin-top:0.25rem;">{{ $message }}</dd>@enderror
+				<dd id="schoolNameCheckMsg" class="join_field_error" style="color:#c00;font-size:1rem;margin-top:0.25rem;display:none;"></dd>
+				@error('school_name')<dd class="join_field_error" style="color:#c00;font-size:1rem;margin-top:0.25rem;">{{ $message }}</dd>@enderror
 			</dl>
 			<dl>
 				<dt>학교 대표자 여부</dt>
 				<dd class="flex_aic gap16">
 					<label class="check"><input type="checkbox" name="is_school_representative" value="1" @checked(old('is_school_representative', $member->is_school_representative))><i></i><span>협회와의 대표 소통자입니다.</span></label>
 				</dd>
-				@error('is_school_representative')<dd class="join_field_error" style="color:#c00;font-size:0.875rem;margin-top:0.25rem;">{{ $message }}</dd>@enderror
+				@error('is_school_representative')<dd class="join_field_error" style="color:#c00;font-size:1rem;margin-top:0.25rem;">{{ $message }}</dd>@enderror
 			</dl>
 		</div>
 
@@ -105,7 +109,7 @@
 				<div class="con gbox flex_center mt">
 					<label class="check"><input type="checkbox" name="secession_agreed" value="1" required><i></i><span>위의 내용을 모두 읽었으며, 내용에 동의합니다.</span></label>
 				</div>
-				@error('secession_agreed')<p class="join_field_error" style="color:#c00;font-size:0.875rem;margin-top:0.25rem;">{{ $message }}</p>@enderror
+				@error('secession_agreed')<p class="join_field_error" style="color:#c00;font-size:1rem;margin-top:0.25rem;">{{ $message }}</p>@enderror
 				<div class="btns_tac">
 					<button type="submit" class="btn btn_bwb">탈퇴하기</button>
 				</div>
@@ -118,5 +122,5 @@
 @include('member.pop_search_school')
 
 <script src="https://t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js"></script>
-<script src="{{ asset('js/mypage/edit-member-information.js') }}"></script>
+<script src="{{ asset('js/mypage/edit-member-information.js') }}?v={{ filemtime(public_path('js/mypage/edit-member-information.js')) }}"></script>
 @endsection

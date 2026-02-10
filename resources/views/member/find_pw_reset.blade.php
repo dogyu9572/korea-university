@@ -9,19 +9,21 @@
 
 				<div class="tt">새로운 비밀번호를 설정해 주세요.</div>
 
-				<form action="{{ route('member.find_pw_reset.post') }}" method="POST" id="findPwResetForm">
+				<form action="{{ route('member.find_pw_reset.post') }}" method="POST" id="findPwResetForm" novalidate>
 					@csrf
 					<div class="inputs">
 						<div class="btn_set">
 							<input type="password" name="password" class="text h56 w100p pw" placeholder="새 비밀번호" autocomplete="new-password">
 							<button type="button" class="btn_trans_text">인풋 문구 보기</button>
 						</div>
-						@error('password')<p class="join_field_error" style="color:#c00;font-size:0.875rem;margin-top:0.25rem;">{{ $message }}</p>@enderror
+						<p id="passwordCheckMsg" class="join_field_error" style="color:#c00;font-size:1rem;margin-top:0.25rem;display:none;"></p>
+						@error('password')<p class="join_field_error" style="color:#c00;font-size:1rem;margin-top:0.25rem;">{{ $message }}</p>@enderror
 						<div class="btn_set">
 							<input type="password" name="password_confirmation" class="text h56 w100p pw" placeholder="새 비밀번호 확인" autocomplete="new-password">
 							<button type="button" class="btn_trans_text">인풋 문구 보기</button>
 						</div>
-						@error('password_confirmation')<p class="join_field_error" style="color:#c00;font-size:0.875rem;margin-top:0.25rem;">{{ $message }}</p>@enderror
+						<p id="passwordConfirmCheckMsg" class="join_field_error" style="color:#c00;font-size:1rem;margin-top:0.25rem;display:none;"></p>
+						@error('password_confirmation')<p class="join_field_error" style="color:#c00;font-size:1rem;margin-top:0.25rem;">{{ $message }}</p>@enderror
 						<p class="ne gray tal">영문/숫자/특수문자 조합 두가지 이상(8~10자 이내 입력)</p>
 					</div>
 
@@ -36,4 +38,5 @@
 </main>
 
 <script src="{{ asset('js/member-login.js') }}"></script>
+<script src="{{ asset('js/member-find-pw-reset.js') }}?v={{ filemtime(public_path('js/member-find-pw-reset.js')) }}"></script>
 @endsection

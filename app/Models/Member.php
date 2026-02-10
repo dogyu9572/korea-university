@@ -170,13 +170,34 @@ class Member extends Model implements AuthenticatableContract
     }
 
     /**
-     * 아이디 찾기 결과용 마스킹 (앞 6자만 노출, 나머지는 *로 동일 길이 유지)
+     * 아이디 찾기 결과용 마스킹
+     * - 이메일 형태: 로컬파트 앞 4글자만 노출, 나머지는 * 처리, 도메인은 전체 노출
+     *   예) wrch********@gmail.com
+     * - 이메일이 아닌 경우: 기존 방식 유지 (앞 6자만 노출, 나머지는 *로 동일 길이 유지)
      */
     public static function maskLoginId(?string $loginId): string
     {
         if ($loginId === null || $loginId === '') {
             return '';
         }
+
+        if (str_contains($loginId, '@')) {
+            [$local, $domain] = explode('@', $loginId, 2);
+            $local = (string) $local;
+            $domain = (string) $domain;
+
+            $len = mb_strlen($local);
+            if ($len === 0) {
+                return '@' . $domain;
+            }
+
+            $visible = mb_substr($local, 0, 4);
+            $maskedLen = max($len - 4, 0);
+            $maskedLocal = $visible . str_repeat('*', $maskedLen);
+
+            return $maskedLocal . '@' . $domain;
+        }
+
         $len = mb_strlen($loginId);
         if ($len <= 6) {
             return str_repeat('*', $len);
