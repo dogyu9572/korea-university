@@ -276,7 +276,6 @@ class SeminarTrainingService
             foreach ($program->attachments as $att) {
                 $this->deleteFile($att->path);
             }
-            $program->schedules()->delete();
             $program->attachments()->delete();
             $program->delete();
             DB::commit();

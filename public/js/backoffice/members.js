@@ -112,8 +112,12 @@ function initEventHandlers() {
         checkDuplicatePhone(phone, excludeId);
     });
 
-    // 우편번호 검색
+    // 우편번호 검색 (단일 핸들러만 유지 - 중복 시 선택 후 팝업이 다시 뜸)
     $(document).on('click', '#btnSearchAddress', function() {
+        if (typeof daum === 'undefined') {
+            alert('우편번호 서비스를 불러올 수 없습니다.');
+            return;
+        }
         new daum.Postcode({
             oncomplete: function(data) {
                 $('#address_postcode').val(data.zonecode);
@@ -248,19 +252,7 @@ function initVanillaEventHandlers() {
         });
     }
     
-    // 우편번호 검색
-    const btnSearchAddress = document.getElementById('btnSearchAddress');
-    if (btnSearchAddress && typeof daum !== 'undefined') {
-        btnSearchAddress.addEventListener('click', function() {
-            new daum.Postcode({
-                oncomplete: function(data) {
-                    document.getElementById('address_postcode').value = data.zonecode;
-                    document.getElementById('address_base').value = data.address;
-                    document.getElementById('address_detail').focus();
-                }
-            }).open();
-        });
-    }
+    // 우편번호 검색: initEventHandlers()의 $(document).on('click', '#btnSearchAddress')에서만 처리 (중복 등록 시 팝업이 두 번 뜨므로 여기서는 등록하지 않음)
 }
 
 // 이메일 중복 확인

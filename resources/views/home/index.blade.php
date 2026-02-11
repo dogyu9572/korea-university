@@ -6,8 +6,14 @@
 	<div class="mvisual_wrap">
 		<div class="inner">
 			<div class="mvisual">
-				<img src="/images/mvisual01.png" alt="">
-				<img src="/images/mvisual01.png" alt="">
+				@forelse(($banners ?? []) as $banner)
+					@php
+						$desktopSrc = $banner->desktop_image ? asset('storage/' . $banner->desktop_image) : asset('images/mvisual01.png');
+						$mobileSrc = $banner->mobile_image ? asset('storage/' . $banner->mobile_image) : $desktopSrc;
+					@endphp
+					<img src="{{ $desktopSrc }}" data-mobile-src="{{ $mobileSrc }}" alt="{{ $banner->title ?? '' }}">
+				@empty
+				@endforelse
 			</div>
 			<div class="txt">
 				<span>대학과 산업의 상생을 이끄는 협력의 중심, </span>
@@ -255,11 +261,15 @@ $(document).ready (function () {
 @if($popups->count() > 0)
     @foreach($popups as $popup)
         @if($popup->popup_display_type === 'normal')
-            {{-- 일반팝업 (새창) --}}
+            {{-- 일반팝업 (새창) - 1일 동안 보지 않음 쿠키 있으면 열지 않음 --}}
             <script>
                 document.addEventListener('DOMContentLoaded', function() {
-                    const popupUrl = '{{ route("popup.show", $popup->id) }}';
-                    const popupFeatures = 'width={{ $popup->width }},height={{ $popup->height }},left={{ $popup->position_left ?? 100 }},top={{ $popup->position_top ?? 100 }},scrollbars=yes,resizable=yes,menubar=no,toolbar=no,location=no,status=no';
+                    var cookieName = 'popup_hide_{{ $popup->id }}';
+                    var value = '; ' + document.cookie;
+                    var parts = value.split('; ' + cookieName + '=');
+                    if (parts.length === 2) { return; }
+                    var popupUrl = '{{ route("popup.show", $popup->id) }}';
+                    var popupFeatures = 'width={{ $popup->width }},height={{ $popup->height }},left={{ $popup->position_left ?? 100 }},top={{ $popup->position_top ?? 100 }},scrollbars=yes,resizable=yes,menubar=no,toolbar=no,location=no,status=no';
                     window.open(popupUrl, 'popup_{{ $popup->id }}', popupFeatures);
                 });
             </script>

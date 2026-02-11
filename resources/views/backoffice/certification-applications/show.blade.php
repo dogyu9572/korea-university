@@ -24,7 +24,7 @@
 @php
     $dow = ['일','월','화','수','목','금','토'];
 @endphp
-<div class="board-container education-applications certification-applications" data-program-id="{{ $program->id }}" data-base-path="/backoffice/certification-applications">
+<div class="board-container education-applications certification-applications" data-program-id="{{ $program->id }}" data-base-path="/backoffice/certification-applications" data-print-base-url="{{ url('/backoffice/print') }}">
     <div class="board-header">
         <a href="{{ route('backoffice.certification-applications.index') }}" class="btn btn-secondary btn-sm">
             <i class="fas fa-arrow-left"></i> 목록으로
@@ -89,7 +89,7 @@
                             <label class="member-form-label">신청 인원</label>
                             <div class="member-form-field">
                                 <div class="board-form-control readonly-field-full">
-                                    자동 입력 ({{ $program->applications()->count() }}명)
+                                    자동 입력 ({{ $program->applications()->whereNull('cancelled_at')->count() }}명)
                                 </div>
                             </div>
                         </div>
@@ -109,8 +109,9 @@
                 </div>
             </div>
         </div>
+    </form>
 
-        <div class="board-card">
+        <div class="board-card" id="applications-list">
             <div class="board-card-body">
                 <div class="member-form-section">
                     <h3 class="member-section-title">2. 신청 명단</h3>
@@ -208,36 +209,42 @@
                                         <td>{{ $application->payment_status ?? '' }}</td>
                                         <td>{{ $application->application_date ? $application->application_date->format('Y.m.d H:i') : '' }}</td>
                                         <td>{{ $application->tax_invoice_status ?? '' }}</td>
+                                        <td>{{ $application->score !== null ? $application->score : '' }}</td>
+                                        <td>{{ $application->score !== null ? ($application->qualification_display_status ?? '') : '' }}</td>
                                         <td>
-                                            <input type="number" class="board-form-control form-control-sm score-input" name="score[{{ $application->id }}]" value="{{ $application->score !== null ? $application->score : '' }}" min="0" data-application-id="{{ $application->id }}" placeholder="">
-                                        </td>
-                                        <td>{{ $application->pass_status ?? '' }}</td>
-                                        <td>
+                                            @if($application->certification_id)
                                             <button type="button" class="btn btn-sm btn-success" data-action="issue-exam-ticket" data-application-id="{{ $application->id }}">
                                                 발급
                                             </button>
+                                            @endif
                                         </td>
                                         <td>
+                                            @if($application->is_qualification_passed)
                                             <button type="button" class="btn btn-sm btn-success" data-action="issue-pass-confirmation" data-application-id="{{ $application->id }}">
                                                 발급
                                             </button>
+                                            @endif
                                         </td>
                                         <td>
+                                            @if($application->is_qualification_passed)
                                             <button type="button" class="btn btn-sm btn-success" data-action="issue-certificate" data-application-id="{{ $application->id }}">
                                                 발급
                                             </button>
+                                            @endif
                                         </td>
                                         <td>
+                                            @if($application->payment_status === '입금완료')
                                             <button type="button" class="btn btn-sm btn-info" data-action="issue-receipt" data-application-id="{{ $application->id }}">
                                                 발급
                                             </button>
+                                            @endif
                                         </td>
                                         <td>
                                             <div class="board-btn-group">
                                                 <a href="{{ route('backoffice.certification-applications.edit', $application) }}" class="btn btn-primary btn-sm">
                                                     <i class="fas fa-edit"></i> 수정
                                                 </a>
-                                                <form action="{{ route('backoffice.certification-applications.destroy', $application) }}" method="POST" class="d-inline" data-action="confirm-delete">
+                                                <form action="{{ route('backoffice.certification-applications.destroy', $application) }}" method="POST" class="d-inline" data-action="confirm-delete" onsubmit="return confirm('정말 삭제하시겠습니까?');">
                                                     @csrf
                                                     @method('DELETE')
                                                     <button type="submit" class="btn btn-danger btn-sm">
@@ -262,16 +269,24 @@
         </div>
 
         <div class="board-form-actions">
-            <button type="submit" class="btn btn-primary">
+            <button type="submit" form="saveForm" class="btn btn-primary">
                 <i class="fas fa-save"></i> 저장
             </button>
             <a href="{{ route('backoffice.certification-applications.index') }}" class="btn btn-secondary">목록</a>
         </div>
-    </form>
 </div>
 @endsection
 
 @section('scripts')
 <script src="{{ asset('js/backoffice/education-applications.js') }}"></script>
 <script src="{{ asset('js/backoffice/certification-applications.js') }}"></script>
+<script>
+(function() {
+    var params = new URLSearchParams(location.search);
+    if (params.has('payment_status') || params.has('search')) {
+        var el = document.getElementById('applications-list');
+        if (el) el.scrollIntoView({ behavior: 'instant', block: 'start' });
+    }
+})();
+</script>
 @endsection

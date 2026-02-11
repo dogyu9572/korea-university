@@ -3,6 +3,8 @@
 namespace App\Http\Controllers;
 
 use App\Services\Backoffice\BoardPostService;
+use App\Services\Backoffice\SchoolService;
+use Illuminate\Http\Request;
 
 class SubController extends Controller
 {
@@ -94,10 +96,20 @@ class SubController extends Controller
         
         return view('about.organizational', compact('gNum', 'sNum', 'gName', 'sName', 'chartContent', 'membersByCategory'));
     }
-    public function about_institutions()
+    public function about_institutions(Request $request, SchoolService $schoolService)
     {
         $gNum = "04"; $sNum = "05"; $gName = "협회 소개"; $sName = "회원기관 소개";
-        return view('about.about_institutions', compact('gNum', 'sNum', 'gName', 'sName'));
+
+        $filters = [
+            'school_name' => $request->get('school_name', ''),
+            'branch' => $request->get('branch', ''),
+            'is_member_school' => 'Y',
+        ];
+        $schools = $schoolService->getSchools($filters, 15);
+        $branches = $schoolService->getBranches();
+        $branchOptions = array_merge(['' => '전체'], array_combine($branches, $branches));
+
+        return view('about.about_institutions', compact('gNum', 'sNum', 'gName', 'sName', 'schools', 'branchOptions', 'filters'));
     }
 
     public function terms()

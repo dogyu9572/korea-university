@@ -234,10 +234,14 @@
                     </div>
                     <input type="hidden" id="participation_fee" name="participation_fee" value="{{ old('participation_fee', $app?->participation_fee ?? '') }}">
                     <input type="hidden" id="fee_type" name="fee_type" value="{{ old('fee_type', $app?->fee_type ?? '') }}">
+                    @php
+                        $feeSchoolType = old('fee_school_type', $app?->fee_type ? (str_starts_with($app?->fee_type ?? '', 'member') ? '회원교' : '비회원교') : '회원교');
+                    @endphp
+                    <input type="hidden" name="fee_school_type" value="{{ $feeSchoolType }}">
                     <div class="fee-type-block mt-2">
                         <div class="form-row-inline mb-1">
                             <div class="board-radio-item">
-                                <input type="radio" id="fee_member_school" name="fee_school_type" value="회원교" class="board-radio-input" @checked(old('fee_school_type', $app?->fee_type ? (str_starts_with($app?->fee_type ?? '', 'member') ? '회원교' : '비회원교') : '회원교') == '회원교')>
+                                <input type="radio" id="fee_member_school" name="fee_school_type_display" value="회원교" class="board-radio-input" disabled @checked($feeSchoolType == '회원교')>
                                 <label for="fee_member_school">회원교</label>
                             </div>
                             <div class="board-radio-group ml-3">
@@ -257,7 +261,7 @@
                         </div>
                         <div class="form-row-inline">
                             <div class="board-radio-item">
-                                <input type="radio" id="fee_guest_school" name="fee_school_type" value="비회원교" class="board-radio-input" @checked(old('fee_school_type') == '비회원교')>
+                                <input type="radio" id="fee_guest_school" name="fee_school_type_display" value="비회원교" class="board-radio-input" disabled @checked($feeSchoolType == '비회원교')>
                                 <label for="fee_guest_school">비회원교</label>
                             </div>
                             <div class="board-radio-group ml-3">

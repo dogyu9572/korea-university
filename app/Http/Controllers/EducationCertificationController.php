@@ -67,9 +67,18 @@ class EducationCertificationController extends Controller
 
         $education = $this->applicationService->getEducationProgram($educationId);
         $member = $request->user('member');
+
+        if ($member && $this->applicationService->hasMemberAppliedForEducation($member->id, $educationId)) {
+            return redirect()
+                ->route('education_certification.application_ec')
+                ->with('error', '이미 신청한 교육입니다.');
+        }
+
+        $memberSchoolType = $this->applicationService->getMemberSchoolType($member);
         $viewData = array_merge($this->menuMeta(), [
             'education' => $education,
             'member' => $member,
+            'memberSchoolType' => $memberSchoolType,
             'feeOptions' => $this->buildEducationFeeOptions($education),
             'refundPolicies' => $this->buildEducationRefundPolicies($education),
         ]);

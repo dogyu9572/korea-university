@@ -197,7 +197,7 @@
             </div>
 
             <div class="member-form-row">
-                <label class="member-form-label">이수증/수료증</label>
+                <label class="member-form-label">{{ old('certificate_type', $program->certificate_type ?? '이수증') }}</label>
                 <div class="member-form-field">
                     <div class="board-radio-group">
                         <div class="board-radio-item">

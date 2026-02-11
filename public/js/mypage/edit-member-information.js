@@ -74,6 +74,15 @@
 			layerShow('secession');
 		});
 
+		$('#secessionForm').on('submit', function (e) {
+			var agreed = $('input[name="secession_agreed"]', this).is(':checked');
+			if (!agreed) {
+				e.preventDefault();
+				alert('회원탈퇴 정책에 동의해주세요.');
+				return false;
+			}
+		});
+
 		$(document).on('click', '[data-action="layer-close"]', function () {
 			var layer = $(this).data('layer');
 			if (layer) layerHide(layer);

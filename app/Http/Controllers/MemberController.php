@@ -111,6 +111,16 @@ class MemberController extends Controller
     /** 로그인 폼 */
     public function login()
     {
+        // 로그인 페이지 직접 접근 시: 이전 페이지(Referer)를 intended로 저장해 로그인 후 그쪽으로 이동
+        if (!request()->session()->has('url.intended')) {
+            $referer = request()->header('Referer');
+            $baseUrl = rtrim(url('/'), '/');
+            $loginUrl = route('member.login');
+            if ($referer && str_starts_with($referer, $baseUrl) && $referer !== $loginUrl && !str_starts_with($referer, $loginUrl . '?')) {
+                request()->session()->put('url.intended', $referer);
+            }
+        }
+
         $remembered = request()->cookie('remembered_email');
         if ($remembered && (str_contains($remembered, '=') || str_contains($remembered, 'expires') || strlen($remembered) > 100)) {
             $remembered = '';
@@ -140,10 +150,15 @@ class MemberController extends Controller
             return back()->withErrors(['email' => '이메일(아이디) 또는 비밀번호가 일치하지 않습니다.'])->withInput($request->only('email'));
         }
 
+        $intendedUrl = $request->session()->pull('url.intended');
         Auth::guard('member')->login($member, false);
         $request->session()->regenerate();
 
-        $redirect = redirect()->intended(route('mypage.application_status'));
+        $redirectUrl = route('mypage.application_status');
+        if ($intendedUrl && str_starts_with($intendedUrl, url('/'))) {
+            $redirectUrl = $intendedUrl;
+        }
+        $redirect = redirect()->to($redirectUrl);
         if ($request->boolean('remember')) {
             $redirect->withCookie(cookie('remembered_email', $loginIdOrEmail, 60 * 24 * 365, '/', null, false, true, false, 'lax'));
         } else {

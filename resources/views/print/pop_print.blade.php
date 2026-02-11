@@ -8,8 +8,12 @@
 			<label class="select"><input type="radio" name="print" data-url="{{ route('mypage.print.receipt', $application->id) }}"><span>영수증 출력</span></label>
 			@endif
 			@if($application->is_completed && $application->is_survey_completed)
+			@php $certType = isset($application->program) ? ($application->program->certificate_type ?? '이수증') : '이수증'; @endphp
+			@if($certType === '수료증')
 			<label class="select"><input type="radio" name="print" data-url="{{ route('mypage.print.certificate_completion', $application->id) }}"><span>수료증 출력</span></label>
+			@else
 			<label class="select"><input type="radio" name="print" data-url="{{ route('mypage.print.certificate_finish', $application->id) }}"><span>이수증 출력</span></label>
+			@endif
 			@endif
 			@elseif(isset($gNum) && $gNum == '05' && $sNum == '01')
 			<label class="select"><input type="radio" name="print" data-url="/print/receipt"><span>영수증 출력</span></label>

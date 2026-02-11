@@ -3,6 +3,10 @@
 <main class="sub_wrap inner" id="application-ec-list">
 	<div class="stitle tal">교육 · 자격증 신청</div>
 
+	@if(session('error'))
+	<p class="msg_error" style="margin-bottom:1rem;">{{ session('error') }}</p>
+	@endif
+
 	@php
 		$currentTab = request('tab', 'all');
 		$currentSort = request('sort', 'created_at');

@@ -143,16 +143,84 @@ function exportExcel() {
     });
 }
 
+// 신청별 즉시 업데이트 공통 경로
+function getApplicationUpdateBaseUrl() {
+    return '/backoffice/applications';
+}
+
 // 결제상태 업데이트
 function updatePaymentStatus(applicationId, status) {
-    // TODO: AJAX로 즉시 저장 기능 구현 필요
-    alert('결제상태 업데이트 기능은 준비 중입니다.');
+    const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content');
+    const url = getApplicationUpdateBaseUrl() + '/' + applicationId + '/payment-status';
+    fetch(url, {
+        method: 'PATCH',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRF-TOKEN': csrfToken,
+            'Accept': 'application/json'
+        },
+        body: JSON.stringify({ payment_status: status })
+    })
+        .then(function (r) { return r.json(); })
+        .then(function (data) {
+            if (data.success) {
+                return;
+            }
+            alert('저장 중 오류가 발생했습니다.');
+        })
+        .catch(function () {
+            alert('저장 중 오류가 발생했습니다.');
+        });
+}
+
+// 세금계산서 상태 업데이트
+function updateTaxInvoiceStatus(applicationId, status) {
+    const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content');
+    const url = getApplicationUpdateBaseUrl() + '/' + applicationId + '/tax-invoice-status';
+    fetch(url, {
+        method: 'PATCH',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRF-TOKEN': csrfToken,
+            'Accept': 'application/json'
+        },
+        body: JSON.stringify({ tax_invoice_status: status })
+    })
+        .then(function (r) { return r.json(); })
+        .then(function (data) {
+            if (data.success) {
+                return;
+            }
+            alert('저장 중 오류가 발생했습니다.');
+        })
+        .catch(function () {
+            alert('저장 중 오류가 발생했습니다.');
+        });
 }
 
 // 이수 여부 업데이트
 function updateCompletionStatus(applicationId, isCompleted) {
-    // TODO: AJAX로 즉시 저장 및 수료증 번호 자동 생성 기능 구현 필요
-    alert('이수 여부 업데이트 기능은 준비 중입니다.');
+    const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content');
+    const url = getApplicationUpdateBaseUrl() + '/' + applicationId + '/completion-status';
+    fetch(url, {
+        method: 'PATCH',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRF-TOKEN': csrfToken,
+            'Accept': 'application/json'
+        },
+        body: JSON.stringify({ is_completed: isCompleted ? 1 : 0 })
+    })
+        .then(function (r) { return r.json(); })
+        .then(function (data) {
+            if (data.success) {
+                return;
+            }
+            alert('저장 중 오류가 발생했습니다.');
+        })
+        .catch(function () {
+            alert('저장 중 오류가 발생했습니다.');
+        });
 }
 
 // 수료증 발급
@@ -530,19 +598,26 @@ function initCreateEditPageHandlers() {
     });
     // 세미나/해외연수: 참가비 타입 동기화 (회원교/비회원교 + 2인1실/1인실/비숙박 -> fee_type)
     const feeTypeEl = document.getElementById('fee_type');
-    const feeSchoolRadios = document.querySelectorAll('input[name="fee_school_type"]');
+    const feeSchoolInput = document.querySelector('input[name="fee_school_type"]');
     const feeAccomRadios = document.querySelectorAll('input[name="fee_accommodation"]');
-    if (feeTypeEl && (feeSchoolRadios.length || feeAccomRadios.length)) {
+    if (feeTypeEl && (feeSchoolInput || feeAccomRadios.length)) {
+        function getFeeSchoolValue() {
+            if (!feeSchoolInput) return '';
+            if (feeSchoolInput.type === 'hidden') return feeSchoolInput.value;
+            var checked = document.querySelector('input[name="fee_school_type"]:checked');
+            return checked ? checked.value : '';
+        }
         function updateFeeType() {
-            var school = document.querySelector('input[name="fee_school_type"]:checked');
+            var schoolVal = getFeeSchoolValue();
             var accom = document.querySelector('input[name="fee_accommodation"]:checked');
-            var schoolVal = school ? school.value : '';
             var accomVal = accom ? accom.value : '';
             var prefix = (schoolVal === '비회원교') ? 'guest' : 'member';
             var suffix = (accomVal === '1인실') ? 'single' : ((accomVal === '비숙박') ? 'no_stay' : 'twin');
             feeTypeEl.value = prefix + '_' + suffix;
         }
-        feeSchoolRadios.forEach(function (r) { r.addEventListener('change', updateFeeType); });
+        if (feeSchoolInput && feeSchoolInput.type !== 'hidden') {
+            feeSchoolInput.addEventListener('change', updateFeeType);
+        }
         feeAccomRadios.forEach(function (r) { r.addEventListener('change', updateFeeType); });
         updateFeeType();
     }
@@ -594,6 +669,9 @@ function initShowPageHandlers() {
         }
         const btnCert = e.target.closest('[data-action="issue-certificate"]');
         if (btnCert) {
+            if (container.classList.contains('certification-applications')) {
+                return;
+            }
             e.preventDefault();
             var id = btnCert.getAttribute('data-application-id');
             if (id) issueCertificate(id);
@@ -601,6 +679,9 @@ function initShowPageHandlers() {
         }
         const btnReceipt = e.target.closest('[data-action="issue-receipt"]');
         if (btnReceipt) {
+            if (container.classList.contains('certification-applications')) {
+                return;
+            }
             e.preventDefault();
             var id = btnReceipt.getAttribute('data-application-id');
             if (id) issueReceipt(id);
@@ -619,6 +700,12 @@ function initShowPageHandlers() {
         if (el && el.nodeName === 'SELECT') {
             var id = el.getAttribute('data-application-id');
             if (id) updatePaymentStatus(id, el.value);
+            return;
+        }
+        const taxEl = e.target.closest('[data-action="update-tax-invoice-status"]');
+        if (taxEl && taxEl.nodeName === 'SELECT') {
+            var id = taxEl.getAttribute('data-application-id');
+            if (id) updateTaxInvoiceStatus(id, taxEl.value);
             return;
         }
         const radio = e.target.closest('[data-action="update-completion-status"]');

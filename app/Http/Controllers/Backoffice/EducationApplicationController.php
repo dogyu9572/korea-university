@@ -121,6 +121,7 @@ class EducationApplicationController extends BaseController
         $isSeminarTraining = $routeName === 'backoffice.seminar-training-applications.edit';
 
         if ($isCertification) {
+            $application = $this->educationApplicationService->ensureCertificationDocumentNumbers($application);
             $examVenues = $this->categoryService->getExamVenues();
             return $this->view('backoffice.certification-applications.edit', compact('application', 'examVenues'));
         }
@@ -351,6 +352,48 @@ class EducationApplicationController extends BaseController
             'success' => true,
             'message' => $count . '건이 이수 처리되었습니다.',
         ]);
+    }
+
+    /**
+     * 신청별 결제상태 즉시 업데이트
+     */
+    public function updatePaymentStatus(EducationApplication $education_application, Request $request)
+    {
+        $request->validate([
+            'payment_status' => 'required|in:미입금,입금완료',
+        ]);
+
+        $this->educationApplicationService->updateApplicationPaymentStatus($education_application, $request->payment_status);
+
+        return response()->json(['success' => true]);
+    }
+
+    /**
+     * 신청별 세금계산서 상태 즉시 업데이트
+     */
+    public function updateTaxInvoiceStatus(EducationApplication $education_application, Request $request)
+    {
+        $request->validate([
+            'tax_invoice_status' => 'required|in:미신청,신청완료,발행완료',
+        ]);
+
+        $education_application->update(['tax_invoice_status' => $request->tax_invoice_status]);
+
+        return response()->json(['success' => true]);
+    }
+
+    /**
+     * 신청별 이수 여부 즉시 업데이트
+     */
+    public function updateCompletionStatus(EducationApplication $education_application, Request $request)
+    {
+        $request->validate([
+            'is_completed' => 'required|boolean',
+        ]);
+
+        $this->educationApplicationService->updateApplicationCompletionStatus($education_application, $request->boolean('is_completed'));
+
+        return response()->json(['success' => true]);
     }
 
     /**
@@ -651,5 +694,73 @@ class EducationApplicationController extends BaseController
     public function printCertificateFinish(EducationApplication $education_application)
     {
         return $this->printDocument($education_application, 'print.certificate_finish', '이수증');
+    }
+
+    /**
+     * 자격증 신청 전용 인쇄 뷰 데이터 (certification, member 로드)
+     */
+    private function printCertificationDocument(EducationApplication $education_application, string $view, string $sName)
+    {
+        if (!$education_application->certification_id) {
+            abort(404, '자격증 신청이 아닙니다.');
+        }
+        $education_application->load(['certification', 'member', 'examVenue']);
+        return view($view, [
+            'gNum' => '99',
+            'sNum' => '00',
+            'gName' => '인쇄',
+            'sName' => $sName,
+            'application' => $education_application,
+        ]);
+    }
+
+    /**
+     * 수험표 출력 (백오피스, 자격증 신청)
+     */
+    public function printAdmissionTicket(EducationApplication $education_application)
+    {
+        return $this->printCertificationDocument($education_application, 'print.admission_ticket', '수험표');
+    }
+
+    /**
+     * 합격확인서 출력 (백오피스, 자격증 신청, 합격자만)
+     */
+    public function printCertificateQualification(EducationApplication $education_application)
+    {
+        if (!$education_application->certification_id) {
+            abort(404, '자격증 신청이 아닙니다.');
+        }
+        $education_application->load(['certification', 'member', 'examVenue']);
+        if (!$education_application->is_qualification_passed) {
+            abort(404, '합격 확인서는 합격 후 발급할 수 있습니다.');
+        }
+        return view('print.certificate_qualification', [
+            'gNum' => '99',
+            'sNum' => '00',
+            'gName' => '인쇄',
+            'sName' => '합격확인서',
+            'application' => $education_application,
+        ]);
+    }
+
+    /**
+     * 자격증 출력 (백오피스, 자격증 신청, 합격자만)
+     */
+    public function printQualificationCertificate(EducationApplication $education_application)
+    {
+        if (!$education_application->certification_id) {
+            abort(404, '자격증 신청이 아닙니다.');
+        }
+        $education_application->load(['certification', 'member', 'examVenue']);
+        if (!$education_application->is_qualification_passed) {
+            abort(404, '자격증은 합격 후 발급할 수 있습니다.');
+        }
+        return view('print.certificate', [
+            'gNum' => '99',
+            'sNum' => '00',
+            'gName' => '인쇄',
+            'sName' => '자격증',
+            'application' => $education_application,
+        ]);
     }
 }

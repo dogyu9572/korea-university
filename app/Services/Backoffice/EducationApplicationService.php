@@ -20,7 +20,7 @@ class EducationApplicationService
      */
     public function getList(Request $request)
     {
-        $query = Education::query()->withCount('applications as enrolled_count');
+        $query = Education::query()->withCount(['applications as enrolled_count' => fn ($q) => $q->whereNull('cancelled_at')]);
         return $this->buildListQuery($query, $request, 'education');
     }
 
@@ -29,7 +29,7 @@ class EducationApplicationService
      */
     public function getOnlineList(Request $request)
     {
-        $query = OnlineEducation::query()->withCount('applications as enrolled_count');
+        $query = OnlineEducation::query()->withCount(['applications as enrolled_count' => fn ($q) => $q->whereNull('cancelled_at')]);
         return $this->buildListQuery($query, $request, 'online_education');
     }
 
@@ -38,7 +38,7 @@ class EducationApplicationService
      */
     public function getSeminarTrainingList(Request $request)
     {
-        $query = SeminarTraining::query()->withCount('applications as enrolled_count');
+        $query = SeminarTraining::query()->withCount(['applications as enrolled_count' => fn ($q) => $q->whereNull('cancelled_at')]);
         return $this->buildListQuery($query, $request, 'seminar_training');
     }
 
@@ -47,7 +47,7 @@ class EducationApplicationService
      */
     public function getCertificationList(Request $request)
     {
-        $query = Certification::query()->withCount('applications as enrolled_count');
+        $query = Certification::query()->withCount(['applications as enrolled_count' => fn ($q) => $q->whereNull('cancelled_at')]);
 
         if ($request->filled('application_status')) {
             $query->where('application_status', $request->application_status);
@@ -90,7 +90,30 @@ class EducationApplicationService
         foreach ($applications as $application) {
             $score = $scores[$application->id] ?? null;
             if ($score !== null && $score !== '') {
+                // 성적 저장
                 $application->update(['score' => (int) $score]);
+                $application->refresh();
+
+                // 합격 여부(버튼 노출 기준)에 맞춰 자격확인서/합격확인서 번호 자동 생성
+                if ($application->is_qualification_passed) {
+                    $updateData = [];
+
+                    if (!$application->qualification_certificate_number) {
+                        $updateData['qualification_certificate_number'] = $this->generateQualificationCertificateNumber(now());
+                    }
+                    if (!$application->pass_confirmation_number) {
+                        $updateData['pass_confirmation_number'] = $this->generatePassConfirmationNumber(now());
+                    }
+                    // pass_status가 아직 비어 있으면 '합격'으로 맞춰 둠 (기존 로직과 정합성 유지)
+                    if (!$application->pass_status) {
+                        $updateData['pass_status'] = '합격';
+                    }
+
+                    if (!empty($updateData)) {
+                        $application->update($updateData);
+                    }
+                }
+
                 $count++;
             }
         }
@@ -154,6 +177,7 @@ class EducationApplicationService
     {
         $query = EducationApplication::query()
             ->where($programColumn, $programId)
+            ->whereNull('cancelled_at')
             ->with(['member', 'education', 'onlineEducation', 'certification', 'seminarTraining']);
 
         if ($request->filled('payment_status') && $request->payment_status !== '전체') {
@@ -182,6 +206,7 @@ class EducationApplicationService
     {
         $query = EducationApplication::query()
             ->where($programColumn, $programId)
+            ->whereNull('cancelled_at')
             ->with(['member', 'education', 'onlineEducation', 'certification', 'seminarTraining']);
 
         if ($applicationIds !== null && !empty($applicationIds)) {
@@ -235,6 +260,36 @@ class EducationApplicationService
             }
         }
         return $updated;
+    }
+
+    /**
+     * 신청별 결제상태 업데이트
+     */
+    public function updateApplicationPaymentStatus(EducationApplication $application, string $status): void
+    {
+        $data = [
+            'payment_status' => $status,
+            'payment_date' => $status === '입금완료' ? now() : null,
+        ];
+        if ($status === '입금완료' && !$application->receipt_number) {
+            $data['receipt_number'] = $this->generateReceiptNumber(now());
+        }
+        $application->update($data);
+    }
+
+    /**
+     * 신청별 이수 여부 업데이트
+     */
+    public function updateApplicationCompletionStatus(EducationApplication $application, bool $isCompleted): void
+    {
+        $data = ['is_completed' => $isCompleted];
+        if ($isCompleted && !$application->certificate_number) {
+            $app = EducationApplication::with(['education', 'onlineEducation', 'certification', 'seminarTraining'])->find($application->id);
+            $data['certificate_number'] = $this->generateCertificateNumber(now(), $app->program);
+        } elseif (!$isCompleted) {
+            $data['certificate_number'] = null;
+        }
+        $application->update($data);
     }
 
     /**
@@ -485,7 +540,7 @@ class EducationApplicationService
             // 자격증 증명사진 저장
             if ($request->hasFile('id_photo')) {
                 $path = $request->file('id_photo')->store('education_applications/id_photos', 'public');
-                $application->update(['id_photo_path' => Storage::url($path)]);
+                $application->update(['id_photo_path' => $path]);
             }
 
             // 첨부파일 저장
@@ -611,14 +666,22 @@ class EducationApplicationService
             // 자격증 증명사진 처리
             if ($request->hasFile('id_photo')) {
                 if ($application->id_photo_path) {
-                    $oldPath = str_replace('/storage/', '', parse_url($application->id_photo_path, PHP_URL_PATH));
-                    Storage::disk('public')->delete($oldPath);
+                    $oldPath = str_starts_with($application->id_photo_path, '/') || str_contains($application->id_photo_path, '://')
+                        ? preg_replace('#^.*/storage/#', '', parse_url($application->id_photo_path, PHP_URL_PATH) ?? '')
+                        : $application->id_photo_path;
+                    if ($oldPath !== '') {
+                        Storage::disk('public')->delete($oldPath);
+                    }
                 }
                 $path = $request->file('id_photo')->store('education_applications/id_photos', 'public');
-                $data['id_photo_path'] = Storage::url($path);
+                $data['id_photo_path'] = $path;
             } elseif ($request->boolean('delete_id_photo') && $application->id_photo_path) {
-                $oldPath = str_replace('/storage/', '', parse_url($application->id_photo_path, PHP_URL_PATH));
-                Storage::disk('public')->delete($oldPath);
+                $oldPath = str_starts_with($application->id_photo_path, '/') || str_contains($application->id_photo_path, '://')
+                    ? preg_replace('#^.*/storage/#', '', parse_url($application->id_photo_path, PHP_URL_PATH) ?? '')
+                    : $application->id_photo_path;
+                if ($oldPath !== '') {
+                    Storage::disk('public')->delete($oldPath);
+                }
                 $data['id_photo_path'] = null;
             }
 
@@ -669,6 +732,46 @@ class EducationApplicationService
     {
         return EducationApplication::with(['education', 'onlineEducation', 'certification', 'seminarTraining', 'member', 'attachments', 'roommate', 'examVenue'])
             ->findOrFail($id);
+    }
+
+    /**
+     * 자격증 신청(edit 화면 진입 시)에서 show 페이지 발급 버튼 노출 기준과 동일하게 번호를 자동 생성합니다.
+     * - 수험표 번호: show에서 수험표 발급 버튼은 certification_id만 있으면 노출 → 번호 없으면 생성
+     * - 자격확인서/합격확인서 번호: show에서 합격 시에만 버튼 노출 → 합격인데 번호 없으면 생성
+     * - 영수증 번호: 입금완료 시에만 생성(기존 로직 유지)
+     */
+    public function ensureCertificationDocumentNumbers(EducationApplication $application): EducationApplication
+    {
+        if (!$application->certification_id) {
+            return $application;
+        }
+
+        $updateData = [];
+
+        // 수험표 번호: show와 동일 조건(certification_id 있으면 발급 버튼 노출) → 번호 없으면 생성
+        if (empty($application->exam_ticket_number)) {
+            $updateData['exam_ticket_number'] = $this->generateExamTicketNumber(now(), $application->program);
+        }
+
+        // 합격자용: 자격확인서/합격확인서 번호
+        if ($application->is_qualification_passed) {
+            if (empty($application->qualification_certificate_number)) {
+                $updateData['qualification_certificate_number'] = $this->generateQualificationCertificateNumber(now());
+            }
+            if (empty($application->pass_confirmation_number)) {
+                $updateData['pass_confirmation_number'] = $this->generatePassConfirmationNumber(now());
+            }
+            if (empty($application->pass_status)) {
+                $updateData['pass_status'] = '합격';
+            }
+        }
+
+        if (!empty($updateData)) {
+            $application->update($updateData);
+            $application->refresh();
+        }
+
+        return $application;
     }
 
     /**

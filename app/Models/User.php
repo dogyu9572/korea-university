@@ -104,7 +104,15 @@ class User extends Authenticatable
     }
 
     /**
-     * 사용자의 메뉴 권한들과의 관계
+     * 이 사용자가 속한 관리자 권한 그룹
+     */
+    public function adminGroup()
+    {
+        return $this->belongsTo(AdminGroup::class, 'admin_group_id');
+    }
+
+    /**
+     * 사용자의 메뉴 권한들과의 관계 (개별 부여 권한)
      */
     public function menuPermissions()
     {
@@ -152,17 +160,29 @@ class User extends Authenticatable
             return $result;
         }
 
-        $permissions = $this->menuPermissions()
+        // 개별(user) 권한
+        $userPermissions = $this->menuPermissions()
             ->get()
             ->pluck('granted', 'menu_id')
             ->toArray();
+
+        // 그룹(admin_group) 권한
+        $groupMenuIds = [];
+        if ($this->admin_group_id) {
+            $group = $this->adminGroup;
+            if ($group) {
+                $groupMenuIds = $group->getAllMenuPermissions(); // menu_id 배열
+            }
+        }
 
         // 모든 메뉴에 대해 권한 정보 생성 (권한이 없는 메뉴는 false)
         $allMenus = \App\Models\AdminMenu::where('is_active', true)->get();
         $result = [];
 
         foreach ($allMenus as $menu) {
-            $result[$menu->id] = $permissions[$menu->id] ?? false;
+            $hasUserPermission = $userPermissions[$menu->id] ?? false;
+            $hasGroupPermission = in_array($menu->id, $groupMenuIds, true);
+            $result[$menu->id] = $hasUserPermission || $hasGroupPermission;
         }
 
         return $result;

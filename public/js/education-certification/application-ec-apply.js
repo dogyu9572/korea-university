@@ -109,8 +109,98 @@ function setupSchoolPopup() {
     });
 }
 
+function setupFeeTypeRestriction() {
+    const typeInput = document.getElementById('memberSchoolType');
+    if (!typeInput) {
+        return;
+    }
+
+    const memberType = typeInput.value;
+    if (memberType !== 'member' && memberType !== 'guest') {
+        return;
+    }
+
+    const feeRadios = document.querySelectorAll('input[name="fee_type"]');
+    if (!feeRadios.length) {
+        return;
+    }
+
+    // 잘못된 그룹 선택 시 알림 및 선택 취소
+    feeRadios.forEach(function (radio) {
+        const group = radio.getAttribute('data-fee-group');
+        if (!group) {
+            return;
+        }
+
+        radio.addEventListener('change', function (event) {
+            if (!radio.checked) {
+                return;
+            }
+
+            if (group === memberType) {
+                return;
+            }
+
+            event.preventDefault();
+            radio.checked = false;
+
+            if (memberType === 'member') {
+                alert('회원교 소속만 선택할 수 있는 참가비입니다.');
+            } else {
+                alert('비회원교 소속만 선택할 수 있는 참가비입니다.');
+            }
+        });
+    });
+
+    // 초기 로딩 시 회원 유형에 맞는 첫 번째 항목 자동 선택
+    let hasValidChecked = false;
+    feeRadios.forEach(function (radio) {
+        const group = radio.getAttribute('data-fee-group');
+        if (radio.checked) {
+            if (group !== memberType) {
+                radio.checked = false;
+            } else {
+                hasValidChecked = true;
+            }
+        }
+    });
+
+    if (!hasValidChecked) {
+        for (let i = 0; i < feeRadios.length; i++) {
+            const radio = feeRadios[i];
+            if (radio.getAttribute('data-fee-group') === memberType) {
+                radio.checked = true;
+                break;
+            }
+        }
+    }
+}
+
 document.addEventListener('DOMContentLoaded', function () {
+    // 유효성 검사 실패 시 첫 번째 에러 위치로 스크롤 (즉시 실행, 맨 위로 가지 않도록)
+    var form = document.querySelector('.application_form[data-join-errors]');
+    if (form) {
+        var errs = form.querySelectorAll('.join_field_error');
+        var firstErr = null;
+        for (var i = 0; i < errs.length; i++) {
+            if (errs[i].offsetParent !== null && errs[i].textContent.trim()) {
+                firstErr = errs[i];
+                break;
+            }
+        }
+        if (firstErr) {
+            var dl = firstErr.closest('dl');
+            var input = dl ? dl.querySelector('input:not([type="hidden"]):not([readonly]), select') : null;
+            var scrollTarget = (input && input.offsetParent) ? input : (dl || firstErr);
+            scrollTarget.style.scrollMarginTop = '120px';
+            scrollTarget.scrollIntoView({ behavior: 'instant', block: 'start' });
+            scrollTarget.style.scrollMarginTop = '';
+            if (input) input.focus();
+        }
+    }
+
     setupFileInputs();
     setupReceiptToggles();
     setupSchoolPopup();
+    setupFeeTypeRestriction();
 });

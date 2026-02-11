@@ -14,7 +14,8 @@ class MemberAuth
     public function handle(Request $request, Closure $next)
     {
         if (!Auth::guard('member')->check()) {
-            return redirect()->guest(route('member.login'));
+            session()->put('url.intended', $request->fullUrl());
+            return redirect()->route('member.login');
         }
 
         return $next($request);

@@ -3,6 +3,7 @@
 namespace App\Http\Requests\EducationCertification;
 
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Http\Exceptions\HttpResponseException;
 
 class EducationProgramApplicationRequest extends FormRequest
 {
@@ -12,6 +13,16 @@ class EducationProgramApplicationRequest extends FormRequest
     public function authorize(): bool
     {
         return $this->user('member') !== null;
+    }
+
+    protected function failedAuthorization(): void
+    {
+        throw new HttpResponseException(
+            redirect()
+                ->route('education_certification.application_ec_apply', ['education_id' => $this->input('education_id')])
+                ->with('error', '로그인 후 신청할 수 있습니다.')
+                ->withInput($this->except('_token'))
+        );
     }
 
     /**
@@ -35,9 +46,9 @@ class EducationProgramApplicationRequest extends FormRequest
             'cash_receipt_purpose' => ['nullable', 'string', 'in:소득공제용,사업자지출증빙용'],
             'cash_receipt_number' => ['nullable', 'string', 'max:50'],
             'has_tax_invoice' => ['nullable', 'boolean'],
-            'company_name' => ['required_if:has_tax_invoice,1', 'nullable', 'string', 'max:100'],
-            'registration_number' => ['required_if:has_tax_invoice,1', 'nullable', 'string', 'max:50'],
-            'contact_person_name' => ['required_if:has_tax_invoice,1', 'nullable', 'string', 'max:50'],
+            'company_name' => ['nullable', 'string', 'max:100'],
+            'registration_number' => ['nullable', 'string', 'max:50'],
+            'contact_person_name' => ['nullable', 'string', 'max:50'],
             'contact_person_email' => ['nullable', 'email', 'max:100'],
             'contact_person_phone' => ['nullable', 'string', 'max:20'],
             'business_registration' => ['nullable', 'file', 'mimes:pdf,jpg,jpeg,png', 'max:2048'],

@@ -83,29 +83,42 @@
         }
     }
 
-    function initIssuePlaceholders() {
+    function getPrintBaseUrl() {
+        const container = document.querySelector('.certification-applications');
+        return container ? (container.getAttribute('data-print-base-url') || '/backoffice/print') : '/backoffice/print';
+    }
+
+    function initIssueDocuments() {
         const container = document.querySelector('.certification-applications');
         if (!container) return;
 
+        const printBase = getPrintBaseUrl();
+        const actions = {
+            'issue-exam-ticket': 'admission_ticket',
+            'issue-pass-confirmation': 'certificate_qualification',
+            'issue-certificate': 'qualification_certificate',
+            'issue-receipt': 'receipt'
+        };
+
         container.addEventListener('click', function (e) {
-            var btn = e.target.closest('[data-action="issue-exam-ticket"]');
-            if (btn) {
-                e.preventDefault();
-                alert('수험표 발급 기능은 준비 중입니다.');
-                return;
-            }
-            btn = e.target.closest('[data-action="issue-pass-confirmation"]');
-            if (btn) {
-                e.preventDefault();
-                alert('합격확인서 발급 기능은 준비 중입니다.');
-                return;
+            for (var dataAction in actions) {
+                var btn = e.target.closest('[data-action="' + dataAction + '"]');
+                if (btn) {
+                    e.preventDefault();
+                    var applicationId = btn.getAttribute('data-application-id');
+                    if (!applicationId) return;
+                    var path = actions[dataAction];
+                    var url = printBase + '/' + path + '/' + applicationId;
+                    window.open(url, '_blank');
+                    return;
+                }
             }
         });
     }
 
     function init() {
         initBatchSaveScores();
-        initIssuePlaceholders();
+        initIssueDocuments();
     }
 
     if (document.readyState === 'loading') {

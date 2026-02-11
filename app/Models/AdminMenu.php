@@ -47,7 +47,7 @@ class AdminMenu extends Model
     }
 
     /**
-     * 최상위 메뉴만 가져오기 (1차 메뉴)
+     * 최상위 메뉴만 가져오기 (1차 메뉴, 자식은 lazy load)
      */
     public static function getMainMenus()
     {
@@ -55,6 +55,28 @@ class AdminMenu extends Model
                    ->where('is_active', true)
                    ->orderBy('order')
                    ->get();
+    }
+
+    /**
+     * 로그인한 관리자 권한에 맞는 사이드바용 메뉴 트리 (부모·자식 모두 권한 필터)
+     */
+    public static function getMainMenusForUser($user)
+    {
+        if (!$user || $user->isSuperAdmin()) {
+            return self::getPermissionMenuTree();
+        }
+
+        $permissions = $user->getAllMenuPermissions();
+        $tree = self::getPermissionMenuTree();
+
+        return $tree->filter(function ($menu) use ($permissions) {
+            $hasParent = !empty($permissions[$menu->id]);
+            $hasChild = $menu->children->contains(fn ($c) => !empty($permissions[$c->id]));
+            return $hasParent || $hasChild;
+        })->map(function ($menu) use ($permissions) {
+            $menu->children = $menu->children->filter(fn ($c) => !empty($permissions[$c->id]))->values();
+            return $menu;
+        })->values();
     }
 
     /**

@@ -35,7 +35,11 @@
 			@endif
 		</div>
 		<div class="btns_tal">
+			@if(!empty($item->card_data['btn']['already_applied']))
+			<button type="button" class="{{ $item->card_data['btn']['class'] }}" data-already-applied="1">{{ $item->card_data['btn']['text'] }}</button>
+			@else
 			<a href="{{ $item->card_data['btn']['url'] }}" class="{{ $item->card_data['btn']['class'] }}">{{ $item->card_data['btn']['text'] }}</a>
+			@endif
 			<a href="{{ $item->card_data['view_url'] }}" class="btn btn_link btn_bwb">상세보기</a>
 		</div>
 	</div>

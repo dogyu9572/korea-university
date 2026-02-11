@@ -46,9 +46,11 @@ class AppServiceProvider extends ServiceProvider
                 $view->with('menuTitle', $menuTitle);
                 $view->with('title', $title);
                 
-                // 사이드바 데이터 추가 (모든 페이지에서 공통 사용)
+                // 사이드바 데이터 추가 (로그인한 관리자 권한에 맞는 메뉴만 표시)
                 $view->with('siteTitle', \App\Models\Setting::getValue('site_title', '관리자'));
-                $view->with('mainMenus', \App\Models\AdminMenu::getMainMenus());
+                $view->with('mainMenus', auth()->check()
+                    ? \App\Models\AdminMenu::getMainMenusForUser(auth()->user())
+                    : collect());
             });
         }
 

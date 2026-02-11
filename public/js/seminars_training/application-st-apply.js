@@ -146,6 +146,27 @@ function setupRoommateSearch() {
 }
 
 document.addEventListener('DOMContentLoaded', function () {
+    // 유효성 검사 실패 시 첫 번째 에러 위치로 스크롤 (맨 위로 가지 않도록 즉시 실행)
+    if (document.querySelector('.application_form[data-join-errors]')) {
+        var errs = document.querySelectorAll('.application_form .join_field_error');
+        var firstErr = null;
+        for (var i = 0; i < errs.length; i++) {
+            if (errs[i].offsetParent !== null && errs[i].textContent.trim()) {
+                firstErr = errs[i];
+                break;
+            }
+        }
+        if (firstErr) {
+            var dl = firstErr.closest('dl');
+            var input = dl ? dl.querySelector('input:not([type="hidden"]):not([readonly]), select') : null;
+            var scrollTarget = (input && input.offsetParent) ? input : (dl || firstErr);
+            scrollTarget.style.scrollMarginTop = '120px';
+            scrollTarget.scrollIntoView({ behavior: 'instant', block: 'start' });
+            scrollTarget.style.scrollMarginTop = '';
+            if (input) input.focus();
+        }
+    }
+
     setupFileInputs();
     setupReceiptToggles();
     setupRoommateSearch();

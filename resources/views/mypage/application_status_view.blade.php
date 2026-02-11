@@ -8,8 +8,12 @@
 			<a href="{{ route('mypage.print.receipt', $application->id) }}" target="_blank" class="btn btn_wbb">영수증 출력</a>
 			@endif
 			@if($application->is_completed && $application->is_survey_completed)
+			@php $certType = $application->program ? ($application->program->certificate_type ?? '이수증') : '이수증'; @endphp
+			@if($certType === '수료증')
 			<a href="{{ route('mypage.print.certificate_completion', $application->id) }}" target="_blank" class="btn btn_bwb">수료증 출력</a>
+			@else
 			<a href="{{ route('mypage.print.certificate_finish', $application->id) }}" target="_blank" class="btn btn_bwb">이수증 출력</a>
+			@endif
 			@endif
 		</div>
 		<div class="btns_abso mo_vw">

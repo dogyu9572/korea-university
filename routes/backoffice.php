@@ -391,6 +391,20 @@ Route::prefix('backoffice')->middleware(['backoffice'])->group(function () {
         ->name('backoffice.print.certificate_completion');
     Route::get('print/certificate_finish/{education_application}', [EducationApplicationController::class, 'printCertificateFinish'])
         ->name('backoffice.print.certificate_finish');
+    Route::get('print/admission_ticket/{education_application}', [EducationApplicationController::class, 'printAdmissionTicket'])
+        ->name('backoffice.print.admission_ticket');
+    Route::get('print/certificate_qualification/{education_application}', [EducationApplicationController::class, 'printCertificateQualification'])
+        ->name('backoffice.print.certificate_qualification');
+    Route::get('print/qualification_certificate/{education_application}', [EducationApplicationController::class, 'printQualificationCertificate'])
+        ->name('backoffice.print.qualification_certificate');
+
+    // 신청별 즉시 업데이트 (결제상태, 세금계산서, 이수여부)
+    Route::patch('applications/{education_application}/payment-status', [EducationApplicationController::class, 'updatePaymentStatus'])
+        ->name('backoffice.applications.update-payment-status');
+    Route::patch('applications/{education_application}/tax-invoice-status', [EducationApplicationController::class, 'updateTaxInvoiceStatus'])
+        ->name('backoffice.applications.update-tax-invoice-status');
+    Route::patch('applications/{education_application}/completion-status', [EducationApplicationController::class, 'updateCompletionStatus'])
+        ->name('backoffice.applications.update-completion-status');
 
     // 온라인 교육 관리
     Route::resource('online-educations', OnlineEducationController::class, [

@@ -96,9 +96,10 @@
 			$refundAmount = $item->participation_fee !== null ? number_format((float) $item->participation_fee) : '0';
 			$canReceipt = $item->payment_status === '입금완료';
 			$canCertificate = $item->is_completed && $item->is_survey_completed;
+			$certType = $program ? ($program->certificate_type ?? '이수증') : '이수증';
 			$receiptUrl = $canReceipt ? route('mypage.print.receipt', $item->id) : '';
-			$completionUrl = $canCertificate ? route('mypage.print.certificate_completion', $item->id) : '';
-			$finishUrl = $canCertificate ? route('mypage.print.certificate_finish', $item->id) : '';
+			$completionUrl = ($canCertificate && $certType === '수료증') ? route('mypage.print.certificate_completion', $item->id) : '';
+			$finishUrl = ($canCertificate && $certType === '이수증') ? route('mypage.print.certificate_finish', $item->id) : '';
 		@endphp
 		<li data-application-id="{{ $item->id }}"
 			data-education-type="{{ $item->education_type_label }}"

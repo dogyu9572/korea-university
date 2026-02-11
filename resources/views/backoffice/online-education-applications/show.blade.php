@@ -98,7 +98,7 @@
                             <label class="member-form-label">수강 인원</label>
                             <div class="member-form-field">
                                 <div class="board-form-control readonly-field-full">
-                                    {{ $program->applications()->count() }}명
+                                    {{ $program->applications()->whereNull('cancelled_at')->count() }}명
                                 </div>
                             </div>
                         </div>
@@ -118,9 +118,10 @@
                 </div>
             </div>
         </div>
+    </form>
 
         <!-- 신청 명단 섹션 (기획서: 결제상태, 결제일시, 세금계산서, 신청일시, 수강상태, 이수여부, 수강률, 수료증 발급, 영수증 발급, 관리) -->
-        <div class="board-card">
+        <div class="board-card" id="applications-list">
             <div class="board-card-body">
                 <div class="member-form-section">
                     <h3 class="member-section-title">신청 명단</h3>
@@ -228,7 +229,7 @@
                                         </td>
                                         <td>{{ $application->payment_date ? $application->payment_date->format('Y.m.d H:i') : '-' }}</td>
                                         <td>
-                                            <select name="tax_invoice_status[{{ $application->id }}]" class="form-control form-control-sm table-select-sm">
+                                            <select name="tax_invoice_status[{{ $application->id }}]" class="form-control form-control-sm table-select-sm" data-action="update-tax-invoice-status" data-application-id="{{ $application->id }}">
                                                 <option value="미신청" @selected($application->tax_invoice_status == '미신청')>미신청</option>
                                                 <option value="신청완료" @selected($application->tax_invoice_status == '신청완료')>신청완료</option>
                                                 <option value="발행완료" @selected($application->tax_invoice_status == '발행완료')>발행완료</option>
@@ -261,7 +262,7 @@
                                                 <a href="{{ route('backoffice.online-education-applications.edit', $application) }}" class="btn btn-primary btn-sm">
                                                     <i class="fas fa-edit"></i> 수정
                                                 </a>
-                                                <form action="{{ route('backoffice.online-education-applications.destroy', $application) }}" method="POST" class="d-inline" data-action="confirm-delete">
+                                                <form action="{{ route('backoffice.online-education-applications.destroy', $application) }}" method="POST" class="d-inline" data-action="confirm-delete" onsubmit="return confirm('정말 삭제하시겠습니까?');">
                                                     @csrf
                                                     @method('DELETE')
                                                     <button type="submit" class="btn btn-danger btn-sm">
@@ -286,16 +287,24 @@
         </div>
 
         <div class="board-form-actions">
-            <button type="submit" class="btn btn-primary">
+            <button type="submit" form="saveForm" class="btn btn-primary">
                 <i class="fas fa-save"></i> 저장
             </button>
             <a href="{{ route('backoffice.online-education-applications.index') }}" class="btn btn-secondary">목록</a>
         </div>
-    </form>
 </div>
 
 @endsection
 
 @section('scripts')
 <script src="{{ asset('js/backoffice/education-applications.js') }}"></script>
+<script>
+(function() {
+    var params = new URLSearchParams(location.search);
+    if (params.has('payment_status') || params.has('search')) {
+        var el = document.getElementById('applications-list');
+        if (el) el.scrollIntoView({ behavior: 'instant', block: 'start' });
+    }
+})();
+</script>
 @endsection

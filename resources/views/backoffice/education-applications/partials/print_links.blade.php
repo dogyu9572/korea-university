@@ -1,7 +1,14 @@
 <td>
     @if($application->is_completed && $application->is_survey_completed)
-        <a href="{{ route('backoffice.print.certificate_completion', $application) }}" target="_blank" rel="noopener noreferrer" class="btn btn-sm btn-success">수료증</a>
-        <a href="{{ route('backoffice.print.certificate_finish', $application) }}" target="_blank" rel="noopener noreferrer" class="btn btn-sm btn-success">이수증</a>
+        @php $certType = $certificate_type ?? null; @endphp
+        @if($certType === '수료증')
+            <a href="{{ route('backoffice.print.certificate_completion', $application) }}" target="_blank" rel="noopener noreferrer" class="btn btn-sm btn-success">수료증</a>
+        @elseif($certType === '이수증')
+            <a href="{{ route('backoffice.print.certificate_finish', $application) }}" target="_blank" rel="noopener noreferrer" class="btn btn-sm btn-success">이수증</a>
+        @else
+            <a href="{{ route('backoffice.print.certificate_completion', $application) }}" target="_blank" rel="noopener noreferrer" class="btn btn-sm btn-success">수료증</a>
+            <a href="{{ route('backoffice.print.certificate_finish', $application) }}" target="_blank" rel="noopener noreferrer" class="btn btn-sm btn-success">이수증</a>
+        @endif
     @else
         <span class="text-muted">-</span>
     @endif

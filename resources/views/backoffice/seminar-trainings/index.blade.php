@@ -34,11 +34,11 @@
                 <form method="GET" action="{{ route('backoffice.seminar-trainings.index') }}" class="filter-form">
                     <div class="filter-row">
                         <div class="filter-group">
-                            <label for="education_type" class="filter-label">구분</label>
-                            <select id="education_type" name="education_type" class="filter-select">
+                            <label for="type" class="filter-label">구분</label>
+                            <select id="type" name="type" class="filter-select">
                                 <option value="">전체</option>
-                                <option value="세미나" @selected(request('education_type') == '세미나')>세미나</option>
-                                <option value="해외연수" @selected(request('education_type') == '해외연수')>해외연수</option>
+                                <option value="세미나" @selected(request('type') == '세미나')>세미나</option>
+                                <option value="해외연수" @selected(request('type') == '해외연수')>해외연수</option>
                             </select>
                         </div>
                         <div class="filter-group">
@@ -91,7 +91,7 @@
                 </div>
                 <div class="list-controls">
                     <form method="GET" action="{{ route('backoffice.seminar-trainings.index') }}" class="per-page-form">
-                        @foreach (['education_type', 'application_status', 'period_start', 'period_end', 'application_start', 'application_end', 'name'] as $key)
+                        @foreach (['type', 'application_status', 'period_start', 'period_end', 'application_start', 'application_end', 'name'] as $key)
                             <input type="hidden" name="{{ $key }}" value="{{ request($key) }}">
                         @endforeach
                         <label for="per_page" class="per-page-label">표시 개수:</label>
@@ -125,7 +125,7 @@
                         @forelse($programs as $index => $p)
                             <tr>
                                 <td>{{ $programs->firstItem() + $index }}</td>
-                                <td>{{ $p->education_type }}</td>
+                                <td>{{ $p->type }}</td>
                                 <td>{{ $p->is_public ? '공개' : '비공개' }}</td>
                                 <td>{{ $p->application_status }}</td>
                                 <td class="text-left">{{ $p->name }}</td>

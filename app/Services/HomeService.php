@@ -2,9 +2,11 @@
 
 namespace App\Services;
 
+use App\Models\Banner;
 use App\Models\Certification;
 use App\Models\Education;
 use App\Models\OnlineEducation;
+use App\Models\Popup;
 use App\Models\SeminarTraining;
 use App\Services\Backoffice\BoardPostService;
 use Illuminate\Support\Collection;
@@ -108,6 +110,28 @@ class HomeService
             'info_label_2' => '교육기간',
             'info_value_2' => $this->formatShortPeriod($item->period_start, $item->period_end),
         ]);
+    }
+
+    /**
+     * 메인 노출용 팝업 목록 (활성 + 게시기간 내)
+     */
+    public function getPopupsForMain(): Collection
+    {
+        return Popup::active()
+            ->inPeriod()
+            ->ordered()
+            ->get();
+    }
+
+    /**
+     * 메인 비주얼용 배너 목록 (활성 + 게시기간 내, 정렬순)
+     */
+    public function getBannersForMain(): Collection
+    {
+        return Banner::active()
+            ->inPeriod()
+            ->ordered()
+            ->get();
     }
 
     /**

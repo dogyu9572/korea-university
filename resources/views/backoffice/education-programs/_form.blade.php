@@ -212,7 +212,8 @@
                 <div class="member-form-inline-item">
                     <label class="member-form-label">설문조사 URL</label>
                     <div class="member-form-field">
-                        <input type="url" class="board-form-control @error('survey_url') is-invalid @enderror" id="survey_url" name="survey_url" value="{{ old('survey_url', $program->survey_url) }}">
+                        <input type="url" class="board-form-control @error('survey_url') is-invalid @enderror" id="survey_url" name="survey_url" value="{{ old('survey_url', $program->survey_url) }}" placeholder="https://example.com">
+                        <p class="form-text text-muted small mt-1 mb-0">http:// 또는 https://를 포함하여 입력해 주세요.</p>
                         @error('survey_url')
                             <div class="invalid-feedback">{{ $message }}</div>
                         @enderror

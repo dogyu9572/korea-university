@@ -12,6 +12,7 @@ use App\Models\EducationApplication;
 use App\Models\EducationApplicationAttachment;
 use App\Models\Member;
 use App\Models\OnlineEducation;
+use App\Models\School;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Pagination\LengthAwarePaginator;
@@ -226,7 +227,9 @@ class EducationCertificationApplicationService
             $this->assertCapacityAvailable('education_id', $program->id, $program->capacity, $program->capacity_unlimited);
             $this->assertNotDuplicated('education_id', $program->id, $member->id, '이미 해당 교육을 신청하셨습니다.');
 
-            [$feeType, $participationFee] = $this->resolveEducationFee($program, (string) $request->input('fee_type'));
+            $feeTypeInput = (string) $request->input('fee_type');
+            $this->assertEducationFeeMatchesMemberSchool($feeTypeInput, $member);
+            [$feeType, $participationFee] = $this->resolveEducationFee($program, $feeTypeInput);
 
             $billing = $this->extractBillingData($request);
 
@@ -248,6 +251,31 @@ class EducationCertificationApplicationService
 
             return $application;
         });
+    }
+
+    /**
+     * 회원의 학교 정보를 기반으로 회원교/비회원교 구분을 반환합니다.
+     * - 'member': 회원교 소속
+     * - 'guest': 비회원교 소속 또는 미등록 학교
+     * - null: 회원 정보에 학교명이 없는 경우
+     */
+    public function getMemberSchoolType(Member $member): ?string
+    {
+        $schoolName = trim((string) $member->school_name);
+        if ($schoolName === '') {
+            return null;
+        }
+
+        $school = School::query()
+            ->where('school_name', $schoolName)
+            ->first();
+
+        if (!$school) {
+            // 학교가 회원교 목록에 없으면 비회원교로 취급
+            return 'guest';
+        }
+
+        return $school->is_member_school ? 'member' : 'guest';
     }
 
     /**
@@ -594,6 +622,38 @@ class EducationCertificationApplicationService
     }
 
     /**
+     * 선택한 참가비 유형이 회원의 회원교/비회원교 구분과 일치하는지 확인합니다.
+     */
+    private function assertEducationFeeMatchesMemberSchool(string $feeType, Member $member): void
+    {
+        $memberType = $this->getMemberSchoolType($member);
+        if ($memberType === null) {
+            // 회원 정보에 학교명이 없으면 제한하지 않음
+            return;
+        }
+
+        $isMemberFee = str_starts_with($feeType, 'member_');
+        $isGuestFee = str_starts_with($feeType, 'guest_');
+
+        // 교육 참가비 유형이 회원교/비회원교와 무관한 다른 유형인 경우 (자격증 등)에는 검사하지 않음
+        if (!$isMemberFee && !$isGuestFee) {
+            return;
+        }
+
+        if ($memberType === 'member' && $isGuestFee) {
+            throw ValidationException::withMessages([
+                'fee_type' => '회원교 소속은 회원교 참가비만 선택할 수 있습니다.',
+            ]);
+        }
+
+        if ($memberType === 'guest' && $isMemberFee) {
+            throw ValidationException::withMessages([
+                'fee_type' => '비회원교 소속은 회원교 참가비를 선택할 수 없습니다.',
+            ]);
+        }
+    }
+
+    /**
      * 교육 데이터를 잠금하고 조회합니다.
      */
     private function lockEducationForApplication(int $id): ?Education
@@ -718,13 +778,14 @@ class EducationCertificationApplicationService
         }
 
         $path = $file->store('education_applications/id_photos', 'public');
-        $application->update(['id_photo_path' => Storage::url($path)]);
+        $application->update(['id_photo_path' => $path]);
     }
 
     /**
      * 교육 카드용 표시 데이터를 준비합니다.
+     * @param array<int> $appliedEducationIds 현재 회원이 이미 신청한 education_id 목록
      */
-    public function prepareEducationCardData(Education $e): array
+    public function prepareEducationCardData(Education $e, array $appliedEducationIds = []): array
     {
         $enrolled = $e->applications_count ?? 0;
         $capacity = $e->capacity ?? 0;
@@ -732,6 +793,11 @@ class EducationCertificationApplicationService
         $periodText = $e->period_start && $e->period_end
             ? format_period_ko($e->period_start, $e->period_end)
             : format_period_ko($e->period_start, null, $e->period_time);
+
+        $alreadyApplied = in_array($e->id, $appliedEducationIds, true);
+        $btn = $alreadyApplied
+            ? ['class' => 'btn btn_end', 'text' => '신청완료', 'url' => 'javascript:void(0);', 'already_applied' => true]
+            : get_application_button_state($this->getEffectiveApplicationStatusForDisplay($e), 'education', $e->id);
 
         return [
             'type_class' => ($e->education_type ?? '') === '수시교육' ? 'c2' : 'c1',
@@ -748,7 +814,7 @@ class EducationCertificationApplicationService
             'education_class' => $e->education_class ?? '-',
             'location' => $e->location ?? '-',
             'fee_text' => format_education_fee($e),
-            'btn' => get_application_button_state($this->getEffectiveApplicationStatusForDisplay($e), 'education', $e->id),
+            'btn' => $btn,
             'view_url' => route('education_certification.application_ec_view', $e->id),
             'thumb' => $e->thumbnail_path ?: '/images/img_application_ec_sample.jpg',
         ];
@@ -914,6 +980,36 @@ class EducationCertificationApplicationService
         }
     }
 
+    /**
+     * 회원이 해당 교육을 이미 신청했는지 여부를 반환합니다.
+     */
+    public function hasMemberAppliedForEducation(int $memberId, int $educationId): bool
+    {
+        return EducationApplication::query()
+            ->where('member_id', $memberId)
+            ->where('education_id', $educationId)
+            ->exists();
+    }
+
+    /**
+     * 현재 로그인 회원이 이미 신청한 교육(education_id) ID 목록을 반환합니다.
+     *
+     * @return array<int>
+     */
+    private function getAppliedEducationIdsForCurrentMember(): array
+    {
+        $memberId = auth('member')?->id();
+        if (!$memberId) {
+            return [];
+        }
+
+        return EducationApplication::query()
+            ->where('member_id', $memberId)
+            ->whereNotNull('education_id')
+            ->pluck('education_id')
+            ->all();
+    }
+
     private function getEducationList(Request $request, string $sort): LengthAwarePaginator
     {
         $query = $this->getEducationQuery($request);
@@ -922,9 +1018,11 @@ class EducationCertificationApplicationService
 
         $paginator = $query->paginate(self::PER_PAGE)->withQueryString();
 
-        $paginator->getCollection()->each(function ($item) {
+        $appliedIds = $this->getAppliedEducationIdsForCurrentMember();
+
+        $paginator->getCollection()->each(function ($item) use ($appliedIds) {
             $item->program_type = 'education';
-            $item->card_data = $this->prepareEducationCardData($item);
+            $item->card_data = $this->prepareEducationCardData($item, $appliedIds);
         });
 
         return $paginator;
@@ -968,9 +1066,11 @@ class EducationCertificationApplicationService
         $certifications = $this->getCertificationQuery($request)->get();
         $onlineEducations = $this->getOnlineEducationQuery($request)->get();
 
-        $educations->each(function ($item) {
+        $appliedEducationIds = $this->getAppliedEducationIdsForCurrentMember();
+
+        $educations->each(function ($item) use ($appliedEducationIds) {
             $item->program_type = 'education';
-            $item->card_data = $this->prepareEducationCardData($item);
+            $item->card_data = $this->prepareEducationCardData($item, $appliedEducationIds);
         });
         $certifications->each(function ($item) {
             $item->program_type = 'certification';

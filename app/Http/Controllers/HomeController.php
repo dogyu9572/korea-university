@@ -16,8 +16,8 @@ class HomeController extends Controller
         $noticePosts = $homeService->getNoticePostsForMain();
         $dataRoomPosts = $homeService->getDataRoomPostsForMain();
 
-        $popups = collect();
-        $banners = collect();
+        $popups = $homeService->getPopupsForMain();
+        $banners = $homeService->getBannersForMain();
         $educationSlides = $homeService->getEducationSlidesForMain();
         $seminarTrainingSlides = $homeService->getSeminarTrainingSlidesForMain();
 

@@ -122,9 +122,19 @@
                             <div class="invalid-feedback">{{ $message }}</div>
                         @enderror
                         @if($isEdit && $app?->id_photo_path)
+                            @php
+                                $idPhotoPath = $app->id_photo_path;
+                                if (str_contains($idPhotoPath, '/storage/')) {
+                                    $idPhotoPath = preg_replace('#^.*/storage/#', '', parse_url($idPhotoPath, PHP_URL_PATH) ?? $idPhotoPath);
+                                } elseif (str_starts_with($idPhotoPath, '/')) {
+                                    $idPhotoPath = ltrim($idPhotoPath, '/');
+                                    $idPhotoPath = str_starts_with($idPhotoPath, 'storage/') ? substr($idPhotoPath, 8) : $idPhotoPath;
+                                }
+                                $idPhotoUrl = $idPhotoPath !== '' ? asset('storage/' . $idPhotoPath) : '';
+                            @endphp
                             <div class="mt-2">
                                 <span class="attachment-item-inline">
-                                    <a href="{{ asset($app->id_photo_path) }}" target="_blank">{{ basename($app->id_photo_path) }}</a>
+                                    <a href="{{ $idPhotoUrl }}" target="_blank">{{ basename($app->id_photo_path) }}</a>
                                     <button type="button" class="btn btn-outline-danger btn-sm ms-1" id="btnDeleteIdPhoto">삭제</button>
                                 </span>
                                 <input type="hidden" name="delete_id_photo" id="delete_id_photo" value="0">
@@ -136,24 +146,11 @@
             <div class="member-form-row member-form-row-inline">
                 <div class="member-form-inline-item">
                     <label class="member-form-label">성적</label>
-                    <div class="member-form-field">
-                        <input type="number" class="board-form-control @error('score') is-invalid @enderror"
-                               name="score" value="{{ old('score', $app?->score ?? '') }}" min="0">
-                        @error('score')
-                            <div class="invalid-feedback">{{ $message }}</div>
-                        @enderror
-                    </div>
+                    {{ $app?->score !== null ? $app->score : '' }}
                 </div>
                 <div class="member-form-inline-item">
                     <label class="member-form-label">합격여부</label>
-                    <div class="member-form-field">
-                        <div class="board-form-control readonly-field">
-                            자동 입력
-                        </div>
-                        @if($isEdit && $app?->pass_status)
-                            <span class="text-muted small">(현재: {{ $app->pass_status }})</span>
-                        @endif
-                    </div>
+                    {{ $app && $app->score !== null ? ($app->qualification_display_status ?? '') : '' }}
                 </div>
             </div>
             <div class="member-form-row member-form-row-inline">
@@ -185,37 +182,21 @@
             <div class="member-form-row member-form-row-inline">
                 <div class="member-form-inline-item">
                     <label class="member-form-label">자격확인서</label>
-                    <div class="member-form-field">
-                        <div class="board-form-control readonly-field">
-                            {{ $isEdit ? ($app?->qualification_certificate_number ?? '자동 생성') : '자동 생성' }}
-                        </div>
-                    </div>
+                    <span>{{ $isEdit ? ($app?->qualification_certificate_number ?? '') : '' }}</span>
                 </div>
                 <div class="member-form-inline-item">
                     <label class="member-form-label">수험표 번호</label>
-                    <div class="member-form-field">
-                        <div class="board-form-control readonly-field">
-                            {{ $isEdit ? ($app?->exam_ticket_number ?? '자동 생성') : '자동 생성' }}
-                        </div>
-                    </div>
+                    <span>{{ $isEdit ? ($app?->exam_ticket_number ?? '') : '' }}</span>
                 </div>
             </div>
             <div class="member-form-row member-form-row-inline">
                 <div class="member-form-inline-item">
                     <label class="member-form-label">영수증 번호</label>
-                    <div class="member-form-field">
-                        <div class="board-form-control readonly-field">
-                            {{ $isEdit ? ($app?->receipt_number ?? '자동생성') : '자동생성' }}
-                        </div>
-                    </div>
+                    <span>{{ $isEdit ? ($app?->receipt_number ?? '') : '' }}</span>
                 </div>
                 <div class="member-form-inline-item">
                     <label class="member-form-label">합격확인서</label>
-                    <div class="member-form-field">
-                        <div class="board-form-control readonly-field">
-                            {{ $isEdit ? ($app?->pass_confirmation_number ?? '자동 생성') : '자동 생성' }}
-                        </div>
-                    </div>
+                    <span>{{ $isEdit ? ($app?->pass_confirmation_number ?? '') : '' }}</span>
                 </div>
             </div>
             <div class="member-form-row">

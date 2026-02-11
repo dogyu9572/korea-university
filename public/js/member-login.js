@@ -1,6 +1,14 @@
 (function () {
     'use strict';
 
+    // 이메일(아이디) 입력 제한: 한글·공백 입력 불가
+    var emailInput = document.querySelector('#memberLoginForm input[name="email"]');
+    if (emailInput) {
+        emailInput.addEventListener('input', function () {
+            this.value = this.value.replace(/[\s가-힣ㄱ-ㅎㅏ-ㅣ]/g, '');
+        });
+    }
+
     // 비밀번호 보기/숨기기
     document.querySelectorAll('.btn_trans_text').forEach(function (btn) {
         btn.addEventListener('click', function () {

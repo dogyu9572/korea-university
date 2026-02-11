@@ -80,24 +80,36 @@ class Inquiry extends Model
     }
 
     /**
-     * 검색 (제목, 소속명, 작성자)
+     * 검색 (전체: 제목+소속명+작성자, 또는 항목별)
      */
     public function scopeSearch($query, $searchType, $searchTerm)
     {
-        if (!$searchTerm || !$searchType || $searchType === '전체') {
+        $term = trim((string) $searchTerm);
+        if ($term === '' || !$searchType) {
             return $query;
+        }
+
+        $like = '%' . $term . '%';
+
+        if ($searchType === '전체') {
+            return $query->where(function ($q) use ($like) {
+                $q->where('title', 'like', $like)
+                    ->orWhereHas('member', function ($sub) use ($like) {
+                        $sub->where('school_name', 'like', $like)->orWhere('name', 'like', $like);
+                    });
+            });
         }
 
         switch ($searchType) {
             case '제목':
-                return $query->where('title', 'like', '%' . $searchTerm . '%');
+                return $query->where('title', 'like', $like);
             case '소속명':
-                return $query->whereHas('member', function($q) use ($searchTerm) {
-                    $q->where('school_name', 'like', '%' . $searchTerm . '%');
+                return $query->whereHas('member', function ($q) use ($like) {
+                    $q->where('school_name', 'like', $like);
                 });
             case '작성자':
-                return $query->whereHas('member', function($q) use ($searchTerm) {
-                    $q->where('name', 'like', '%' . $searchTerm . '%');
+                return $query->whereHas('member', function ($q) use ($like) {
+                    $q->where('name', 'like', $like);
                 });
             default:
                 return $query;

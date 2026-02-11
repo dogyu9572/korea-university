@@ -69,6 +69,14 @@
         if (!main) return;
 
         main.addEventListener('click', function (e) {
+            var alreadyAppliedBtn = e.target.closest('[data-already-applied="1"]');
+            if (alreadyAppliedBtn) {
+                e.preventDefault();
+                e.stopPropagation();
+                alert('이미 신청한 교육입니다.');
+                return;
+            }
+
             const a = e.target.closest('a');
             if (!a) return;
 

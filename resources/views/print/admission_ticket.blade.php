@@ -38,7 +38,7 @@
 						</tr>
 						<tr>
 							<th>수험번호</th>
-							<td>{{ $application->exam_ticket_number ?? '' }}</td>
+							<td>{{ $num }}</td>
 						</tr>
 						<tr>
 							<th>이메일</th>
@@ -59,10 +59,25 @@
 					</tbody>
 				</table>
 			</div>
-			@if($application->id_photo_path)
-			<div class="img"><img src="{{ asset('storage/' . $application->id_photo_path) }}" alt=""></div>
-			@else
-			<div class="img"><img src="{{ asset('images/img_profile_sample.jpg') }}" alt=""></div>
+			@php
+				$path = trim((string) ($application->id_photo_path ?? ''));
+				$idPhotoUrl = null;
+				if ($path !== '') {
+					if (str_contains($path, '/storage/')) {
+						$path = preg_replace('#^.*/storage/#', '', parse_url($path, PHP_URL_PATH) ?? $path);
+					} elseif (str_starts_with($path, '/')) {
+						$path = ltrim($path, '/');
+						if (str_starts_with($path, 'storage/')) {
+							$path = substr($path, 8);
+						}
+					}
+					if ($path !== '') {
+						$idPhotoUrl = asset('storage/' . $path);
+					}
+				}
+			@endphp
+			@if($idPhotoUrl)
+			<div class="img"><img src="{{ $idPhotoUrl }}" alt="증명사진"></div>
 			@endif
 		</div>
 

@@ -107,7 +107,7 @@
 			<form action="{{ route('mypage.secession') }}" method="POST" id="secessionForm">
 				@csrf
 				<div class="con gbox flex_center mt">
-					<label class="check"><input type="checkbox" name="secession_agreed" value="1" required><i></i><span>위의 내용을 모두 읽었으며, 내용에 동의합니다.</span></label>
+					<label class="check"><input type="checkbox" name="secession_agreed" value="1"><i></i><span>위의 내용을 모두 읽었으며, 내용에 동의합니다.</span></label>
 				</div>
 				@error('secession_agreed')<p class="join_field_error" style="color:#c00;font-size:1rem;margin-top:0.25rem;">{{ $message }}</p>@enderror
 				<div class="btns_tac">

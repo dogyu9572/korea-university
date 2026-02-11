@@ -23,6 +23,7 @@
 	<link rel="stylesheet" href="/css/font.css" media="all">
     <link rel="stylesheet" href="{{ asset('css/styles.css?v2') }}">
     <link rel="stylesheet" href="{{ asset('css/reactive.css?v2') }}">
+    <link rel="stylesheet" href="{{ asset('css/popup.css') }}">
 	<link rel="icon" href="/images/favicon.png" type="image/x-icon"/>
     @yield('styles')
     

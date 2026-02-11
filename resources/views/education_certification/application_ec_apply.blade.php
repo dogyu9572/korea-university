@@ -3,9 +3,10 @@
 <main class="sub_wrap inner">
 	<div class="stitle tal bdb">교육 · 자격증 신청</div>
 
-	<form method="POST" action="{{ route('education_certification.application_ec_apply.store') }}" enctype="multipart/form-data" class="application_form">
+	<form method="POST" action="{{ route('education_certification.application_ec_apply.store') }}" enctype="multipart/form-data" class="application_form" @if($errors->any()) data-join-errors="1" @endif>
 		@csrf
 		<input type="hidden" name="education_id" value="{{ $education->id }}">
+		<input type="hidden" id="memberSchoolType" value="{{ $memberSchoolType ?? '' }}">
 
 		<div class="otit">교육 신청</div>
 		<div class="glbox dl_slice">
@@ -117,7 +118,13 @@
 									<td class="tac">
 										@if($item)
 											<label class="radio">
-												<input type="radio" name="fee_type" value="{{ $item['key'] }}" @checked(old('fee_type', $defaultFeeType) === $item['key'])>
+												<input
+													type="radio"
+													name="fee_type"
+													value="{{ $item['key'] }}"
+													data-fee-group="{{ str_starts_with($item['key'], 'member_') ? 'member' : (str_starts_with($item['key'], 'guest_') ? 'guest' : '') }}"
+													@checked(old('fee_type', $defaultFeeType) === $item['key'])
+												>
 												<i></i>
 												<span><strong>{{ $item['display_amount'] }}원</strong></span>
 											</label>

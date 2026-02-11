@@ -3,7 +3,7 @@
 <main class="sub_wrap inner">
 	<div class="stitle tal bdb">세미나 · 해외연수 신청</div>
 
-	<form method="POST" action="{{ route('seminars_training.application_st_apply.store') }}" enctype="multipart/form-data" class="application_form" data-roommate-check-url="{{ route('seminars_training.roommate_check') }}">
+	<form method="POST" action="{{ route('seminars_training.application_st_apply.store') }}" enctype="multipart/form-data" class="application_form" data-roommate-check-url="{{ route('seminars_training.roommate_check') }}" @if($errors->any()) data-join-errors="1" @endif>
 		@csrf
 		<input type="hidden" name="seminar_training_id" value="{{ $program->id }}">
 

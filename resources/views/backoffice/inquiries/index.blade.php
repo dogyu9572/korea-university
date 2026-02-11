@@ -127,7 +127,19 @@
             </div>
 
             <div class="table-responsive">
-                <table class="board-table">
+                <table class="board-table" style="table-layout: fixed; width: 100%;">
+                    <colgroup>
+                        <col style="width: 3%;">
+                        <col style="width: 5%;">
+                        <col style="width: 8%;">
+                        <col style="width: 32%;">
+                        <col style="width: 10%;">
+                        <col style="width: 8%;">
+                        <col style="width: 8%;">
+                        <col style="width: 8%;">
+                        <col style="width: 6%;">
+                        <col style="width: 12%;">
+                    </colgroup>
                     <thead>
                         <tr>
                             <th class="w5 board-checkbox-column">
