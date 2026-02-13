@@ -99,6 +99,7 @@ Route::prefix('mypage')->name('mypage.')->middleware('member')->group(function (
     Route::post('/application_status/cancel', [MypageController::class, 'application_status_cancel'])->name('application_status.cancel');
     Route::get('/application_status_view/{id}', [MypageController::class, 'application_status_view'])->name('application_status_view');
     Route::get('/application_status_view2/{id}', [MypageController::class, 'application_status_view2'])->name('application_status_view2');
+    Route::post('/application_status_view2/{id}/dwell', [MypageController::class, 'application_status_view2_dwell'])->name('application_status_view2.dwell')->whereNumber('id');
     Route::get('/print/receipt/{id}', [MypageController::class, 'printReceipt'])->name('print.receipt')->whereNumber('id');
     Route::get('/print/certificate_completion/{id}', [MypageController::class, 'printCertificateCompletion'])->name('print.certificate_completion')->whereNumber('id');
     Route::get('/print/certificate_finish/{id}', [MypageController::class, 'printCertificateFinish'])->name('print.certificate_finish')->whereNumber('id');

@@ -56,7 +56,9 @@ class ApplicationStatusService
             ->whereNull('certification_id')
             ->whereNull('cancelled_at')
             ->whereNotNull('online_education_id')
-            ->with(['onlineEducation.attachments', 'member'])
+            ->with(['onlineEducation' => function ($q) {
+                $q->with(['attachments', 'lectures' => fn ($q2) => $q2->with('lectureVideo')->orderBy('order')]);
+            }, 'member'])
             ->firstOrFail();
     }
 
@@ -145,5 +147,33 @@ class ApplicationStatusService
             'cancelled_at' => now(),
             'receipt_status' => '접수취소',
         ]);
+    }
+
+    /**
+     * 온라인교육 상세 페이지 체류시간을 누적하고 진도율을 갱신합니다.
+     *
+     * @throws \Illuminate\Database\Eloquent\ModelNotFoundException
+     */
+    public function recordDwellTime(int $applicationId, int $memberId, int $seconds): void
+    {
+        $application = $this->getDetailForOnlineMember($applicationId, $memberId);
+        $online = $application->onlineEducation;
+
+        // 등록된 강의가 있으면 강의시간 합산, 없으면 교육이수시간(completion_hours) 사용
+        if ($online->lectures->isNotEmpty()) {
+            $requiredMinutes = $online->lectures->sum('lecture_time');
+        } else {
+            $requiredMinutes = (int) (($online->completion_hours ?? 0) * 60);
+        }
+
+        $application->learning_minutes += (int) ceil($seconds / 60);
+
+        if ($requiredMinutes > 0) {
+            $application->attendance_rate = min(100, round(($application->learning_minutes / $requiredMinutes) * 100, 2));
+        } else {
+            $application->attendance_rate = 100;
+        }
+
+        $application->save();
     }
 }

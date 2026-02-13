@@ -127,6 +127,7 @@ class OnlineEducationService
                     if (!empty($lectureData['lecture_name'])) {
                         OnlineEducationLecture::create([
                             'online_education_id' => $program->id,
+                            'lecture_video_id' => !empty($lectureData['lecture_video_id']) ? (int) $lectureData['lecture_video_id'] : null,
                             'lecture_name' => $lectureData['lecture_name'],
                             'instructor_name' => $lectureData['instructor_name'] ?? '',
                             'lecture_time' => (int)($lectureData['lecture_time'] ?? 0),
@@ -243,6 +244,7 @@ class OnlineEducationService
                     if (!empty($lectureData['lecture_name'])) {
                         OnlineEducationLecture::create([
                             'online_education_id' => $program->id,
+                            'lecture_video_id' => !empty($lectureData['lecture_video_id']) ? (int) $lectureData['lecture_video_id'] : null,
                             'lecture_name' => $lectureData['lecture_name'],
                             'instructor_name' => $lectureData['instructor_name'] ?? '',
                             'lecture_time' => (int)($lectureData['lecture_time'] ?? 0),
@@ -328,7 +330,7 @@ class OnlineEducationService
      */
     public function searchLectures(Request $request)
     {
-        $query = LectureVideo::select('id', 'title', 'instructor_name', 'lecture_time', 'created_at')
+        $query = LectureVideo::select('id', 'title', 'instructor_name', 'lecture_time', 'video_url', 'created_at')
             ->where('is_active', true);
 
         // 검색 필터
@@ -374,7 +376,7 @@ class OnlineEducationService
         $isEdit = $program && $program->exists;
         $program = $program ?? new OnlineEducation();
         $attachments = $isEdit ? $program->attachments : collect([]);
-        $lectures = $isEdit ? $program->lectures : collect([]);
+        $lectures = $isEdit ? $program->lectures()->with('lectureVideo')->orderBy('order')->get() : collect([]);
 
         $appStart = $program->application_start;
         $appEnd = $program->application_end;
@@ -404,5 +406,14 @@ class OnlineEducationService
         } catch (\Exception $e) {
             Log::error('파일 삭제 실패', ['path' => $filePath, 'error' => $e->getMessage()]);
         }
+    }
+
+    /**
+     * 강의 삭제
+     */
+    public function deleteLecture(int $id): void
+    {
+        $lecture = OnlineEducationLecture::findOrFail($id);
+        $lecture->delete();
     }
 }

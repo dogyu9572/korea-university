@@ -128,7 +128,7 @@
                         @forelse($schools as $index => $school)
                             <tr data-id="{{ $school->id }}">
                                 <td>{{ $schools->total() - ($schools->currentPage() - 1) * $schools->perPage() - $index }}</td>
-                                <td>{{ $school->year }}</td>
+                                <td>{{ $school->year ?? '-' }}</td>
                                 <td>{{ $school->school_name }}</td>
                                 <td>{{ $school->branch }}</td>
                                 <td>{{ $school->is_member_school ? 'Y' : 'N' }}</td>

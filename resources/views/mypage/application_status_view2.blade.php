@@ -17,7 +17,7 @@
 		}
 	@endphp
 
-	<div class="board_view">
+	<div class="board_view" data-application-id="{{ $application->id }}" data-dwell-url="{{ route('mypage.application_status_view2.dwell', ['id' => $application->id]) }}">
 		<div class="tit gbox">
 			<div class="types"><span class="type type_online">온라인교육</span></div>
 			<strong>{{ $online ? $online->name : '' }}</strong>
@@ -26,11 +26,46 @@
 
 		<div class="con">
 			@if($online && ($online->education_overview || $online->curriculum))
-				{!! nl2br(e($online->education_overview ?? $online->curriculum ?? '')) !!}
+				{!! $online->education_overview ?? $online->curriculum ?? '' !!}
 			@else
 				{{ '' }}
 			@endif
 		</div>
+
+		@if($online && $online->lectures->count() > 0)
+			@php
+				$lecturesWithVideo = $online->lectures->filter(function ($l) {
+					return $l->lectureVideo && isset($l->lectureVideo->video_url) && trim((string) $l->lectureVideo->video_url) !== '';
+				});
+			@endphp
+			@if($lecturesWithVideo->count() > 0)
+		<div class="otit">강의 영상</div>
+		<div class="download_area type_gbox">
+				@foreach($lecturesWithVideo as $lecture)
+					@php
+						$videoUrl = trim((string) $lecture->lectureVideo->video_url);
+						$isYoutube = str_contains($videoUrl, 'youtube.com') || str_contains($videoUrl, 'youtu.be');
+						if ($isYoutube) {
+							if (preg_match('/(?:youtube\.com\/watch\?v=|youtu\.be\/)([a-zA-Z0-9_-]+)/', $videoUrl, $m)) {
+								$embedUrl = 'https://www.youtube.com/embed/' . $m[1] . '?autoplay=1&mute=1';
+							} else {
+								$embedUrl = $videoUrl;
+							}
+						}
+					@endphp
+					<div class="lecture-video-item" style="margin-bottom:1rem;">
+						@if($isYoutube && isset($embedUrl))
+							<div class="lecture-video-wrap" style="position:relative;width:100%;max-width:100%;padding-bottom:56.25%;">
+								<iframe src="{{ $embedUrl }}" style="position:absolute;top:0;left:0;width:100%;height:100%;" allowfullscreen allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" title="{{ $lecture->lecture_name }}"></iframe>
+							</div>
+						@else
+							<video src="{{ $videoUrl }}" controls autoplay style="max-width:100%;"></video>
+						@endif
+					</div>
+				@endforeach
+		</div>
+			@endif
+		@endif
 
 		<div class="otit">강의 자료 다운로드</div>
 		<div class="download_area type_gbox">
@@ -48,5 +83,6 @@
 		</div>
 	</div>
 
+	<script src="{{ asset('js/mypage/online-education-dwell.js') }}"></script>
 </main>
 @endsection

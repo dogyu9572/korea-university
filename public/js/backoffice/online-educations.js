@@ -16,7 +16,7 @@
             const index = parseInt(row.getAttribute('data-lecture-index'));
             const deleteBtn = row.querySelector('.delete-lecture-btn');
             const lecture = {
-                id: deleteBtn?.getAttribute('data-lecture-id') || null,
+                lecture_video_id: row.getAttribute('data-lecture-video-id') ? parseInt(row.getAttribute('data-lecture-video-id'), 10) : null,
                 lecture_name: row.cells[2].textContent.trim(),
                 instructor_name: row.cells[3].textContent.trim(),
                 lecture_time: parseInt(row.cells[4].textContent.replace('분', '').trim()) || 0,
@@ -27,8 +27,13 @@
 
             // 기존 강의 삭제 버튼 이벤트
             if (deleteBtn) {
+                const lectureId = deleteBtn.getAttribute('data-lecture-id');
                 deleteBtn.addEventListener('click', function() {
-                    removeLecture(index);
+                    if (lectureId) {
+                        deleteLectureFromDB(lectureId, index);
+                    } else {
+                        removeLecture(index);
+                    }
                 });
             }
         });
@@ -94,6 +99,7 @@
                 const row = document.createElement('tr');
                 const no = (data.current_page - 1) * data.per_page + index + 1;
                 const title = lecture.title || '';
+                const videoUrl = (lecture.video_url || '').replace(/"/g, '&quot;');
                 row.innerHTML = `
                     <td>${no}</td>
                     <td>${title}</td>
@@ -101,10 +107,11 @@
                     <td>${lecture.lecture_time || 0}분</td>
                     <td>
                         <button type="button" class="btn btn-primary btn-sm select-lecture-btn" 
-                                data-lecture-id="${lecture.id}"
+                                data-lecture-video-id="${lecture.id}"
                                 data-lecture-title="${title}"
                                 data-instructor-name="${lecture.instructor_name || ''}"
-                                data-lecture-time="${lecture.lecture_time || 0}">
+                                data-lecture-time="${lecture.lecture_time || 0}"
+                                data-video-url="${videoUrl}">
                             선택
                         </button>
                     </td>
@@ -216,23 +223,24 @@
 
     // 강의영상 선택
     function selectLecture(button) {
-        const lectureId = button.getAttribute('data-lecture-id');
+        const lectureVideoId = button.getAttribute('data-lecture-video-id');
         const title = button.getAttribute('data-lecture-title');
         const instructorName = button.getAttribute('data-instructor-name');
         const lectureTime = button.getAttribute('data-lecture-time');
+        const videoUrl = button.getAttribute('data-video-url') || '';
 
         // 이미 추가된 강의인지 확인
-        if (lectures.some(l => l.id && l.id == lectureId)) {
+        if (lectures.some(l => l.lecture_video_id && l.lecture_video_id == lectureVideoId)) {
             alert('이미 추가된 강의영상입니다.');
             return;
         }
 
         // LectureVideo를 OnlineEducationLecture 형식으로 변환
         const lecture = {
-            id: lectureId,
-            lecture_name: title, // title → lecture_name
+            lecture_video_id: lectureVideoId ? parseInt(lectureVideoId, 10) : null,
+            lecture_name: title,
             instructor_name: instructorName,
-            lecture_time: parseInt(lectureTime) || 0, // 분 단위 그대로
+            lecture_time: parseInt(lectureTime) || 0,
             order: lectureIndex++
         };
         lectures.push(lecture);
@@ -250,6 +258,7 @@
 
         const row = document.createElement('tr');
         row.setAttribute('data-lecture-index', index);
+        if (lecture.lecture_video_id) row.setAttribute('data-lecture-video-id', lecture.lecture_video_id);
         row.innerHTML = `
             <td>${lectures.length}</td>
             <td>${lecture.order + 1}</td>
@@ -299,14 +308,67 @@
     }
 
     // 강의영상 삭제
-    function removeLecture(index) {
-        if (!confirm('강의영상을 삭제하시겠습니까?')) return;
+    // DB에서 강의 삭제 (기존 강의)
+    function deleteLectureFromDB(lectureId, index) {
+        if (!confirm('강의를 삭제하시겠습니까?')) return;
 
-        lectures.splice(index, 1);
+        const csrfToken = document.querySelector('meta[name="csrf-token"]');
+        const token = csrfToken ? csrfToken.getAttribute('content') : '';
+
+        fetch(`/backoffice/online-educations/lectures/${lectureId}`, {
+            method: 'DELETE',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRF-TOKEN': token,
+                'Accept': 'application/json',
+                'X-Requested-With': 'XMLHttpRequest'
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                alert('강의가 삭제되었습니다.');
+                // DOM에서 행 제거
+                const row = document.querySelector(`tr[data-lecture-index="${index}"]`);
+                if (row) row.remove();
+                
+                // 배열에서 제거
+                lectures = lectures.filter(function(lecture) {
+                    return lecture.order !== index;
+                });
+                
+                // 인덱스 재정렬
+                lectures.forEach(function(lecture, i) {
+                    lecture.order = i;
+                });
+                lectureIndex = lectures.length;
+                
+                // 테이블 업데이트
+                updateTableAfterDelete();
+            } else {
+                alert(data.message || '삭제 중 오류가 발생했습니다.');
+            }
+        })
+        .catch(error => {
+            console.error('강의 삭제 실패:', error);
+            alert('삭제 중 오류가 발생했습니다.');
+        });
+    }
+
+    // 메모리에서만 강의 삭제 (새로 추가한 강의)
+    function removeLecture(index) {
+        if (!confirm('강의를 삭제하시겠습니까?')) return;
+
+        // DOM에서 해당 행 찾아서 즉시 제거
         const row = document.querySelector(`tr[data-lecture-index="${index}"]`);
         if (row) {
             row.remove();
         }
+
+        // 배열에서 해당 인덱스 삭제
+        lectures = lectures.filter(function(lecture) {
+            return lecture.order !== index;
+        });
 
         // 인덱스 재정렬
         lectures.forEach(function(lecture, i) {
@@ -314,8 +376,35 @@
         });
         lectureIndex = lectures.length;
 
+        updateTableAfterDelete();
+    }
+
+    // 삭제 후 테이블 업데이트
+    function updateTableAfterDelete() {
+        const tbody = document.getElementById('lecturesTableBody');
+        if (tbody) {
+            const rows = tbody.querySelectorAll('tr');
+            rows.forEach(function(row, i) {
+                row.setAttribute('data-lecture-index', i);
+                if (row.cells[0]) row.cells[0].textContent = i + 1; // No
+                if (row.cells[1]) row.cells[1].textContent = i + 1; // 순서
+                
+                // 삭제 버튼 이벤트 재설정
+                const deleteBtn = row.querySelector('.delete-lecture-btn');
+                if (deleteBtn) {
+                    const lectureId = deleteBtn.getAttribute('data-lecture-id');
+                    deleteBtn.onclick = function() {
+                        if (lectureId) {
+                            deleteLectureFromDB(lectureId, i);
+                        } else {
+                            removeLecture(i);
+                        }
+                    };
+                }
+            });
+        }
+
         updateLecturesData();
-        updateTableNumbers();
     }
 
     // 강의영상 행 업데이트
@@ -350,6 +439,12 @@
         lectures.forEach(function(lecture, index) {
             const namePrefix = `lectures[${index}]`;
             
+            const videoIdInput = document.createElement('input');
+            videoIdInput.type = 'hidden';
+            videoIdInput.name = `${namePrefix}[lecture_video_id]`;
+            videoIdInput.value = lecture.lecture_video_id || '';
+            container.appendChild(videoIdInput);
+
             const nameInput = document.createElement('input');
             nameInput.type = 'hidden';
             nameInput.name = `${namePrefix}[lecture_name]`;

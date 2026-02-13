@@ -339,7 +339,7 @@
                             </thead>
                             <tbody id="lecturesTableBody">
                                 @foreach($lectures as $index => $lecture)
-                                    <tr data-lecture-index="{{ $index }}">
+                                    <tr data-lecture-index="{{ $index }}" @if($lecture->lecture_video_id) data-lecture-video-id="{{ $lecture->lecture_video_id }}" @endif>
                                         <td>{{ $index + 1 }}</td>
                                         <td>{{ $lecture->order + 1 }}</td>
                                         <td>{{ $lecture->lecture_name }}</td>

@@ -16,6 +16,16 @@ class SchoolRequest extends FormRequest
     }
 
     /**
+     * 빈 연도는 null로 변환
+     */
+    protected function prepareForValidation(): void
+    {
+        if ($this->has('year') && $this->year === '') {
+            $this->merge(['year' => null]);
+        }
+    }
+
+    /**
      * Get the validation rules that apply to the request.
      */
     public function rules(): array
@@ -26,7 +36,7 @@ class SchoolRequest extends FormRequest
 
         return [
             'branch' => ['required', 'in:' . implode(',', $branches)],
-            'year' => ['required', 'integer', 'min:1970', 'max:' . $currentYear],
+            'year' => ['nullable', 'integer', 'min:1970', 'max:' . $currentYear],
             'school_name' => ['required', 'string', 'max:255'],
             'is_member_school' => ['required', 'in:Y,N'],
             'url' => ['nullable', 'url', 'max:500'],
@@ -41,7 +51,6 @@ class SchoolRequest extends FormRequest
         return [
             'branch.required' => '지회를 선택해주세요.',
             'branch.in' => '올바른 지회를 선택해주세요.',
-            'year.required' => '연도를 선택해주세요.',
             'year.integer' => '연도는 숫자여야 합니다.',
             'year.min' => '연도는 1970년 이상이어야 합니다.',
             'year.max' => '연도는 현재 연도 이하여야 합니다.',

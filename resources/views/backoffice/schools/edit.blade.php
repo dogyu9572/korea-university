@@ -81,10 +81,10 @@
                         </div>
 
                         <div class="member-form-row">
-                            <label class="member-form-label">연도 <span class="required">*</span></label>
+                            <label class="member-form-label">연도</label>
                             <div class="member-form-field">
                                 <select class="board-form-control @error('year') is-invalid @enderror" 
-                                        id="year" name="year" required>
+                                        id="year" name="year">
                                     <option value="">선택</option>
                                     @foreach($years as $key => $value)
                                         <option value="{{ $key }}" @selected(old('year', $school->year) == $key)>{{ $value }}</option>

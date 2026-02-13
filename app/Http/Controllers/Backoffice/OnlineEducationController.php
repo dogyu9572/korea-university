@@ -100,4 +100,17 @@ class OnlineEducationController extends BaseController
         $lectures = $this->onlineEducationService->searchLectures($request);
         return response()->json($lectures);
     }
+
+    /**
+     * 강의 삭제 API
+     */
+    public function deleteLecture(int $id)
+    {
+        try {
+            $this->onlineEducationService->deleteLecture($id);
+            return response()->json(['success' => true, 'message' => '강의가 삭제되었습니다.']);
+        } catch (\Exception $e) {
+            return response()->json(['success' => false, 'message' => '삭제 중 오류가 발생했습니다: ' . $e->getMessage()], 500);
+        }
+    }
 }

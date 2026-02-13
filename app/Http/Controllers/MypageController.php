@@ -88,6 +88,30 @@ class MypageController extends Controller
         ));
     }
 
+    /**
+     * 온라인교육 상세 페이지 체류시간 전송 (진도율 누적)
+     */
+    public function application_status_view2_dwell(int $id, Request $request, ApplicationStatusService $applicationStatusService)
+    {
+        $request->validate([
+            'seconds' => 'required|integer|min:0|max:86400',
+        ], [
+            'seconds.required' => '체류시간(초)이 필요합니다.',
+            'seconds.integer' => '체류시간은 정수여야 합니다.',
+            'seconds.min' => '체류시간은 0 이상이어야 합니다.',
+            'seconds.max' => '체류시간은 86400초(24시간)를 초과할 수 없습니다.',
+        ]);
+
+        $memberId = Auth::guard('member')->id();
+        try {
+            $applicationStatusService->recordDwellTime($id, $memberId, (int) $request->input('seconds'));
+        } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
+            throw new NotFoundHttpException('해당 신청 내역을 찾을 수 없습니다.', $e);
+        }
+
+        return response()->json(['ok' => true]);
+    }
+
     private function printViewData(EducationApplication $application, string $sName): array
     {
         return [

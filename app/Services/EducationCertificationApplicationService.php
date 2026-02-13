@@ -831,12 +831,19 @@ class EducationCertificationApplicationService
 
     /**
      * 자격증 카드용 표시 데이터를 준비합니다.
+     *
+     * @param array<int> $appliedCertificationIds 현재 회원이 이미 신청한 certification_id 목록
      */
-    public function prepareCertificationCardData(Certification $c): array
+    public function prepareCertificationCardData(Certification $c, array $appliedCertificationIds = []): array
     {
         $enrolled = $c->applications_count ?? 0;
         $capacity = $c->capacity ?? 0;
         $capacityUnlimited = $c->capacity_unlimited ?? false;
+
+        $alreadyApplied = in_array($c->id, $appliedCertificationIds, true);
+        $btn = $alreadyApplied
+            ? ['class' => 'btn btn_end', 'text' => '신청완료', 'url' => 'javascript:void(0);', 'already_applied' => true]
+            : get_application_button_state($this->getEffectiveApplicationStatusForDisplay($c), 'certification', $c->id);
 
         return [
             'name' => $c->name ?? '',
@@ -848,7 +855,7 @@ class EducationCertificationApplicationService
             'capacity_unlimited' => $capacityUnlimited,
             'capacity_text' => ($capacityUnlimited && (int) $capacity > 0) ? '무제한' : ((int) $capacity) . '명',
             'has_remain' => $capacityUnlimited || $enrolled < $capacity,
-            'btn' => get_application_button_state($this->getEffectiveApplicationStatusForDisplay($c), 'certification', $c->id),
+            'btn' => $btn,
             'view_url' => route('education_certification.application_ec_view_type2', $c->id),
             'thumb' => $c->thumbnail_path ?: '/images/sample.jpg',
         ];
@@ -1037,6 +1044,26 @@ class EducationCertificationApplicationService
     }
 
     /**
+     * 현재 로그인 회원이 이미 신청한 자격증(certification_id) ID 목록을 반환합니다.
+     *
+     * @return array<int>
+     */
+    private function getAppliedCertificationIdsForCurrentMember(): array
+    {
+        $memberId = auth('member')?->id();
+        if (!$memberId) {
+            return [];
+        }
+
+        return EducationApplication::query()
+            ->where('member_id', $memberId)
+            ->whereNotNull('certification_id')
+            ->whereNull('cancelled_at')
+            ->pluck('certification_id')
+            ->all();
+    }
+
+    /**
      * 현재 로그인 회원이 이미 신청한 온라인교육(online_education_id) ID 목록을 반환합니다.
      *
      * @return array<int>
@@ -1081,9 +1108,10 @@ class EducationCertificationApplicationService
 
         $paginator = $query->paginate(self::PER_PAGE)->withQueryString();
 
-        $paginator->getCollection()->each(function ($item) {
+        $appliedIds = $this->getAppliedCertificationIdsForCurrentMember();
+        $paginator->getCollection()->each(function ($item) use ($appliedIds) {
             $item->program_type = 'certification';
-            $item->card_data = $this->prepareCertificationCardData($item);
+            $item->card_data = $this->prepareCertificationCardData($item, $appliedIds);
         });
 
         return $paginator;
@@ -1118,9 +1146,10 @@ class EducationCertificationApplicationService
             $item->program_type = 'education';
             $item->card_data = $this->prepareEducationCardData($item, $appliedEducationIds);
         });
-        $certifications->each(function ($item) {
+        $appliedCertificationIds = $this->getAppliedCertificationIdsForCurrentMember();
+        $certifications->each(function ($item) use ($appliedCertificationIds) {
             $item->program_type = 'certification';
-            $item->card_data = $this->prepareCertificationCardData($item);
+            $item->card_data = $this->prepareCertificationCardData($item, $appliedCertificationIds);
         });
         $appliedOnlineIds = $this->getAppliedOnlineEducationIdsForCurrentMember();
         $onlineEducations->each(function ($item) use ($appliedOnlineIds) {

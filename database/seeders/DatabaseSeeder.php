@@ -43,5 +43,8 @@ class DatabaseSeeder extends Seeder
 
         // 설정 시더 실행
         $this->call(SettingSeeder::class);
+
+        // 학교(회원교) 시더 실행
+        $this->call(SchoolSeeder::class);
     }
 }

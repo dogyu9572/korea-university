@@ -126,7 +126,7 @@
                 <label class="member-form-label">수강률 (%)</label>
                 <div class="member-form-field">
                     <input type="number" class="board-form-control @error('attendance_rate') is-invalid @enderror"
-                           name="attendance_rate" value="{{ old('attendance_rate', $app?->attendance_rate ?? '') }}" min="0" max="100" step="0.01" placeholder="0–100">
+                           name="attendance_rate" value="{{ old('attendance_rate', $app ? (int) round((float) ($app->attendance_rate ?? 0)) : '') }}" min="0" max="100" step="1">
                     @error('attendance_rate')
                         <div class="invalid-feedback">{{ $message }}</div>
                     @enderror

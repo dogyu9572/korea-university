@@ -5,6 +5,9 @@
 	<div class="inner">
 		<form action="{{ route('member.login.post') }}" method="POST" id="memberLoginForm">
 			@csrf
+			@if(!empty($intended_redirect))
+			<input type="hidden" name="intended_redirect" value="{{ $intended_redirect }}">
+			@endif
 			<div class="member_area">
 				<div class="tit">LOGIN</div>
 				<div class="inputs">

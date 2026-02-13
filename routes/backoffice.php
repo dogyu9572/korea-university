@@ -412,6 +412,9 @@ Route::prefix('backoffice')->middleware(['backoffice'])->group(function () {
     ]);
     Route::get('online-educations/lectures/search', [OnlineEducationController::class, 'searchLectures'])
         ->name('backoffice.online-educations.lectures.search');
+    Route::delete('online-educations/lectures/{id}', [OnlineEducationController::class, 'deleteLecture'])
+        ->name('backoffice.online-educations.lectures.delete')
+        ->whereNumber('id');
 
     // 자격증 관리
     Route::resource('certifications', CertificationController::class, [

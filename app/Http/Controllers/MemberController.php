@@ -111,13 +111,32 @@ class MemberController extends Controller
     /** 로그인 폼 */
     public function login()
     {
-        // 로그인 페이지 직접 접근 시: 이전 페이지(Referer)를 intended로 저장해 로그인 후 그쪽으로 이동
+        $baseUrl = rtrim(url('/'), '/');
+        $loginUrl = route('member.login');
+
+        // 리다이렉트 시 쿼리로 넘어온 intended가 있으면 세션에 저장 (로그인 후 해당 페이지로 복귀)
+        if (request()->filled('intended')) {
+            $decoded = urldecode(request()->input('intended'));
+            if (str_starts_with($decoded, $baseUrl) && $decoded !== $loginUrl && !str_starts_with($decoded, $loginUrl . '?')) {
+                request()->session()->put('url.intended', $decoded);
+            }
+        }
+        // intended 없고 세션에도 없을 때: Referer를 intended로 저장
         if (!request()->session()->has('url.intended')) {
             $referer = request()->header('Referer');
-            $baseUrl = rtrim(url('/'), '/');
-            $loginUrl = route('member.login');
             if ($referer && str_starts_with($referer, $baseUrl) && $referer !== $loginUrl && !str_starts_with($referer, $loginUrl . '?')) {
                 request()->session()->put('url.intended', $referer);
+            }
+        }
+
+        // 로그인 후 복귀할 URL (폼 hidden으로 전달해 세션 유실 시에도 동작)
+        $intendedRedirect = '';
+        if (request()->session()->has('url.intended')) {
+            $intendedRedirect = request()->session()->get('url.intended');
+        } elseif (request()->filled('intended')) {
+            $decoded = urldecode(request()->input('intended'));
+            if (str_starts_with($decoded, $baseUrl) && $decoded !== $loginUrl && !str_starts_with($decoded, $loginUrl . '?')) {
+                $intendedRedirect = $decoded;
             }
         }
 
@@ -127,6 +146,7 @@ class MemberController extends Controller
         }
         return view('member.login', array_merge($this->memberMenuMeta('로그인'), [
             'remembered_email_value' => $remembered ?: '',
+            'intended_redirect' => $intendedRedirect,
         ]));
     }
 
@@ -150,13 +170,27 @@ class MemberController extends Controller
             return back()->withErrors(['email' => '이메일(아이디) 또는 비밀번호가 일치하지 않습니다.'])->withInput($request->only('email'));
         }
 
-        $intendedUrl = $request->session()->pull('url.intended');
+        // 폼 hidden으로 넘어온 URL 우선 (미들웨어 리다이렉트 시 세션 유실 대비)
+        $intendedUrl = $request->input('intended_redirect');
+        if (!$intendedUrl) {
+            $intendedUrl = $request->session()->pull('url.intended');
+        }
         Auth::guard('member')->login($member, false);
         $request->session()->regenerate();
 
         $redirectUrl = route('mypage.application_status');
-        if ($intendedUrl && str_starts_with($intendedUrl, url('/'))) {
-            $redirectUrl = $intendedUrl;
+        if ($intendedUrl) {
+            $intendedUrl = trim($intendedUrl);
+            // 같은 호스트인지 확인 (http/https 차이 무시)
+            $appHost = parse_url(url('/'), PHP_URL_HOST);
+            $intendedHost = parse_url($intendedUrl, PHP_URL_HOST);
+            $intendedPath = parse_url($intendedUrl, PHP_URL_PATH) ?: '/';
+            $loginPath = parse_url(route('member.login'), PHP_URL_PATH);
+            $isSameSite = $appHost && $intendedHost && $appHost === $intendedHost;
+            $isNotLoginPage = $intendedPath !== $loginPath;
+            if ($isSameSite && $isNotLoginPage) {
+                $redirectUrl = $intendedUrl;
+            }
         }
         $redirect = redirect()->to($redirectUrl);
         if ($request->boolean('remember')) {

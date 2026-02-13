@@ -48,6 +48,7 @@ class EducationApplication extends Model
         // 온라인교육 전용
         'course_status',
         'attendance_rate',
+        'learning_minutes',
         // 자격증 전용
         'score',
         'pass_status',
@@ -76,6 +77,7 @@ class EducationApplication extends Model
         'participation_fee' => 'decimal:2',
         'payment_method' => 'array',
         'attendance_rate' => 'decimal:2',
+        'learning_minutes' => 'integer',
         'score' => 'integer',
         'birth_date' => 'date',
         'cancelled_at' => 'datetime',

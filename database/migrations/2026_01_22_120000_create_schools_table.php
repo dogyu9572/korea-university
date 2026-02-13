@@ -14,7 +14,7 @@ return new class extends Migration
         Schema::create('schools', function (Blueprint $table) {
             $table->id();
             $table->string('branch')->comment('지회명');
-            $table->integer('year')->comment('연도');
+            $table->integer('year')->nullable()->comment('연도');
             $table->string('school_name')->comment('학교명');
             $table->boolean('is_member_school')->default(false)->comment('회원교 여부');
             $table->string('url')->nullable()->comment('URL');
