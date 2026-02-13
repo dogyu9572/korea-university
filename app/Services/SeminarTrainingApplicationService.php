@@ -118,7 +118,7 @@ class SeminarTrainingApplicationService
             'fee_text' => format_fee_with_option_names($st),
             'btn' => get_application_button_state($this->getEffectiveApplicationStatusForDisplay($st), 'seminar_training', $st->id),
             'view_url' => route('seminars_training.application_st_view', $st->id),
-            'thumb' => $st->thumbnail_path ?: '/images/img_application_st_sample.jpg',
+            'thumb' => $st->thumbnail_path ?: '/images/sample.jpg',
         ];
     }
 
@@ -153,7 +153,7 @@ class SeminarTrainingApplicationService
             'btn_class' => $btn['class'],
             'btn_text' => $btn['text'],
             'apply_url' => $btn['url'],
-            'thumb' => $st->thumbnail_path ?: '/images/img_application_view_sample.jpg',
+            'thumb' => $st->thumbnail_path ?: '/images/sample.jpg',
         ];
     }
 
@@ -414,6 +414,7 @@ class SeminarTrainingApplicationService
             'is_completed' => false,
             'is_survey_completed' => false,
             'payment_status' => '미입금',
+            'receipt_status' => '신청완료',
         ];
     }
 

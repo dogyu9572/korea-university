@@ -20,10 +20,17 @@
 		if (!area || typeof html2pdf === 'undefined') return;
 		var filename = area.getAttribute('data-pdf-filename') || 'document.pdf';
 		var opt = {
-			margin: 10,
+			margin: 0,
 			filename: filename,
 			image: { type: 'jpeg', quality: 0.98 },
-			html2canvas: { scale: 2 },
+			html2canvas: { 
+				scale: 2, 
+				useCORS: true,
+					width:794,
+				ignoreElements: function (element) {
+					return element.classList.contains('btns');
+				}
+			},
 			jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
 		};
 		html2pdf().set(opt).from(area).save();

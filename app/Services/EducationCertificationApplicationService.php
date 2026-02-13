@@ -131,12 +131,12 @@ class EducationCertificationApplicationService
             'enrolled' => $enrolled,
             'capacity' => $capacity,
             'capacity_unlimited' => $capacityUnlimited,
-            'capacity_text' => $capacityUnlimited ? '무제한' : $capacity . '명',
+            'capacity_text' => ($capacityUnlimited && (int) $capacity > 0) ? '무제한' : ((int) $capacity) . '명',
             'has_remain' => $hasRemain,
             'btn_class' => $btn['class'],
             'btn_text' => $btn['text'],
             'apply_url' => $btn['url'],
-            'thumb' => $e->thumbnail_path ?: '/images/img_application_view_sample.jpg',
+            'thumb' => $e->thumbnail_path ?: '/images/sample.jpg',
         ];
     }
 
@@ -164,12 +164,12 @@ class EducationCertificationApplicationService
             'enrolled' => $enrolled,
             'capacity' => $capacity,
             'capacity_unlimited' => $capacityUnlimited,
-            'capacity_text' => $capacityUnlimited ? '무제한' : $capacity . '명',
+            'capacity_text' => ($capacityUnlimited && (int) $capacity > 0) ? '무제한' : ((int) $capacity) . '명',
             'has_remain' => $hasRemain,
             'btn_class' => $btn['class'],
             'btn_text' => $btn['text'],
             'apply_url' => $btn['url'],
-            'thumb' => $c->thumbnail_path ?: '/images/img_application_view_sample2.jpg',
+            'thumb' => $c->thumbnail_path ?: '/images/sample.jpg',
         ];
     }
 
@@ -203,7 +203,7 @@ class EducationCertificationApplicationService
             'enrolled' => $enrolled,
             'capacity' => $capacity,
             'capacity_unlimited' => $capacityUnlimited,
-            'capacity_text' => $capacityUnlimited ? '무제한' : $capacity . '명',
+            'capacity_text' => ($capacityUnlimited && (int) $capacity > 0) ? '무제한' : ((int) $capacity) . '명',
             'has_remain' => $hasRemain,
             'target' => $o->target ?? '-',
             'education_class' => $educationClass,
@@ -211,7 +211,7 @@ class EducationCertificationApplicationService
             'btn_class' => $btn['class'],
             'btn_text' => $btn['text'],
             'apply_url' => $btn['url'],
-            'thumb' => $o->thumbnail_path ?: '/images/img_application_view_sample.jpg',
+            'thumb' => $o->thumbnail_path ?: '/images/sample.jpg',
         ];
     }
 
@@ -381,6 +381,7 @@ class EducationCertificationApplicationService
             'is_completed' => false,
             'is_survey_completed' => false,
             'payment_status' => '미입금',
+            'receipt_status' => '신청완료',
         ];
     }
 
@@ -544,6 +545,9 @@ class EducationCertificationApplicationService
         $capacity = (int) ($program->capacity ?? 0);
         $capacityUnlimited = (bool) ($program->capacity_unlimited ?? false);
         $enrolled = (int) ($program->applications_count ?? 0);
+        if (!$capacityUnlimited && $capacity <= 0) {
+            return '접수마감';
+        }
         if (!$capacityUnlimited && $capacity > 0 && $enrolled >= $capacity) {
             return '접수마감';
         }
@@ -555,8 +559,13 @@ class EducationCertificationApplicationService
      */
     private function assertCapacityAvailable(string $column, int $programId, ?int $capacity, bool $unlimited): void
     {
-        if ($unlimited || !$capacity) {
+        if ($unlimited) {
             return;
+        }
+        if ($capacity === null || $capacity <= 0) {
+            throw ValidationException::withMessages([
+                $column => '모집 정원이 마감되었습니다.',
+            ]);
         }
 
         $count = EducationApplication::query()
@@ -808,7 +817,7 @@ class EducationCertificationApplicationService
             'enrolled' => $enrolled,
             'capacity' => $capacity,
             'capacity_unlimited' => $capacityUnlimited,
-            'capacity_text' => $capacityUnlimited ? '무제한' : $capacity . '명',
+            'capacity_text' => ($capacityUnlimited && (int) $capacity > 0) ? '무제한' : ((int) $capacity) . '명',
             'has_remain' => $capacityUnlimited || $enrolled < $capacity,
             'target' => $e->target ?? '-',
             'education_class' => $e->education_class ?? '-',
@@ -816,7 +825,7 @@ class EducationCertificationApplicationService
             'fee_text' => format_education_fee($e),
             'btn' => $btn,
             'view_url' => route('education_certification.application_ec_view', $e->id),
-            'thumb' => $e->thumbnail_path ?: '/images/img_application_ec_sample.jpg',
+            'thumb' => $e->thumbnail_path ?: '/images/sample.jpg',
         ];
     }
 
@@ -837,18 +846,19 @@ class EducationCertificationApplicationService
             'enrolled' => $enrolled,
             'capacity' => $capacity,
             'capacity_unlimited' => $capacityUnlimited,
-            'capacity_text' => $capacityUnlimited ? '무제한' : $capacity . '명',
+            'capacity_text' => ($capacityUnlimited && (int) $capacity > 0) ? '무제한' : ((int) $capacity) . '명',
             'has_remain' => $capacityUnlimited || $enrolled < $capacity,
             'btn' => get_application_button_state($this->getEffectiveApplicationStatusForDisplay($c), 'certification', $c->id),
             'view_url' => route('education_certification.application_ec_view_type2', $c->id),
-            'thumb' => $c->thumbnail_path ?: '/images/img_application_ec_sample2.jpg',
+            'thumb' => $c->thumbnail_path ?: '/images/sample.jpg',
         ];
     }
 
     /**
      * 온라인교육 카드용 표시 데이터를 준비합니다.
+     * @param array<int> $appliedOnlineEducationIds 현재 회원이 이미 신청한 online_education_id 목록
      */
-    public function prepareOnlineEducationCardData(OnlineEducation $o): array
+    public function prepareOnlineEducationCardData(OnlineEducation $o, array $appliedOnlineEducationIds = []): array
     {
         $enrolled = $o->applications_count ?? 0;
         $capacity = $o->capacity ?? 0;
@@ -859,6 +869,11 @@ class EducationCertificationApplicationService
         }
         $educationClass = $educationClass ?: '-';
 
+        $alreadyApplied = in_array($o->id, $appliedOnlineEducationIds, true);
+        $btn = $alreadyApplied
+            ? ['class' => 'btn btn_end', 'text' => '신청완료', 'url' => 'javascript:void(0);', 'already_applied' => true]
+            : get_application_button_state($this->getEffectiveApplicationStatusForDisplay($o), 'online', $o->id);
+
         return [
             'name' => $o->name ?? '',
             'app_period' => format_period_ko($o->application_start, $o->application_end),
@@ -868,11 +883,11 @@ class EducationCertificationApplicationService
             'enrolled' => $enrolled,
             'capacity' => $capacity,
             'capacity_unlimited' => $capacityUnlimited,
-            'capacity_text' => $capacityUnlimited ? '무제한' : $capacity . '명',
+            'capacity_text' => ($capacityUnlimited && (int) $capacity > 0) ? '무제한' : ((int) $capacity) . '명',
             'has_remain' => $capacityUnlimited || $enrolled < $capacity,
-            'btn' => get_application_button_state($this->getEffectiveApplicationStatusForDisplay($o), 'online', $o->id),
+            'btn' => $btn,
             'view_url' => route('education_certification.application_ec_view_online', $o->id),
-            'thumb' => $o->thumbnail_path ?: '/images/img_application_ec_sample.jpg',
+            'thumb' => $o->thumbnail_path ?: '/images/sample.jpg',
         ];
     }
 
@@ -992,6 +1007,17 @@ class EducationCertificationApplicationService
     }
 
     /**
+     * 회원이 해당 온라인교육을 이미 신청했는지 여부를 반환합니다.
+     */
+    public function hasMemberAppliedForOnlineEducation(int $memberId, int $onlineEducationId): bool
+    {
+        return EducationApplication::query()
+            ->where('member_id', $memberId)
+            ->where('online_education_id', $onlineEducationId)
+            ->exists();
+    }
+
+    /**
      * 현재 로그인 회원이 이미 신청한 교육(education_id) ID 목록을 반환합니다.
      *
      * @return array<int>
@@ -1007,6 +1033,25 @@ class EducationCertificationApplicationService
             ->where('member_id', $memberId)
             ->whereNotNull('education_id')
             ->pluck('education_id')
+            ->all();
+    }
+
+    /**
+     * 현재 로그인 회원이 이미 신청한 온라인교육(online_education_id) ID 목록을 반환합니다.
+     *
+     * @return array<int>
+     */
+    private function getAppliedOnlineEducationIdsForCurrentMember(): array
+    {
+        $memberId = auth('member')?->id();
+        if (!$memberId) {
+            return [];
+        }
+
+        return EducationApplication::query()
+            ->where('member_id', $memberId)
+            ->whereNotNull('online_education_id')
+            ->pluck('online_education_id')
             ->all();
     }
 
@@ -1052,9 +1097,10 @@ class EducationCertificationApplicationService
 
         $paginator = $query->paginate(self::PER_PAGE)->withQueryString();
 
-        $paginator->getCollection()->each(function ($item) {
+        $appliedOnlineIds = $this->getAppliedOnlineEducationIdsForCurrentMember();
+        $paginator->getCollection()->each(function ($item) use ($appliedOnlineIds) {
             $item->program_type = 'online';
-            $item->card_data = $this->prepareOnlineEducationCardData($item);
+            $item->card_data = $this->prepareOnlineEducationCardData($item, $appliedOnlineIds);
         });
 
         return $paginator;
@@ -1076,9 +1122,10 @@ class EducationCertificationApplicationService
             $item->program_type = 'certification';
             $item->card_data = $this->prepareCertificationCardData($item);
         });
-        $onlineEducations->each(function ($item) {
+        $appliedOnlineIds = $this->getAppliedOnlineEducationIdsForCurrentMember();
+        $onlineEducations->each(function ($item) use ($appliedOnlineIds) {
             $item->program_type = 'online';
-            $item->card_data = $this->prepareOnlineEducationCardData($item);
+            $item->card_data = $this->prepareOnlineEducationCardData($item, $appliedOnlineIds);
         });
 
         $merged = $educations->concat($certifications)->concat($onlineEducations);

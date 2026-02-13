@@ -30,10 +30,10 @@
 						<th>성명</th>
 						<td>{{ $application->applicant_name ?? '' }}</td>
 					</tr>
-					<tr>
+					<!-- <tr>
 						<th>생년월일</th>
 						<td>{{ $birthDate }}</td>
-					</tr>
+					</tr> -->
 					<tr>
 						<th>소속기관</th>
 						<td>{{ $application->affiliation ?? '' }}</td>

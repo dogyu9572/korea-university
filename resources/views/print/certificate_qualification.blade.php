@@ -11,7 +11,7 @@
 	<div class="print_area" data-pdf-filename="합격확인서_{{ $num }}.pdf">
 		<div class="print_head">
 			<div class="num">[{{ $num }}]</div>
-			<div class="btns">
+			<div class="btns" data-html2canvas-ignore>
 				<button type="button" class="btn btn_wkk btn_down">PDF 다운</button>
 				<button type="button" class="btn btn_print btn_kwk">인쇄</button>
 			</div>
@@ -62,7 +62,7 @@
 	<div class="print_area">
 		<div class="print_head">
 			<div class="num">[KS-123456789]</div>
-			<div class="btns">
+			<div class="btns" data-html2canvas-ignore>
 				<a href="#this" class="btn btn_wkk btn_down">PDF 다운</a>
 				<button type="button" class="btn btn_print btn_kwk">인쇄</button>
 			</div>

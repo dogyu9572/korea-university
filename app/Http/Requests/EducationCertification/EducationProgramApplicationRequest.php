@@ -25,6 +25,20 @@ class EducationProgramApplicationRequest extends FormRequest
         );
     }
 
+    protected function prepareForValidation(): void
+    {
+        $merge = [];
+        if ($this->has('has_cash_receipt')) {
+            $merge['has_cash_receipt'] = $this->input('has_cash_receipt') === '1' || $this->input('has_cash_receipt') === true ? '1' : '0';
+        }
+        if ($this->has('has_tax_invoice')) {
+            $merge['has_tax_invoice'] = $this->input('has_tax_invoice') === '1' || $this->input('has_tax_invoice') === true ? '1' : '0';
+        }
+        if ($merge !== []) {
+            $this->merge($merge);
+        }
+    }
+
     /**
      * Get the validation rules that apply to the request.
      *
@@ -43,15 +57,15 @@ class EducationProgramApplicationRequest extends FormRequest
             'refund_bank_name' => ['required', 'string', 'max:50'],
             'refund_account_number' => ['required', 'string', 'max:50'],
             'has_cash_receipt' => ['nullable', 'boolean'],
-            'cash_receipt_purpose' => ['nullable', 'string', 'in:소득공제용,사업자지출증빙용'],
-            'cash_receipt_number' => ['nullable', 'string', 'max:50'],
+            'cash_receipt_purpose' => ['required_if:has_cash_receipt,1', 'nullable', 'string', 'in:소득공제용,사업자지출증빙용'],
+            'cash_receipt_number' => ['required_if:has_cash_receipt,1', 'nullable', 'string', 'max:50'],
             'has_tax_invoice' => ['nullable', 'boolean'],
-            'company_name' => ['nullable', 'string', 'max:100'],
-            'registration_number' => ['nullable', 'string', 'max:50'],
-            'contact_person_name' => ['nullable', 'string', 'max:50'],
-            'contact_person_email' => ['nullable', 'email', 'max:100'],
-            'contact_person_phone' => ['nullable', 'string', 'max:20'],
-            'business_registration' => ['nullable', 'file', 'mimes:pdf,jpg,jpeg,png', 'max:2048'],
+            'company_name' => ['required_if:has_tax_invoice,1', 'nullable', 'string', 'max:100'],
+            'registration_number' => ['required_if:has_tax_invoice,1', 'nullable', 'string', 'max:50'],
+            'contact_person_name' => ['required_if:has_tax_invoice,1', 'nullable', 'string', 'max:50'],
+            'contact_person_email' => ['required_if:has_tax_invoice,1', 'nullable', 'email', 'max:100'],
+            'contact_person_phone' => ['required_if:has_tax_invoice,1', 'nullable', 'string', 'max:20'],
+            'business_registration' => ['required_if:has_tax_invoice,1', 'nullable', 'file', 'mimes:pdf,jpg,jpeg,png', 'max:2048'],
             'attachments.*' => ['nullable', 'file', 'mimes:pdf,jpg,jpeg,png', 'max:2048'],
         ];
     }
@@ -86,9 +100,12 @@ class EducationProgramApplicationRequest extends FormRequest
             'required_if' => ':attribute을(를) 입력해주세요.',
             'email' => ':attribute 형식이 올바르지 않습니다.',
             'max.string' => ':attribute은(는) :max자 이하여야 합니다.',
+            'integer' => '선택한 :attribute이(가) 올바르지 않습니다.',
             'exists' => '선택한 :attribute이(가) 올바르지 않습니다.',
             'in' => '선택한 :attribute이(가) 올바르지 않습니다.',
             'mimes' => ':attribute은(는) :values 형식만 가능합니다.',
+            'max.file' => ':attribute은(는) 2MB 이하여야 합니다.',
+            'file' => ':attribute은(는) 올바른 파일을 선택해주세요.',
         ];
     }
 }

@@ -12,36 +12,42 @@
 		<div class="glbox dl_slice in_inputs">
 			<dl>
 				<dt>이메일</dt>
-				<dd><input type="text" class="w1" name="email" value="{{ old('email', $member->email) }}" readonly></dd>
-				@error('email')<dd class="join_field_error" style="color:#c00;font-size:1rem;margin-top:0.25rem;">{{ $message }}</dd>@enderror
+				<dd><input type="text" class="w1" name="email" value="{{ old('email', $member->email) }}" readonly>
+					@error('email')<p class="join_field_error w100p" style="color:#c00;font-size:1rem;margin-top:0.25rem;">{{ $message }}</p>@enderror
+				</dd>
 			</dl>
 			<dl>
 				<dt>현재 비밀번호</dt>
-				<dd><input type="password" class="w1" name="current_password" placeholder="비밀번호 변경 시에만 입력"></dd>
-				<dd id="currentPasswordCheckMsg" class="join_field_error" style="color:#c00;font-size:1rem;margin-top:0.25rem;display:none;"></dd>
-				@error('current_password')<dd class="join_field_error" style="color:#c00;font-size:1rem;margin-top:0.25rem;">{{ $message }}</dd>@enderror
+				<dd><input type="password" class="w1" name="current_password" placeholder="비밀번호 변경 시에만 입력">
+					<p id="currentPasswordCheckMsg" class="join_field_error w100p" style="color:#c00;font-size:1rem;margin-top:0.25rem;display:none;"></p>
+					@error('current_password')<p class="join_field_error w100p" style="color:#c00;font-size:1rem;margin-top:0.25rem;">{{ $message }}</p>@enderror
+				</dd>
 			</dl>
 			<dl>
 				<dt>새 비밀번호</dt>
-				<dd><input type="password" class="w1" name="password" placeholder="영문/숫자/특수문자 조합 두가지 이상(8~10자 이내 입력)"></dd>
-				<dd id="passwordCheckMsg" class="join_field_error" style="color:#c00;font-size:1rem;margin-top:0.25rem;display:none;"></dd>
-				@error('password')<dd class="join_field_error" style="color:#c00;font-size:1rem;margin-top:0.25rem;">{{ $message }}</dd>@enderror
+				<dd><input type="password" class="w1" name="password" placeholder="영문/숫자/특수문자 조합 두가지 이상(8~10자 이내 입력)">
+					<p id="passwordCheckMsg" class="join_field_error w100p" style="color:#c00;font-size:1rem;margin-top:0.25rem;display:none;"></p>
+					@error('password')<p class="join_field_error w100p" style="color:#c00;font-size:1rem;margin-top:0.25rem;">{{ $message }}</p>@enderror
+				</dd>
 			</dl>
 			<dl>
 				<dt>새 비밀번호 확인</dt>
-				<dd><input type="password" class="w1" name="password_confirmation" placeholder="비밀번호를 한 번 더 입력해주세요."></dd>
-				<dd id="passwordConfirmCheckMsg" class="join_field_error" style="color:#c00;font-size:1rem;margin-top:0.25rem;display:none;"></dd>
-				@error('password_confirmation')<dd class="join_field_error" style="color:#c00;font-size:1rem;margin-top:0.25rem;">{{ $message }}</dd>@enderror
+				<dd><input type="password" class="w1" name="password_confirmation" placeholder="비밀번호를 한 번 더 입력해주세요.">
+					<p id="passwordConfirmCheckMsg" class="join_field_error w100p" style="color:#c00;font-size:1rem;margin-top:0.25rem;display:none;"></p>
+					@error('password_confirmation')<p class="join_field_error w100p" style="color:#c00;font-size:1rem;margin-top:0.25rem;">{{ $message }}</p>@enderror
+				</dd>				
 			</dl>
 			<dl>
 				<dt>휴대폰번호</dt>
-				<dd><input type="text" class="w1" name="phone_number" value="{{ \App\Models\Member::formatPhoneForDisplay(old('phone_number', $member->phone_number)) }}" readonly></dd>
-				@error('phone_number')<dd class="join_field_error" style="color:#c00;font-size:1rem;margin-top:0.25rem;">{{ $message }}</dd>@enderror
+				<dd><input type="text" class="w1" name="phone_number" value="{{ \App\Models\Member::formatPhoneForDisplay(old('phone_number', $member->phone_number)) }}" readonly>
+					@error('phone_number')<p class="join_field_error w100p" style="color:#c00;font-size:1rem;margin-top:0.25rem;">{{ $message }}</p>@enderror
+				</dd>
 			</dl>
 			<dl>
 				<dt>이름</dt>
-				<dd><input type="text" class="w1" name="name" value="{{ old('name', $member->name) }}" maxlength="8" readonly></dd>
-				@error('name')<dd class="join_field_error" style="color:#c00;font-size:1rem;margin-top:0.25rem;">{{ $message }}</dd>@enderror
+				<dd><input type="text" class="w1" name="name" value="{{ old('name', $member->name) }}" maxlength="8" readonly>
+					@error('name')<o class="join_field_error w100p" style="color:#c00;font-size:1rem;margin-top:0.25rem;">{{ $message }}</o>@enderror
+				</dd>
 			</dl>
 			<dl>
 				<dt>주소</dt>
@@ -78,16 +84,16 @@
 						<button type="button" class="btn" id="btnSearchSchool">검색</button>
 					</div>
 					<div style="margin-top:8px;"><input type="text" class="w1" id="school_name_direct" placeholder="학교명을 직접 입력해주세요." @if(old('school_name', $member->school_name)) disabled @endif></div>
+					<p id="schoolNameCheckMsg" class="join_field_error w100p" style="color:#c00;font-size:1rem;margin-top:0.25rem;display:none;"></p>
+					@error('school_name')<p class="join_field_error w100p" style="color:#c00;font-size:1rem;margin-top:0.25rem;">{{ $message }}</p>@enderror
 				</dd>
-				<dd id="schoolNameCheckMsg" class="join_field_error" style="color:#c00;font-size:1rem;margin-top:0.25rem;display:none;"></dd>
-				@error('school_name')<dd class="join_field_error" style="color:#c00;font-size:1rem;margin-top:0.25rem;">{{ $message }}</dd>@enderror
 			</dl>
 			<dl>
 				<dt>학교 대표자 여부</dt>
 				<dd class="flex_aic gap16">
 					<label class="check"><input type="checkbox" name="is_school_representative" value="1" @checked(old('is_school_representative', $member->is_school_representative))><i></i><span>협회와의 대표 소통자입니다.</span></label>
+	`				@error('is_school_representative')<p class="join_field_error w100p" style="color:#c00;font-size:1rem;margin-top:0.25rem;">{{ $message }}</p>@enderror
 				</dd>
-				@error('is_school_representative')<dd class="join_field_error" style="color:#c00;font-size:1rem;margin-top:0.25rem;">{{ $message }}</dd>@enderror
 			</dl>
 		</div>
 

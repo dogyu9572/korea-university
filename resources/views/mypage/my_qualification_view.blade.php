@@ -65,9 +65,9 @@
 			<dt>결제상태</dt>
 			<dd>
 				@if($application->payment_status === '입금완료')
-				<i class="deposit completed">Y</i>
+				<i class="deposit completed">입금완료</i>
 				@else
-				<i class="deposit not">N</i>
+				<i class="deposit not">미결제</i>
 				@endif
 			</dd>
 		</dl>

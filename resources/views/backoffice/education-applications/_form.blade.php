@@ -113,6 +113,21 @@
             </div>
 
             <div class="member-form-row">
+                <label class="member-form-label">접수상태</label>
+                <div class="member-form-field">
+                    <select name="receipt_status" class="board-form-control @error('receipt_status') is-invalid @enderror">
+                        <option value="신청완료" @selected(old('receipt_status', $app?->receipt_status ?? '') == '신청완료')>신청완료</option>
+                        <option value="수료" @selected(old('receipt_status', $app?->receipt_status ?? '') == '수료')>수료</option>
+                        <option value="미수료" @selected(old('receipt_status', $app?->receipt_status ?? '') == '미수료')>미수료</option>
+                        <option value="접수취소" @selected(old('receipt_status', $app?->receipt_status ?? '') == '접수취소')>접수취소</option>
+                    </select>
+                    @error('receipt_status')
+                        <div class="invalid-feedback">{{ $message }}</div>
+                    @enderror
+                </div>
+            </div>
+
+            <div class="member-form-row">
                 <label class="member-form-label">설문조사 여부</label>
                 <div class="member-form-field">
                     <div class="board-radio-group">
@@ -334,25 +349,40 @@
         <h3 class="member-section-title">결제 정보</h3>
 
         <div class="member-form-list">
+        @php
+                            $ft = $app?->fee_type ?? '';
+                            if (in_array($ft, ['member_twin', 'member_single', 'member_no_stay', 'guest_twin', 'guest_single', 'guest_no_stay'], true)) {
+                                $feeTypeMember = str_starts_with($ft, 'member_') ? '회원교' : '비회원교';
+                                $feeTypeAccommodation = (str_ends_with($ft, '_twin') ? '2인1실' : (str_ends_with($ft, '_single') ? '1인실' : '비숙박'));
+                            } else {
+                                $feeTypeMember = (strpos($ft, '회원교') !== false ? '회원교' : '비회원교');
+                                $feeTypeAccommodation = (strpos($ft, '2인1실') !== false ? '2인1실' : (strpos($ft, '1인실') !== false ? '1인실' : '비숙박'));
+                            }
+                            $defaultMemberType = old('member_type', $feeTypeMember);
+                            $defaultAccommodationType = old('accommodation_type', $feeTypeAccommodation);
+                        @endphp
             <div class="member-form-row">
                 <label class="member-form-label">참가비</label>
                 <div class="member-form-field">
                     <div class="form-row-group">
                         <div class="form-row-inline">
-                            <span class="sub-label" style="margin-bottom:0;">자동 입력</span>
+                            <span class="sub-label" style="margin-bottom:0;">참가비</span>
                             <div class="board-form-control readonly-field form-field-flex-200">
-                                자동 입력
+                                @php
+                                    $displayFee = old('participation_fee', $app?->participation_fee ?? '');
+                                    echo $displayFee !== '' && $displayFee !== null ? number_format((float) $displayFee) . '원' : '';
+                                @endphp
                             </div>
                         </div>
                         <div class="form-row-inline">
                             <span class="sub-label" style="margin-bottom:0;">회원교/비회원교</span>
                             <div class="board-radio-group">
                                 <div class="board-radio-item">
-                                    <input type="radio" id="member_type_member" name="member_type" value="회원교" class="board-radio-input" @checked(old('member_type', (strpos($app?->fee_type ?? '', '회원교') !== false ? '회원교' : '비회원교')) == '회원교')>
+                                    <input type="radio" id="member_type_member" name="member_type" value="회원교" class="board-radio-input" @checked($defaultMemberType == '회원교')>
                                     <label for="member_type_member">회원교</label>
                                 </div>
                                 <div class="board-radio-item">
-                                    <input type="radio" id="member_type_nonmember" name="member_type" value="비회원교" class="board-radio-input" @checked(old('member_type', (strpos($app?->fee_type ?? '', '회원교') !== false ? '회원교' : '비회원교')) == '비회원교')>
+                                    <input type="radio" id="member_type_nonmember" name="member_type" value="비회원교" class="board-radio-input" @checked($defaultMemberType == '비회원교')>
                                     <label for="member_type_nonmember">비회원교</label>
                                 </div>
                             </div>
@@ -361,15 +391,15 @@
                             <span class="sub-label" style="margin-bottom:0;">숙박 옵션</span>
                             <div class="board-radio-group">
                                 <div class="board-radio-item">
-                                    <input type="radio" id="accommodation_2in1" name="accommodation_type" value="2인1실" class="board-radio-input" @checked(old('accommodation_type', (strpos($app?->fee_type ?? '', '2인1실') !== false ? '2인1실' : (strpos($app?->fee_type ?? '', '1인실') !== false ? '1인실' : '비숙박'))) == '2인1실')>
+                                    <input type="radio" id="accommodation_2in1" name="accommodation_type" value="2인1실" class="board-radio-input" @checked($defaultAccommodationType == '2인1실')>
                                     <label for="accommodation_2in1">2인 1실</label>
                                 </div>
                                 <div class="board-radio-item">
-                                    <input type="radio" id="accommodation_1in1" name="accommodation_type" value="1인실" class="board-radio-input" @checked(old('accommodation_type', (strpos($app?->fee_type ?? '', '2인1실') !== false ? '2인1실' : (strpos($app?->fee_type ?? '', '1인실') !== false ? '1인실' : '비숙박'))) == '1인실')>
+                                    <input type="radio" id="accommodation_1in1" name="accommodation_type" value="1인실" class="board-radio-input" @checked($defaultAccommodationType == '1인실')>
                                     <label for="accommodation_1in1">1인실</label>
                                 </div>
                                 <div class="board-radio-item">
-                                    <input type="radio" id="accommodation_none" name="accommodation_type" value="비숙박" class="board-radio-input" @checked(old('accommodation_type', (strpos($app?->fee_type ?? '', '2인1실') !== false ? '2인1실' : (strpos($app?->fee_type ?? '', '1인실') !== false ? '1인실' : '비숙박'))) == '비숙박')>
+                                    <input type="radio" id="accommodation_none" name="accommodation_type" value="비숙박" class="board-radio-input" @checked($defaultAccommodationType == '비숙박')>
                                     <label for="accommodation_none">비숙박</label>
                                 </div>
                             </div>
@@ -445,20 +475,6 @@
             </div>
 
             <div class="member-form-row">
-                <label class="member-form-label">세금계산서 발행여부</label>
-                <div class="member-form-field">
-                    <select name="tax_invoice_status" class="board-form-control @error('tax_invoice_status') is-invalid @enderror">
-                        <option value="미신청" @selected(old('tax_invoice_status', $app?->tax_invoice_status ?? '미신청') == '미신청')>미신청</option>
-                        <option value="신청완료" @selected(old('tax_invoice_status', $app?->tax_invoice_status ?? '') == '신청완료')>신청완료</option>
-                        <option value="발행완료" @selected(old('tax_invoice_status', $app?->tax_invoice_status ?? '') == '발행완료')>발행완료</option>
-                    </select>
-                    @error('tax_invoice_status')
-                        <div class="invalid-feedback">{{ $message }}</div>
-                    @enderror
-                </div>
-            </div>
-
-            <div class="member-form-row">
                 <label class="member-form-label">현금영수증</label>
                 <div class="member-form-field">
                     <div class="form-row-group">
@@ -497,6 +513,20 @@
                             @enderror
                         </div>
                     </div>
+                </div>
+            </div>
+
+            <div class="member-form-row">
+                <label class="member-form-label">세금계산서 발행여부</label>
+                <div class="member-form-field">
+                    <select name="tax_invoice_status" class="board-form-control @error('tax_invoice_status') is-invalid @enderror">
+                        <option value="미신청" @selected(old('tax_invoice_status', $app?->tax_invoice_status ?? '미신청') == '미신청')>미신청</option>
+                        <option value="신청완료" @selected(old('tax_invoice_status', $app?->tax_invoice_status ?? '') == '신청완료')>신청완료</option>
+                        <option value="발행완료" @selected(old('tax_invoice_status', $app?->tax_invoice_status ?? '') == '발행완료')>발행완료</option>
+                    </select>
+                    @error('tax_invoice_status')
+                        <div class="invalid-feedback">{{ $message }}</div>
+                    @enderror
                 </div>
             </div>
 

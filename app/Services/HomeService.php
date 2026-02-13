@@ -15,7 +15,7 @@ class HomeService
 {
     private const SLIDE_LIMIT_PER_TYPE = 2;
 
-    private const DEFAULT_IMAGE = '/images/img_mc01_sample.jpg';
+    private const DEFAULT_IMAGE = '/images/sample.jpg';
 
     public function __construct(private BoardPostService $boardPostService)
     {

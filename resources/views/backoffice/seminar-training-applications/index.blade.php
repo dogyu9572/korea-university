@@ -103,7 +103,18 @@
             </div>
 
             <div class="table-responsive">
-                <table class="board-table">
+                <table class="board-table" style="table-layout: fixed; width: 100%;">
+                    <colgroup>
+                        <col style="width: 4%;">
+                        <col style="width: 8%;">
+                        <col style="width: 8%;">
+                        <col style="width: 24%;">
+                        <col style="width: 18%;">
+                        <col style="width: 6%;">
+                        <col style="width: 6%;">
+                        <col style="width: 18%;">
+                        <col style="width: 8%;">
+                    </colgroup>
                     <thead>
                         <tr>
                             <th>No</th>
@@ -123,7 +134,7 @@
                                 <td>{{ $programs->firstItem() + $index }}</td>
                                 <td>{{ $program->education_type }}</td>
                                 <td>{{ $program->application_status }}</td>
-                                <td class="text-left">{{ $program->name }}</td>
+                                <td class="text-left" style="overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">{{ $program->name }}</td>
                                 <td>
                                     @if($program->period_start && $program->period_end)
                                         @php
@@ -147,7 +158,7 @@
                                     @endif
                                 </td>
                                 <td>{{ $program->enrolled_count ?? 0 }}</td>
-                                <td class="text-left">{{ $program->location ?? '-' }}</td>
+                                <td class="text-left" style="overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">{{ $program->location ?? '-' }}</td>
                                 <td>
                                     <div class="board-btn-group">
                                         <a href="{{ route('backoffice.seminar-training-applications.show', $program) }}" class="btn btn-primary btn-sm">

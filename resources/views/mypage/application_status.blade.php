@@ -162,6 +162,9 @@
 						<dt>환불금액</dt>
 						<dd id="cancel_refund"></dd>
 					</dl>
+					<div class="con gbox flex_center mt">
+						<label class="check"><input type="checkbox" name="cancel_agreed" value="1"><i></i><span>위의 내용을 모두 읽었으며, 수강취소에 동의합니다.</span></label>
+					</div>
 				</div>
 				<div class="btns_tac">
 					<button type="submit" class="btn btn_wbb">취소하기</button>
@@ -235,8 +238,16 @@ function openCancelPopup(btn) {
 	$('#cancel_name').text(name);
 	$('#cancel_period').text(period);
 	$('#cancel_refund').text(refund + '원');
+	$('#formCancel input[name="cancel_agreed"]').prop('checked', false);
 	layerShow('classCancel');
 }
+$('#formCancel').on('submit', function (e) {
+	if (!$(this).find('input[name="cancel_agreed"]').is(':checked')) {
+		e.preventDefault();
+		alert('수강취소 안내 내용에 동의해 주세요.');
+		return false;
+	}
+});
 
 //검색 PC 열림, 모바일 닫힘
 function toggleFilterOn() {

@@ -39,7 +39,9 @@
             return;
         }
 
-        const csrfToken = document.querySelector('meta[name="csrf-token"]') ? document.querySelector('meta[name="csrf-token"]').getAttribute('content') : '';
+        const container = document.querySelector('.certification-applications');
+        const meta = document.querySelector('meta[name="csrf-token"]');
+        const csrfToken = meta ? meta.getAttribute('content') : (container ? container.getAttribute('data-csrf-token') || '' : '');
         const url = basePath + '/' + programId + '/scores';
 
         fetch(url, {

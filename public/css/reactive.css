@@ -172,7 +172,7 @@
 	.member_area .aco_area .all label.check span {font-size:16px;}
 /** 교육 · 자격증 **/
 /* 교육 안내 */
-	.img_top {height:240px;}
+	.img_top {height:240px; max-height:240px;}
 /* 자격증 안내 */
 	.expert_info {gap:10px; margin-bottom:60px;}
 	.expert_info li {width:calc((100% - 40px)/5); padding:20px;}
@@ -608,7 +608,7 @@
 
 /** 교육 · 자격증 **/
 /* 교육 안내 */
-	.img_top {height:220px;}
+	.img_top {height:220px; max-height:220px;}
 /* 자격증 안내 */
 	.expert_info {gap:5px; margin-bottom:40px;}
 	.expert_info li {width:calc((100% - 20px)/5); border-radius:12px; padding:20px 15px;}
@@ -1097,9 +1097,9 @@
 	.board_view .board_btm .next {padding-left:70px;}
 	.board_view .board_btm .prev strong,
 	.board_view .board_btm .next strong {left:24px; right:auto;}
-	.board_view .board_btm .arrow:before {left:0; right:auto; width:16px;}
-	.board_view .board_btm .prev:before {transform:rotate(90deg);}
-	.board_view .board_btm .next:before {transform:rotate(-90deg);}
+	.board_view .board_btm .arrow:after {left:0; right:auto; width:16px;}
+	.board_view .board_btm .prev:after {transform:translateY(-50%) rotate(90deg);}
+	.board_view .board_btm .next:after {transform:translateY(-50%) rotate(-90deg);}
 	.board_view .board_btm .btn_list {line-height:48px; height:48px; width:150px; margin-top:20px;}
 /* 다운로드 영역 */
 	.download_area a {font-size:13px; line-height:24px; padding:12px 12px 12px 48px; border-radius:6px;}
@@ -1207,8 +1207,9 @@
 
 /** 교육 · 자격증 **/
 /* 교육 안내 */
-	.img_top {height:210px;}
-	.img_education_top {background-image:url('/images/img_education01_m.jpg');}
+	.img_top {height:210px; max-height:210px;}
+	.img_education_top {background-position:90% 50% !important;}
+	/* .img_education_top {background-image:url('/images/img_education01_m.jpg');} */
 /* 자격증 안내 */
 	.expert_info {flex-direction:column; gap:12px; margin-bottom:48px;}
 	.expert_info li {position:relative; width:100%; border-radius:12px; padding:20px 20px 20px 66px;}

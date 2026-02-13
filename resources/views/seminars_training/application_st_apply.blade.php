@@ -219,11 +219,11 @@
 			<dt>현금영수증 발행</dt>
 			<dd class="radios">
 				<label class="radio">
-					<input type="radio" name="has_cash_receipt" value="1" @checked(old('has_cash_receipt', '1') === '1')>
+					<input type="radio" name="has_cash_receipt" value="1" @checked(old('has_cash_receipt') === '1')>
 					<i></i><span>발행</span>
 				</label>
 				<label class="radio">
-					<input type="radio" name="has_cash_receipt" value="0" @checked(old('has_cash_receipt') === '0')>
+					<input type="radio" name="has_cash_receipt" value="0" @checked(old('has_cash_receipt', '0') === '0')>
 					<i></i><span>미발행</span>
 				</label>
 			</dd>
@@ -241,11 +241,17 @@
 						<i></i><span>사업자 지출증빙용</span>
 					</label>
 				</dd>
+				@error('cash_receipt_purpose')
+					<p class="join_field_error" style="color:#c00;font-size:0.875rem;margin-top:0.25rem;">{{ $message }}</p>
+				@enderror
 			</dl>
 			<dl>
 				<dt>발행번호</dt>
 				<dd>
-					<input type="text" name="cash_receipt_number" class="w1" value="{{ old('cash_receipt_number', $member->phone_number ?? '') }}" placeholder="휴대폰번호 또는 사업자등록번호">
+					<input type="text" name="cash_receipt_number" class="w1 @error('cash_receipt_number') is-invalid @enderror" value="{{ old('cash_receipt_number', $member->phone_number ?? '') }}" placeholder="휴대폰번호 또는 사업자등록번호">
+					@error('cash_receipt_number')
+						<p class="join_field_error" style="color:#c00;font-size:0.875rem;margin-top:0.25rem;">{{ $message }}</p>
+					@enderror
 				</dd>
 			</dl>
 		</div>
@@ -255,11 +261,11 @@
 			<dt>세금계산서 발행</dt>
 			<dd class="radios">
 				<label class="radio">
-					<input type="radio" name="has_tax_invoice" value="1" @checked(old('has_tax_invoice', '1') === '1')>
+					<input type="radio" name="has_tax_invoice" value="1" @checked(old('has_tax_invoice') === '1')>
 					<i></i><span>발행</span>
 				</label>
 				<label class="radio">
-					<input type="radio" name="has_tax_invoice" value="0" @checked(old('has_tax_invoice') === '0')>
+					<input type="radio" name="has_tax_invoice" value="0" @checked(old('has_tax_invoice', '0') === '0')>
 					<i></i><span>미발행</span>
 				</label>
 			</dd>
@@ -268,21 +274,30 @@
 			<dl>
 				<dt>사업자등록번호</dt>
 				<dd>
-					<input type="text" name="registration_number" class="w1" placeholder="사업자등록번호를 입력해주세요." value="{{ old('registration_number') }}">
+					<input type="text" name="registration_number" class="w1 @error('registration_number') is-invalid @enderror" placeholder="사업자등록번호를 입력해주세요." value="{{ old('registration_number') }}">
+					@error('registration_number')
+						<p class="join_field_error" style="color:#c00;font-size:0.875rem;margin-top:0.25rem;">{{ $message }}</p>
+					@enderror
 				</dd>
 			</dl>
 			<dl>
 				<dt>상호명</dt>
 				<dd>
-					<input type="text" name="company_name" class="w1" placeholder="상호명을 입력해주세요." value="{{ old('company_name') }}">
+					<input type="text" name="company_name" class="w1 @error('company_name') is-invalid @enderror" placeholder="상호명을 입력해주세요." value="{{ old('company_name') }}">
+					@error('company_name')
+						<p class="join_field_error" style="color:#c00;font-size:0.875rem;margin-top:0.25rem;">{{ $message }}</p>
+					@enderror
 				</dd>
 			</dl>
 			<dl>
 				<dt>담당자 정보</dt>
 				<dd class="colm">
-					<input type="text" name="contact_person_name" class="w1" placeholder="담당자명 입력해주세요." value="{{ old('contact_person_name') }}">
-					<input type="text" name="contact_person_email" class="w1" placeholder="이메일을 입력해주세요." value="{{ old('contact_person_email') }}" inputmode="email">
-					<input type="text" name="contact_person_phone" class="w1" placeholder="연락처를 입력해주세요." value="{{ old('contact_person_phone') }}">
+					<input type="text" name="contact_person_name" class="w1 @error('contact_person_name') is-invalid @enderror" placeholder="담당자명 입력해주세요." value="{{ old('contact_person_name') }}">
+					<input type="text" name="contact_person_email" class="w1 @error('contact_person_email') is-invalid @enderror" placeholder="이메일을 입력해주세요." value="{{ old('contact_person_email') }}" inputmode="email">
+					<input type="text" name="contact_person_phone" class="w1 @error('contact_person_phone') is-invalid @enderror" placeholder="연락처를 입력해주세요." value="{{ old('contact_person_phone') }}">
+					@error('contact_person_name')<p class="join_field_error" style="color:#c00;font-size:0.875rem;margin-top:0.25rem;">{{ $message }}</p>@enderror
+					@error('contact_person_email')<p class="join_field_error" style="color:#c00;font-size:0.875rem;margin-top:0.25rem;">{{ $message }}</p>@enderror
+					@error('contact_person_phone')<p class="join_field_error" style="color:#c00;font-size:0.875rem;margin-top:0.25rem;">{{ $message }}</p>@enderror
 				</dd>
 			</dl>
 			<dl>
@@ -293,6 +308,9 @@
 						<span>파일선택</span>
 					</label>
 					<div class="file_input">선택된 파일 없음</div>
+					@error('business_registration')
+						<p class="join_field_error" style="color:#c00;font-size:0.875rem;margin-top:0.25rem;">{{ $message }}</p>
+					@enderror
 				</dd>
 			</dl>
 		</div>

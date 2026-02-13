@@ -62,7 +62,7 @@
 		</dl>
 		<dl>
 			<dt>수료일</dt>
-			<dd>{{ $application->is_completed && $application->payment_date ? $application->payment_date->format('Y.m.d') : '' }}</dd>
+			<dd>{{ $application->is_completed && $application->completed_at ? $application->completed_at->format('Y.m.d') : '' }}</dd>
 		</dl>
 		<dl>
 			<dt>상태</dt>

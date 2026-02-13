@@ -56,7 +56,7 @@ class MemberController extends Controller
             session()->forget('sns_join_data');
             Auth::guard('member')->login($member, false);
             $request->session()->regenerate();
-            return redirect()->route('member.join_end')->with('success', '회원가입이 완료되었습니다.');
+            return redirect()->route('home')->with('success', '회원가입이 완료되었습니다.');
         }
 
         try {
@@ -67,7 +67,7 @@ class MemberController extends Controller
             return redirect()->back()->withInput($request->except('_token'))->withErrors($e->errors());
         }
         $memberService->createMember($memberJoinRequest->getMemberData());
-        return redirect()->route('member.join_end')->with('success', '회원가입이 완료되었습니다.');
+        return redirect()->route('home')->with('success', '회원가입이 완료되었습니다.');
     }
 
     /** 이메일 중복 확인 (AJAX) - 로그인 회원이면 본인 제외 */
@@ -240,8 +240,6 @@ class MemberController extends Controller
     public function logout(Request $request)
     {
         Auth::guard('member')->logout();
-        $request->session()->invalidate();
-        $request->session()->regenerateToken();
 
         return redirect()->route('member.login')->with('success', '로그아웃되었습니다.');
     }

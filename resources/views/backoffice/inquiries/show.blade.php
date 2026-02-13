@@ -61,7 +61,7 @@
                     <div class="member-form-row">
                         <label class="member-form-label">내용</label>
                         <div class="member-form-field">
-                            <div class="board-form-control" style="background-color: #f8f9fa; padding: 15px; min-height: 200px; white-space: pre-wrap; border: 1px solid #dee2e6; width: 100%; max-width: none !important;">
+                            <div class="board-form-control" style="background-color: #f8f9fa; padding: 15px; min-height: 200px; border: 1px solid #dee2e6; width: 100%; max-width: none !important;">
                                 {!! nl2br(e($inquiry->content)) !!}
                             </div>
                         </div>
@@ -145,7 +145,7 @@
                             <div class="member-form-field">
                                 <input type="date" class="board-form-control @error('reply_date') is-invalid @enderror" 
                                        id="reply_date" name="reply_date" 
-                                       value="{{ old('reply_date', $reply && $reply->reply_date ? $reply->reply_date->format('Y-m-d') : '') }}"
+                                       value="{{ old('reply_date', $reply && $reply->reply_date ? $reply->reply_date->format('Y-m-d') : now()->format('Y-m-d')) }}"
                                        style="max-width: none !important;">
                                 @error('reply_date')
                                     <div class="invalid-feedback">{{ $message }}</div>

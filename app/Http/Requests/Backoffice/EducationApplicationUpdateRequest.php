@@ -27,6 +27,7 @@ class EducationApplicationUpdateRequest extends FormRequest
             'application_date' => 'required|date',
             'is_completed' => 'nullable|boolean',
             'is_survey_completed' => 'nullable|boolean',
+            'receipt_status' => 'nullable|string|in:신청완료,수료,미수료,접수취소',
             'participation_fee' => 'nullable|numeric|min:0',
             'fee_type' => 'nullable|string|max:50',
             'payment_method' => 'nullable|array',

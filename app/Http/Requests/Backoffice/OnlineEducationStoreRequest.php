@@ -40,7 +40,7 @@ class OnlineEducationStoreRequest extends FormRequest
             'application_start_hour' => 'nullable|integer|min:0|max:23',
             'application_end_date' => 'nullable|date|after_or_equal:application_start_date',
             'application_end_hour' => 'nullable|integer|min:0|max:23',
-            'capacity' => 'nullable|integer|min:0',
+            'capacity' => 'required_unless:capacity_unlimited,1|nullable|integer|min:0',
             'capacity_unlimited' => 'nullable|boolean',
             'payment_methods' => 'nullable|array',
             'payment_methods.*' => 'in:무통장입금,방문카드결제,온라인카드결제',
@@ -75,6 +75,7 @@ class OnlineEducationStoreRequest extends FormRequest
             'attachments.*.max' => '첨부파일 크기는 10MB를 초과할 수 없습니다.',
             'lectures.*.lecture_name.required_with' => '강의명을 입력해주세요.',
             'fee.min' => '교육비는 0 이상이어야 합니다.',
+            'capacity.required_unless' => '정원을 입력해주세요.',
         ];
     }
 }

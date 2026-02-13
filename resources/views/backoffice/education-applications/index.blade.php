@@ -110,7 +110,19 @@
             </div>
 
             <div class="table-responsive">
-                <table class="board-table">
+                <table class="board-table" style="table-layout: fixed; width: 100%;">
+                    <colgroup>
+                        <col style="width: 4%;">
+                        <col style="width: 8%;">
+                        <col style="width: 8%;">
+                        <col style="width: 8%;">
+                        <col style="width: 22%;">
+                        <col style="width: 12%;">
+                        <col style="width: 6%;">
+                        <col style="width: 6%;">
+                        <col style="width: 18%;">
+                        <col style="width: 8%;">
+                    </colgroup>
                     <thead>
                         <tr>
                             <th>No</th>
@@ -132,7 +144,7 @@
                                 <td>{{ $program->education_class ?? '-' }}</td>
                                 <td>{{ $program->application_status }}</td>
                                 <td>{{ $program->education_type }}</td>
-                                <td class="text-left">{{ $program->name }}</td>
+                                <td class="text-left" style="overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">{{ $program->name }}</td>
                                 <td>
                                     @if($program->period_start && $program->period_end)
                                         {{ $program->period_start->format('Y.m.d') }} ~ {{ $program->period_end->format('Y.m.d') }}
@@ -150,7 +162,7 @@
                                     @endif
                                 </td>
                                 <td>{{ $program->enrolled_count ?? 0 }}명</td>
-                                <td>{{ $program->location ?? '-' }}</td>
+                                <td style="overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">{{ $program->location ?? '-' }}</td>
                                 <td>
                                     <div class="board-btn-group">
                                         <a href="{{ $isOnline ? route('backoffice.online-education-applications.show', $program) : route('backoffice.education-applications.show', $program) }}" class="btn btn-primary btn-sm">

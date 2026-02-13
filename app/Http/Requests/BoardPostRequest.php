@@ -23,10 +23,13 @@ class BoardPostRequest extends FormRequest
      */
     public function rules(): array
     {
+        $slug = $this->route('slug');
+        $categoryRule = $slug === 'faq' ? 'required|string|max:50' : 'nullable|string|max:50';
+
         $rules = [
             'title' => 'required|string|max:255',
             'content' => 'required|string',
-            'category' => 'nullable|string|max:50',
+            'category' => $categoryRule,
             'is_notice' => 'nullable|boolean',
             'is_secret' => 'nullable|boolean',
             'is_active' => 'nullable|boolean',
@@ -135,6 +138,7 @@ class BoardPostRequest extends FormRequest
             'title.required' => '제목은 필수 입력 항목입니다.',
             'title.max' => '제목은 최대 255자까지 입력 가능합니다.',
             'content.required' => '내용은 필수 입력 항목입니다.',
+            'category.required' => '카테고리 분류를 선택해 주세요.',
             'category.max' => '카테고리는 최대 50자까지 입력 가능합니다.',
             'thumbnail.image' => '썸네일은 이미지 파일이어야 합니다.',
             'thumbnail.mimes' => '썸네일은 jpeg, png, jpg, gif 형식만 지원합니다.',

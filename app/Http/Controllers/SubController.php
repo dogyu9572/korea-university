@@ -68,6 +68,9 @@ class SubController extends Controller
         }
         unset($range);
 
+        // 연혁이 하나라도 있는 기간만 표시 (빈 기간은 왼쪽 메뉴·오른쪽 영역 모두 미노출)
+        $yearRanges = array_values(array_filter($yearRanges, fn($r) => $r['histories']->isNotEmpty()));
+
         return view('about.history', compact('gNum', 'sNum', 'gName', 'sName', 'yearRanges'));
     }
     public function bylaws(BoardPostService $boardPostService)

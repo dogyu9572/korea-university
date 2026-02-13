@@ -177,7 +177,7 @@ function setupFeeTypeRestriction() {
 }
 
 document.addEventListener('DOMContentLoaded', function () {
-    // 유효성 검사 실패 시 첫 번째 에러 위치로 스크롤 (즉시 실행, 맨 위로 가지 않도록)
+    // 유효성 검사 실패 시 첫 번째 에러 위치로 스크롤
     var form = document.querySelector('.application_form[data-join-errors]');
     if (form) {
         var errs = form.querySelectorAll('.join_field_error');
@@ -189,13 +189,16 @@ document.addEventListener('DOMContentLoaded', function () {
             }
         }
         if (firstErr) {
-            var dl = firstErr.closest('dl');
-            var input = dl ? dl.querySelector('input:not([type="hidden"]):not([readonly]), select') : null;
-            var scrollTarget = (input && input.offsetParent) ? input : (dl || firstErr);
+            var scrollTarget = firstErr.closest('dl') || firstErr.closest('tr') || firstErr.closest('.tbl') || firstErr;
+            var input = scrollTarget.querySelector('input:not([type="hidden"]):not([readonly]), select');
+            if (!input && scrollTarget !== firstErr) {
+                input = firstErr.closest('dd') && firstErr.closest('dd').querySelector('input:not([type="hidden"]):not([readonly]), select');
+            }
+            var focusTarget = (input && input.offsetParent) ? input : null;
             scrollTarget.style.scrollMarginTop = '120px';
             scrollTarget.scrollIntoView({ behavior: 'instant', block: 'start' });
             scrollTarget.style.scrollMarginTop = '';
-            if (input) input.focus();
+            if (focusTarget) focusTarget.focus();
         }
     }
 

@@ -28,12 +28,14 @@
 		<div class="reply_wrap">
 			<div class="box">
 				<div class="tit flex">
-					<dl class="writer"><dt>분류</dt><dd>관리자</dd></dl>
+					<dl class="writer"><dt>작성자
+
+					<!-- </dt><dd>{{ $inquiry->category }} -->
+
+					</dd><dd>{{ $inquiry->reply->author ?? '관리자' }}</dd></dl>
 					<dl class="date"><dt>등록일</dt><dd>{{ $inquiry->reply->reply_date ? $inquiry->reply->reply_date->format('Y.m.d') : $inquiry->reply->created_at->format('Y.m.d') }}</dd></dl>
 				</div>
-				<div class="con">
-					{!! $inquiry->reply->content !!}
-				</div>
+				<div class="con">{!! $inquiry->reply->content !!}</div>
 				@if($inquiry->reply->files && $inquiry->reply->files->count() > 0)
 				<div class="download_area type_gbox">
 					@foreach($inquiry->reply->files as $file)

@@ -4,11 +4,10 @@
 	<div class="stitle tal">교육 · 자격증 신청</div>
 
 	@if(session('error'))
-	<p class="msg_error" style="margin-bottom:1rem;">{{ session('error') }}</p>
+	<p class="msg_error" style="margin-bottom:1rem;" id="application-ec-error-msg">{{ session('error') }}</p>
 	@endif
 
 	@php
-		$currentTab = request('tab', 'all');
 		$currentSort = request('sort', 'created_at');
 		$tabCounts = $tabCounts ?? ['all' => 0, 'education' => 0, 'certification' => 0, 'online' => 0];
 	@endphp
@@ -44,7 +43,9 @@
 									<option value="">전체</option>
 									<option value="application" @selected(request('date_type') === 'application')>신청기간</option>
 									<option value="education" @selected(request('date_type') === 'education')>교육기간</option>
+									@if($currentTab === 'certification')
 									<option value="exam" @selected(request('date_type') === 'exam')>시험일</option>
+									@endif
 								</select>
 								<select name="period_year">
 									<option value="">연도</option>
@@ -137,5 +138,15 @@ $(window).on('resize', toggleFilterOn);
 </script>
 @push('scripts')
 <script src="{{ asset('js/education-certification/application-ec.js') }}"></script>
+@if(session('error'))
+<script>
+(function () {
+	var msg = document.getElementById('application-ec-error-msg');
+	if (msg && msg.textContent) {
+		alert(msg.textContent.trim());
+	}
+})();
+</script>
+@endif
 @endpush
 @endsection

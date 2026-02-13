@@ -1,6 +1,7 @@
 @php
     $app = $application ?? null;
     $isEdit = $isEdit ?? false;
+    $feeProgram = $app->seminarTraining ?? $program ?? null;
 @endphp
 <form action="{{ $isEdit ? route('backoffice.seminar-training-applications.update', $app) : route('backoffice.seminar-training-applications.store') }}" method="POST" enctype="multipart/form-data" id="applicationForm"
     @if($isEdit && ($app->seminar_training_id ?? null))
@@ -134,6 +135,20 @@
                 </div>
             </div>
             <div class="member-form-row">
+                <label class="member-form-label">접수상태</label>
+                <div class="member-form-field">
+                    <select name="receipt_status" class="board-form-control @error('receipt_status') is-invalid @enderror">
+                        <option value="신청완료" @selected(old('receipt_status', $app?->receipt_status ?? '') == '신청완료')>신청완료</option>
+                        <option value="수료" @selected(old('receipt_status', $app?->receipt_status ?? '') == '수료')>수료</option>
+                        <option value="미수료" @selected(old('receipt_status', $app?->receipt_status ?? '') == '미수료')>미수료</option>
+                        <option value="접수취소" @selected(old('receipt_status', $app?->receipt_status ?? '') == '접수취소')>접수취소</option>
+                    </select>
+                    @error('receipt_status')
+                        <div class="invalid-feedback">{{ $message }}</div>
+                    @enderror
+                </div>
+            </div>
+            <div class="member-form-row">
                 <label class="member-form-label">설문조사 여부</label>
                 <div class="member-form-field">
                     <div class="board-radio-group">
@@ -229,16 +244,32 @@
             <div class="member-form-row">
                 <label class="member-form-label">참가비</label>
                 <div class="member-form-field">
-                    <div class="board-form-control readonly-field form-field-flex-200">
-                        자동 입력
+                    <div class="board-form-control readonly-field form-field-flex-200" id="participation_fee_display">
+                        @if(isset($app) && $app->participation_fee !== null && $app->participation_fee !== '')
+                            {{ number_format((float) $app->participation_fee) }}원
+                        @else
+                            {{ '' }}
+                        @endif
                     </div>
                     <input type="hidden" id="participation_fee" name="participation_fee" value="{{ old('participation_fee', $app?->participation_fee ?? '') }}">
                     <input type="hidden" id="fee_type" name="fee_type" value="{{ old('fee_type', $app?->fee_type ?? '') }}">
                     @php
                         $feeSchoolType = old('fee_school_type', $app?->fee_type ? (str_starts_with($app?->fee_type ?? '', 'member') ? '회원교' : '비회원교') : '회원교');
+                        $ft = $app?->fee_type ?? '';
+                        $feeAccommodation = old('fee_accommodation');
+                        if ($feeAccommodation === null || $feeAccommodation === '') {
+                            $feeAccommodation = str_contains($ft, 'twin') ? '2인1실' : (str_contains($ft, 'single') ? '1인실' : (str_contains($ft, 'no_stay') ? '비숙박' : '2인1실'));
+                        }
                     @endphp
                     <input type="hidden" name="fee_school_type" value="{{ $feeSchoolType }}">
-                    <div class="fee-type-block mt-2">
+                    <div class="fee-type-block mt-2"
+                         id="fee-type-block"
+                         data-fee-member-twin="{{ $feeProgram ? (string) ($feeProgram->fee_member_twin ?? '') : '' }}"
+                         data-fee-member-single="{{ $feeProgram ? (string) ($feeProgram->fee_member_single ?? '') : '' }}"
+                         data-fee-member-no-stay="{{ $feeProgram ? (string) ($feeProgram->fee_member_no_stay ?? '') : '' }}"
+                         data-fee-guest-twin="{{ $feeProgram ? (string) ($feeProgram->fee_guest_twin ?? '') : '' }}"
+                         data-fee-guest-single="{{ $feeProgram ? (string) ($feeProgram->fee_guest_single ?? '') : '' }}"
+                         data-fee-guest-no-stay="{{ $feeProgram ? (string) ($feeProgram->fee_guest_no_stay ?? '') : '' }}">
                         <div class="form-row-inline mb-1">
                             <div class="board-radio-item">
                                 <input type="radio" id="fee_member_school" name="fee_school_type_display" value="회원교" class="board-radio-input" disabled @checked($feeSchoolType == '회원교')>
@@ -246,15 +277,15 @@
                             </div>
                             <div class="board-radio-group ml-3">
                                 <div class="board-radio-item">
-                                    <input type="radio" id="fee_member_twin" name="fee_accommodation" value="2인1실" class="board-radio-input fee-accommodation-member" @checked(old('fee_accommodation', $app?->fee_type ? (str_contains($app?->fee_type ?? '', 'twin') ? '2인1실' : (str_contains($app?->fee_type ?? '', 'single') ? '1인실' : '비숙박')) : '2인1실') == '2인1실')>
+                                    <input type="radio" id="fee_member_twin" name="fee_accommodation" value="2인1실" class="board-radio-input fee-accommodation-member" @disabled($feeSchoolType == '비회원교') @checked($feeSchoolType == '회원교' && $feeAccommodation == '2인1실')>
                                     <label for="fee_member_twin">2인 1실</label>
                                 </div>
                                 <div class="board-radio-item">
-                                    <input type="radio" id="fee_member_single" name="fee_accommodation" value="1인실" class="board-radio-input fee-accommodation-member" @checked(old('fee_accommodation') == '1인실')>
+                                    <input type="radio" id="fee_member_single" name="fee_accommodation" value="1인실" class="board-radio-input fee-accommodation-member" @disabled($feeSchoolType == '비회원교') @checked($feeSchoolType == '회원교' && $feeAccommodation == '1인실')>
                                     <label for="fee_member_single">1인실</label>
                                 </div>
                                 <div class="board-radio-item">
-                                    <input type="radio" id="fee_member_no_stay" name="fee_accommodation" value="비숙박" class="board-radio-input fee-accommodation-member" @checked(old('fee_accommodation') == '비숙박')>
+                                    <input type="radio" id="fee_member_no_stay" name="fee_accommodation" value="비숙박" class="board-radio-input fee-accommodation-member" @disabled($feeSchoolType == '비회원교') @checked($feeSchoolType == '회원교' && $feeAccommodation == '비숙박')>
                                     <label for="fee_member_no_stay">비숙박</label>
                                 </div>
                             </div>
@@ -266,15 +297,15 @@
                             </div>
                             <div class="board-radio-group ml-3">
                                 <div class="board-radio-item">
-                                    <input type="radio" id="fee_guest_twin" name="fee_accommodation" value="2인1실" class="board-radio-input fee-accommodation-guest" @checked(old('fee_accommodation') == '2인1실')>
+                                    <input type="radio" id="fee_guest_twin" name="fee_accommodation" value="2인1실" class="board-radio-input fee-accommodation-guest" @disabled($feeSchoolType == '회원교') @checked($feeSchoolType == '비회원교' && $feeAccommodation == '2인1실')>
                                     <label for="fee_guest_twin">2인 1실</label>
                                 </div>
                                 <div class="board-radio-item">
-                                    <input type="radio" id="fee_guest_single" name="fee_accommodation" value="1인실" class="board-radio-input fee-accommodation-guest" @checked(old('fee_accommodation') == '1인실')>
+                                    <input type="radio" id="fee_guest_single" name="fee_accommodation" value="1인실" class="board-radio-input fee-accommodation-guest" @disabled($feeSchoolType == '회원교') @checked($feeSchoolType == '비회원교' && $feeAccommodation == '1인실')>
                                     <label for="fee_guest_single">1인실</label>
                                 </div>
                                 <div class="board-radio-item">
-                                    <input type="radio" id="fee_guest_no_stay" name="fee_accommodation" value="비숙박" class="board-radio-input fee-accommodation-guest" @checked(old('fee_accommodation') == '비숙박')>
+                                    <input type="radio" id="fee_guest_no_stay" name="fee_accommodation" value="비숙박" class="board-radio-input fee-accommodation-guest" @disabled($feeSchoolType == '회원교') @checked($feeSchoolType == '비회원교' && $feeAccommodation == '비숙박')>
                                     <label for="fee_guest_no_stay">비숙박</label>
                                 </div>
                             </div>

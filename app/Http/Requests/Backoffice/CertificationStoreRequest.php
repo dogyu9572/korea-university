@@ -36,7 +36,7 @@ class CertificationStoreRequest extends FormRequest
             'application_start_hour' => 'nullable|integer|min:0|max:23',
             'application_end_date' => 'nullable|date|after_or_equal:application_start_date',
             'application_end_hour' => 'nullable|integer|min:0|max:23',
-            'capacity' => 'nullable|integer|min:0',
+            'capacity' => 'required_unless:capacity_unlimited,1|nullable|integer|min:0',
             'capacity_unlimited' => 'nullable|boolean',
             'application_status' => 'required|in:접수중,접수마감,접수예정,비공개',
             'payment_methods' => 'nullable|array',
@@ -67,6 +67,7 @@ class CertificationStoreRequest extends FormRequest
             'thumbnail.max' => '썸네일 파일 크기는 2MB를 초과할 수 없습니다.',
             'deposit_deadline_days.min' => '입금기한은 1일 이상이어야 합니다.',
             'deposit_deadline_days.max' => '입금기한은 7일 이하여야 합니다.',
+            'capacity.required_unless' => '정원을 입력해주세요.',
         ];
     }
 }

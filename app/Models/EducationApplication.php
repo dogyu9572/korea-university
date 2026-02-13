@@ -34,6 +34,7 @@ class EducationApplication extends Model
         'payment_method',
         'payment_status',
         'payment_date',
+        'completed_at',
         'tax_invoice_status',
         'has_cash_receipt',
         'cash_receipt_purpose',
@@ -61,6 +62,7 @@ class EducationApplication extends Model
         'roommate_name',
         'roommate_phone',
         'cancelled_at',
+        'receipt_status',
     ];
 
     protected $casts = [
@@ -70,6 +72,7 @@ class EducationApplication extends Model
         'has_tax_invoice' => 'boolean',
         'application_date' => 'datetime',
         'payment_date' => 'datetime',
+        'completed_at' => 'datetime',
         'participation_fee' => 'decimal:2',
         'payment_method' => 'array',
         'attendance_rate' => 'decimal:2',
@@ -162,24 +165,12 @@ class EducationApplication extends Model
     }
 
     /**
-     * 목록 표시용 진행상태 (신청완료/수료/미수료)
-     * 수료=이수상태 Y, 미수료=교육기간 지남+이수 N, 그 외=신청완료(신청시)
+     * 목록 표시용 진행상태 (접수취소/신청완료/수료/미수료)
+     * DB 컬럼 receipt_status 값을 반환합니다.
      */
     public function getDisplayStatusAttribute(): string
     {
-        if ($this->is_completed) {
-            return '수료';
-        }
-        $program = $this->program;
-        if ($program && $program->period_end) {
-            $endOfPeriod = $program->period_end instanceof \Carbon\Carbon
-                ? $program->period_end->endOfDay()
-                : \Carbon\Carbon::parse($program->period_end)->endOfDay();
-            if ($endOfPeriod->isPast()) {
-                return '미수료';
-            }
-        }
-        return '신청완료';
+        return $this->receipt_status ?? '신청완료';
     }
 
     /**

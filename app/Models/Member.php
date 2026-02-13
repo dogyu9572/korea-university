@@ -86,11 +86,21 @@ class Member extends Model implements AuthenticatableContract
 
     /**
      * 이름/학교명/이메일/휴대폰/ID 검색
+     * 검색 구분 '전체'일 때는 ID, 이름, 휴대폰만 검색합니다.
      */
     public function scopeSearch($query, $searchType, $searchTerm)
     {
-        if (!$searchTerm || !$searchType || $searchType === '전체') {
+        if (!$searchTerm) {
             return $query;
+        }
+
+        if (!$searchType || $searchType === '전체') {
+            return $query->where(function ($q) use ($searchTerm) {
+                $term = '%' . $searchTerm . '%';
+                $q->where('login_id', 'like', $term)
+                    ->orWhere('name', 'like', $term)
+                    ->orWhere('phone_number', 'like', $term);
+            });
         }
 
         switch ($searchType) {
@@ -100,6 +110,7 @@ class Member extends Model implements AuthenticatableContract
                 return $query->where('school_name', 'like', '%' . $searchTerm . '%');
             case '이메일주소':
                 return $query->where('email', 'like', '%' . $searchTerm . '%');
+            case '휴대폰':
             case '휴대폰번호':
                 return $query->where('phone_number', 'like', '%' . $searchTerm . '%');
             case 'ID':

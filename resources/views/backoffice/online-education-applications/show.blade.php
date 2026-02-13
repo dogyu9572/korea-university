@@ -106,7 +106,7 @@
                         <div class="member-form-row">
                             <label class="member-form-label">접수상태</label>
                             <div class="member-form-field">
-                                <select name="application_status" class="board-form-control select-full-width">
+                                <select name="application_status" id="application_status" class="board-form-control select-full-width" data-auto-save-url="{{ route('backoffice.online-education-applications.update-status', $program) }}">
                                     <option value="접수중" @selected($program->application_status == '접수중')>접수중</option>
                                     <option value="접수마감" @selected($program->application_status == '접수마감')>접수마감</option>
                                     <option value="접수예정" @selected($program->application_status == '접수예정')>접수예정</option>
@@ -215,7 +215,7 @@
                                         <td>
                                             <input type="checkbox" name="selected_applications[]" value="{{ $application->id }}" class="application-checkbox">
                                         </td>
-                                        <td>{{ $applications->firstItem() + $index }}</td>
+                                        <td>{{ $applications->total() - ($applications->firstItem() + $index) + 1 }}</td>
                                         <td>{{ $application->application_number }}</td>
                                         <td>{{ $application->affiliation ?? '-' }}</td>
                                         <td>{{ $application->applicant_name }}</td>
@@ -262,7 +262,7 @@
                                                 <a href="{{ route('backoffice.online-education-applications.edit', $application) }}" class="btn btn-primary btn-sm">
                                                     <i class="fas fa-edit"></i> 수정
                                                 </a>
-                                                <form action="{{ route('backoffice.online-education-applications.destroy', $application) }}" method="POST" class="d-inline" data-action="confirm-delete" onsubmit="return confirm('정말 삭제하시겠습니까?');">
+                                                <form action="{{ route('backoffice.online-education-applications.destroy', $application) }}" method="POST" class="d-inline" data-action="confirm-delete">
                                                     @csrf
                                                     @method('DELETE')
                                                     <button type="submit" class="btn btn-danger btn-sm">
@@ -286,12 +286,6 @@
             </div>
         </div>
 
-        <div class="board-form-actions">
-            <button type="submit" form="saveForm" class="btn btn-primary">
-                <i class="fas fa-save"></i> 저장
-            </button>
-            <a href="{{ route('backoffice.online-education-applications.index') }}" class="btn btn-secondary">목록</a>
-        </div>
 </div>
 
 @endsection
@@ -304,6 +298,28 @@
     if (params.has('payment_status') || params.has('search')) {
         var el = document.getElementById('applications-list');
         if (el) el.scrollIntoView({ behavior: 'instant', block: 'start' });
+    }
+    var select = document.getElementById('application_status');
+    var form = document.getElementById('saveForm');
+    if (select && form) {
+        var url = select.getAttribute('data-auto-save-url');
+        var token = form.querySelector('input[name="_token"]');
+        select.addEventListener('change', function() {
+            var body = new FormData();
+            body.append('_token', token ? token.value : '');
+            body.append('_method', 'PUT');
+            body.append('application_status', select.value);
+            fetch(url, { method: 'POST', body: body, headers: { 'Accept': 'application/json', 'X-Requested-With': 'XMLHttpRequest' } })
+            .then(function(r) { return r.json(); })
+            .then(function(data) {
+                if (data && data.success && data.message) {
+                    var alert = document.querySelector('.board-hidden-alert.alert-success');
+                    if (alert) { alert.textContent = data.message; alert.classList.remove('board-hidden-alert'); alert.style.display = 'block'; setTimeout(function() { alert.style.display = 'none'; }, 3000); }
+                    else { var div = document.createElement('div'); div.className = 'alert alert-success'; div.textContent = data.message; document.querySelector('.board-container').insertBefore(div, document.querySelector('.board-container').firstChild); setTimeout(function() { div.remove(); }, 3000); }
+                }
+            })
+            .catch(function() { alert('접수상태 저장에 실패했습니다.'); });
+        });
     }
 })();
 </script>

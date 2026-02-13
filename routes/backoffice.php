@@ -431,7 +431,7 @@ Route::prefix('backoffice')->middleware(['backoffice'])->group(function () {
     // 탈퇴회원 관리 (members 제외)
     Route::get('withdrawn', [MemberController::class, 'withdrawn'])->name('backoffice.withdrawn');
     Route::post('withdrawn/{id}/restore', [MemberController::class, 'restore'])->name('backoffice.withdrawn.restore');
-    Route::delete('withdrawn/{id}/force-delete', [MemberController::class, 'forceDelete'])->name('backoffice.withdrawn.force-delete');
+    Route::post('withdrawn/{id}/force-delete', [MemberController::class, 'forceDelete'])->name('backoffice.withdrawn.force-delete');
     Route::post('withdrawn/force-delete-multiple', [MemberController::class, 'forceDeleteMultiple'])->name('backoffice.withdrawn.force-delete-multiple');
     
     // 회원 관리

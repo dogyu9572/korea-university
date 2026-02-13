@@ -19,6 +19,7 @@ class BackOfficeAuth
     {
         // 인증되지 않은 경우 로그인 페이지로 리디렉션
         if (!Auth::check()) {
+            session()->put('url.intended', $request->fullUrl());
             return redirect('/backoffice/login');
         }
 

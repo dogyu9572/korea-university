@@ -52,11 +52,9 @@
                 <div class="board-form-group">
                     <label for="category" class="board-form-label">
                         카테고리 분류
-                        @if($board->isFieldRequired('category'))
-                            <span class="required">*</span>
-                        @endif
+                        <span class="required">*</span>
                     </label>
-                    <select class="board-form-control" id="category" name="category" @if($board->isFieldRequired('category')) required @endif>
+                    <select class="board-form-control" id="category" name="category" required>
                         <option value="">카테고리를 선택하세요</option>
                         @foreach($categoryOptions as $category)
                             <option value="{{ $category->name }}" @selected(old('category') == $category->name)>

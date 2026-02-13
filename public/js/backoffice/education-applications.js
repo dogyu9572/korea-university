@@ -596,10 +596,13 @@ function initCreateEditPageHandlers() {
             return;
         }
     });
-    // 세미나/해외연수: 참가비 타입 동기화 (회원교/비회원교 + 2인1실/1인실/비숙박 -> fee_type)
+    // 세미나/해외연수: 참가비 타입 동기화 (회원교/비회원교 + 2인1실/1인실/비숙박 -> fee_type, 금액 표시)
     const feeTypeEl = document.getElementById('fee_type');
     const feeSchoolInput = document.querySelector('input[name="fee_school_type"]');
     const feeAccomRadios = document.querySelectorAll('input[name="fee_accommodation"]');
+    const feeTypeBlock = document.getElementById('fee-type-block');
+    const participationFeeEl = document.getElementById('participation_fee');
+    const participationFeeDisplay = document.getElementById('participation_fee_display');
     if (feeTypeEl && (feeSchoolInput || feeAccomRadios.length)) {
         function getFeeSchoolValue() {
             if (!feeSchoolInput) return '';
@@ -607,13 +610,31 @@ function initCreateEditPageHandlers() {
             var checked = document.querySelector('input[name="fee_school_type"]:checked');
             return checked ? checked.value : '';
         }
+        function formatAmount(num) {
+            if (num === null || num === '' || isNaN(num)) return '';
+            return Number(num).toLocaleString('ko-KR') + '원';
+        }
         function updateFeeType() {
             var schoolVal = getFeeSchoolValue();
             var accom = document.querySelector('input[name="fee_accommodation"]:checked');
             var accomVal = accom ? accom.value : '';
             var prefix = (schoolVal === '비회원교') ? 'guest' : 'member';
             var suffix = (accomVal === '1인실') ? 'single' : ((accomVal === '비숙박') ? 'no_stay' : 'twin');
-            feeTypeEl.value = prefix + '_' + suffix;
+            var feeType = prefix + '_' + suffix;
+            feeTypeEl.value = feeType;
+
+            if (feeTypeBlock && participationFeeEl && participationFeeDisplay) {
+                var dataKey = 'fee-' + prefix + '-' + (suffix === 'no_stay' ? 'no-stay' : suffix);
+                var amount = feeTypeBlock.getAttribute('data-' + dataKey);
+                if (amount !== null && amount !== '') {
+                    var num = parseFloat(amount);
+                    participationFeeEl.value = isNaN(num) ? '' : num;
+                    participationFeeDisplay.textContent = formatAmount(num);
+                } else {
+                    participationFeeEl.value = '';
+                    participationFeeDisplay.textContent = '';
+                }
+            }
         }
         if (feeSchoolInput && feeSchoolInput.type !== 'hidden') {
             feeSchoolInput.addEventListener('change', updateFeeType);

@@ -276,12 +276,12 @@ class EducationApplicationController extends BaseController
         if ($request->wantsJson()) {
             return response()->json([
                 'success' => true,
-                'message' => $count . '건의 성적이 저장되었습니다.',
+                'message' => '성적이 저장되었습니다.',
             ]);
         }
 
         return redirect()->route('backoffice.certification-applications.show', $program->id)
-            ->with('success', $count . '건의 성적이 저장되었습니다.');
+            ->with('success', '성적이 저장되었습니다.');
     }
 
     /**
@@ -305,6 +305,10 @@ class EducationApplicationController extends BaseController
         ]);
 
         $program->update(['application_status' => $request->application_status]);
+
+        if ($request->wantsJson()) {
+            return response()->json(['success' => true, 'message' => '접수상태가 업데이트되었습니다.']);
+        }
 
         $showRoute = $routeName === 'backoffice.seminar-training-applications.update-status'
             ? 'backoffice.seminar-training-applications.show'

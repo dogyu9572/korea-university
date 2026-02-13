@@ -117,23 +117,7 @@ class ApplicationStatusService
         }
 
         if ($request->filled('status') && $request->status !== '전체') {
-            $status = $request->status;
-            $todayStart = now()->startOfDay();
-            if ($status === '수료') {
-                $query->where('is_completed', true);
-            } elseif ($status === '미수료') {
-                $query->where('is_completed', false)->where(function ($q) use ($todayStart) {
-                    $q->whereHas('education', fn ($q2) => $q2->where('period_end', '<', $todayStart))
-                        ->orWhereHas('onlineEducation', fn ($q2) => $q2->where('period_end', '<', $todayStart))
-                        ->orWhereHas('seminarTraining', fn ($q2) => $q2->where('period_end', '<', $todayStart));
-                });
-            } elseif ($status === '신청완료') {
-                $query->where('is_completed', false)->where(function ($q) use ($todayStart) {
-                    $q->whereHas('education', fn ($q2) => $q2->whereNull('period_end')->orWhere('period_end', '>=', $todayStart))
-                        ->orWhereHas('onlineEducation', fn ($q2) => $q2->whereNull('period_end')->orWhere('period_end', '>=', $todayStart))
-                        ->orWhereHas('seminarTraining', fn ($q2) => $q2->whereNull('period_end')->orWhere('period_end', '>=', $todayStart));
-                });
-            }
+            $query->where('receipt_status', $request->status);
         }
 
         return $query->orderBy('created_at', 'desc')
@@ -157,6 +141,9 @@ class ApplicationStatusService
             throw new \InvalidArgumentException('이수 완료된 신청은 취소할 수 없습니다.');
         }
 
-        $application->update(['cancelled_at' => now()]);
+        $application->update([
+            'cancelled_at' => now(),
+            'receipt_status' => '접수취소',
+        ]);
     }
 }

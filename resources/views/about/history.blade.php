@@ -10,22 +10,21 @@
 	<div class="history_wrap">
 		<div class="point" id="start"></div>
 		<div class="point" id="end"></div>
+		@if($yearRanges)
 		<ul class="year_tabs mo_vw">
-			<li><button type="button">현재 ~ 2020년</button></li>
-			<li><button type="button">2010년 ~ 2019년</button></li>
-			<li><button type="button">2000년 ~ 2009년</button></li>
-			<li><button type="button">1992년 ~ 1999년</button></li>
+			@foreach($yearRanges as $index => $range)
+			<li class="{{ $loop->first ? 'on' : '' }}"><button type="button">{{ $range['label_end'] }} ~ {{ $range['label_start'] }}</button></li>
+			@endforeach
 		</ul>
 		<div class="years">
-			<button type="button" class="on"><p>2020년</p><strong>현재</strong><img src="/images/history01.jpg" alt=""></button>
-			<button type="button"><p>2010년</p><strong>2019년</strong><img src="/images/history02.jpg" alt=""></button>
-			<button type="button"><p>2000년</p><strong>2009년</strong><img src="/images/history03.jpg" alt=""></button>
-			<button type="button"><p>1992년</p><strong>1999년</strong><img src="/images/history04.jpg" alt=""></button>
+			@foreach($yearRanges as $index => $range)
+			<button type="button" class="{{ $loop->first ? 'on' : '' }}"><p>{{ $range['label_start'] }}</p><strong>{{ $range['label_end'] }}</strong><img src="/images/{{ $range['img'] }}" alt=""></button>
+			@endforeach
 		</div>
 		<div class="daylist">
 			@foreach($yearRanges as $range)
 			<div class="cont_area">
-				@forelse($range['histories'] as $history)
+				@foreach($range['histories'] as $history)
 				<div class="box"><i></i>
 					<div class="day"><strong>{{ $history->date_display }}</strong><p>{{ $history->title ?: $history->content }}</p></div>
 					@if($history->content)
@@ -36,15 +35,12 @@
 					</ul>
 					@endif
 				</div>
-				@empty
-				<div class="box"><i></i>
-					<div class="day"><strong>—</strong><p>해당 기간 등록된 연혁이 없습니다.</p></div>
-				</div>
-				@endforelse
+				@endforeach
 			</div>
 			@endforeach
 			<div class="line"><div class="bar"></div></div>
 		</div>
+		@endif
 	</div>
 	
 </main>
@@ -83,15 +79,24 @@ $(function () {
 			}
 		}
 	}
-	// 스크롤 위치 기준으로 버튼 상태 업데이트
+	// 스크롤 위치 기준으로 버튼 상태 업데이트 (하단 구간에서는 마지막 구간 고정으로 흔들림 방지)
 	function updateYearsByScroll() {
 		const scrollTop = $(window).scrollTop();
 		const headerH = $(".header").outerHeight() || 0;
+		const winH = $(window).height();
+		const $daylist = $history.find(".daylist");
+		const listBottom = $daylist.length ? $daylist.offset().top + $daylist.outerHeight() : 0;
+		const viewportBottom = scrollTop + winH;
+		const bottomStickyZone = 220;
+		if (viewportBottom >= listBottom - bottomStickyZone) {
+			$yearsBtns.last().addClass("on").siblings().removeClass("on");
+			updateBeforeAfterClass();
+			return;
+		}
 		let currentYear = null;
 		$boxes.each(function () {
 			const boxTop = $(this).offset().top - headerH;
-
-			if (scrollTop >= (boxTop - 20)) {
+			if (scrollTop >= (boxTop - 60)) {
 				currentYear = parseInt($(this).find(".day strong").text().substring(0, 4), 10);
 			}
 		});
@@ -99,10 +104,9 @@ $(function () {
 		$yearsBtns.each(function () {
 			const $btn = $(this);
 			const { startYear, endYear } = getYearRange($btn);
-
 			if (currentYear >= startYear && currentYear <= endYear) {
 				$btn.addClass("on").siblings().removeClass("on");
-				updateBeforeAfterClass(); // ⭐ 추가
+				updateBeforeAfterClass();
 				return false;
 			}
 		});
@@ -139,18 +143,25 @@ $(window).on("scroll resize", function () {
 	if (!$history.length) return;
 	const scrollTop = $(window).scrollTop();
 	const winH = $(window).height();
-	const winBottom = scrollTop + winH;
 	const historyTop = $history.offset().top;
 	const historyHeight = $history.outerHeight();
 	const yearsH = $years.outerHeight();
 	const startPoint = historyTop - headerH;
 	const endPoint = historyTop + historyHeight - yearsH;
-	if (scrollTop >= startPoint && scrollTop < endPoint) {
-		$history.addClass("start").removeClass("end");
-	} else if (scrollTop >= endPoint) {
-		$history.addClass("end").removeClass("start");
-	} else {
+	const buffer = 80;
+	const isEnd = $history.hasClass("end");
+	if (scrollTop < startPoint) {
 		$history.removeClass("start end");
+	} else if (isEnd) {
+		if (scrollTop < endPoint - buffer) {
+			$history.addClass("start").removeClass("end");
+		}
+	} else {
+		if (scrollTop >= endPoint + buffer) {
+			$history.addClass("end").removeClass("start");
+		} else if (scrollTop >= startPoint && scrollTop < endPoint + buffer) {
+			$history.addClass("start").removeClass("end");
+		}
 	}
 }).trigger("scroll");
 

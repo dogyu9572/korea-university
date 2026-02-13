@@ -55,7 +55,7 @@
 				@forelse($educationSlides ?? [] as $slide)
 				@php
 					$imgSrc = $slide->image_url;
-					$imgFallback = asset('images/img_mc01_sample.jpg');
+					$imgFallback = asset('images/sample.jpg');
 				@endphp
 				<a href="{{ $slide->url ?? '#' }}">
 					<span class="imgfit"><img src="{{ $imgSrc }}" alt="{{ $slide->title }}" onerror="this.onerror=null;this.src='{{ $imgFallback }}';"></span>
@@ -72,7 +72,7 @@
 				</a>
 				@empty
 				<a href="{{ route('education_certification.education') }}">
-					<span class="imgfit"><img src="{{ asset('images/img_mc01_sample.jpg') }}" alt=""></span>
+					<span class="imgfit"><img src="{{ asset('images/sample.jpg') }}" alt=""></span>
 					<span class="txt">
 						<span class="type c1">교육</span>
 						<span class="tit">등록된 프로그램이 없습니다.</span>
@@ -91,7 +91,7 @@
 				@forelse($seminarTrainingSlides ?? [] as $slide)
 				@php
 					$stImgSrc = $slide->image_url;
-					$stImgFallback = asset('images/img_mc01_sample.jpg');
+					$stImgFallback = asset('images/sample.jpg');
 				@endphp
 				<a href="{{ $slide->url ?? '#' }}">
 					<span class="imgfit"><img src="{{ $stImgSrc }}" alt="{{ $slide->title }}" onerror="this.onerror=null;this.src='{{ $stImgFallback }}';"></span>
@@ -108,7 +108,7 @@
 				</a>
 				@empty
 				<a href="{{ route('seminars_training.seminar') }}">
-					<span class="imgfit"><img src="{{ asset('images/img_mc01_sample.jpg') }}" alt=""></span>
+					<span class="imgfit"><img src="{{ asset('images/sample.jpg') }}" alt=""></span>
 					<span class="txt">
 						<span class="type c5">세미나</span>
 						<span class="tit">등록된 프로그램이 없습니다.</span>
@@ -190,57 +190,73 @@
 <script>
 $(document).ready (function () {
 //메인 비주얼
-	$(".mvisual").slick({
-		arrows: true,
-		dots: true,
-		autoplay: true,
-		autoplaySpeed: 3000,
-		pauseOnHover: false,
-		swipeToSlide: true,
-		fade: true,
-		appendDots: $('.mvisual_wrap .paging'),
-		prevArrow: $('.mvisual_wrap .prev'),
-		nextArrow: $('.mvisual_wrap .next'),
-		responsive: [
-			{
-				breakpoint: 767,
-				settings: {
-					fade: false,
-				}
-			},
-		]
+	$(".mvisual").each(function() {
+		var $this = $(this);
+		var $wrapper = $this.closest('.mvisual_wrap');
+		var slideCount = $this.children().length;
+		$this.slick({
+			arrows: true,
+			dots: true,
+			autoplay: true,
+			autoplaySpeed: 3000,
+			pauseOnHover: false,
+			swipeToSlide: true,
+			fade: true,
+			appendDots: $wrapper.find('.paging'),
+			prevArrow: $wrapper.find('.prev'),
+			nextArrow: $wrapper.find('.next'),
+			responsive: [
+				{
+					breakpoint: 767,
+					settings: {
+						fade: false,
+					}
+				},
+			]
+		});
+		if (slideCount <= 1) {
+			$wrapper.find('.navi').hide(); 
+			$this.slick('slickPause');
+		}
 	});
 	$('.mvisual_wrap .pause').click(function(){
-		$('.mvisual').slick('slickPause');
+		$(this).closest('.mvisual_wrap').find('.mvisual').slick('slickPause');
 		$(this).removeClass("on").siblings(".papl").addClass("on");
 	});
 	$('.mvisual_wrap .play').click(function(){
-		$('.mvisual').slick('slickPlay');
+		$(this).closest('.mvisual_wrap').find('.mvisual').slick('slickPlay');
 		$(this).removeClass("on").siblings(".papl").addClass("on");
 	});
 //mc01_slide
-	$(".mc01_slide").slick({
-		arrows: true,
-		dots: true,
-		autoplay: true,
-		autoplaySpeed: 3000,
-		pauseOnHover: false,
-		swipeToSlide: true,
-		slidesToShow: 3,
-		centerMode: true,
-		centerPadding: 0,
-		responsive: [
-			{
-				breakpoint: 767,
-				settings: {
-					slidesToShow: 1,
-					centerMode: false,
-					arrows: false,
-				}
-			},
-		]
+	$(".mc01_slide").each(function() {
+		var $this = $(this);
+		var slideCount = $this.children().length;
+		var slickOptions = {
+			arrows: true,
+			dots: true,
+			autoplay: true,
+			autoplaySpeed: 3000,
+			pauseOnHover: false,
+			swipeToSlide: true,
+			slidesToShow: 3,
+			centerMode: true,
+			centerPadding: 0,
+			responsive: [
+				{
+					breakpoint: 767,
+					settings: {
+						slidesToShow: 1,
+						centerMode: false,
+						arrows: false,
+					}
+				},
+			]
+		};
+		if (slideCount <= 2) {
+			slickOptions.centerMode = false;
+		}
+		$this.slick(slickOptions);
 	});
-		
 //mc02 - 알림마당
 	$('.jq_tabonoff>.jq_cont').children().css('display', 'none');
 	$('.jq_tabonoff>.jq_cont .cont:first-child').css('display', 'block');

@@ -177,7 +177,6 @@ class EducationApplicationService
     {
         $query = EducationApplication::query()
             ->where($programColumn, $programId)
-            ->whereNull('cancelled_at')
             ->with(['member', 'education', 'onlineEducation', 'certification', 'seminarTraining']);
 
         if ($request->filled('payment_status') && $request->payment_status !== '전체') {
@@ -206,7 +205,6 @@ class EducationApplicationService
     {
         $query = EducationApplication::query()
             ->where($programColumn, $programId)
-            ->whereNull('cancelled_at')
             ->with(['member', 'education', 'onlineEducation', 'certification', 'seminarTraining']);
 
         if ($applicationIds !== null && !empty($applicationIds)) {
@@ -254,6 +252,7 @@ class EducationApplicationService
             if ($application && !$application->is_completed) {
                 $application->update([
                     'is_completed' => true,
+                    'receipt_status' => '수료',
                     'certificate_number' => $this->generateCertificateNumber(now(), $application->program),
                 ]);
                 $updated++;
@@ -278,18 +277,48 @@ class EducationApplicationService
     }
 
     /**
-     * 신청별 이수 여부 업데이트
+     * 신청별 이수 여부 업데이트 (접수상태 함께 갱신)
      */
     public function updateApplicationCompletionStatus(EducationApplication $application, bool $isCompleted): void
     {
-        $data = ['is_completed' => $isCompleted];
-        if ($isCompleted && !$application->certificate_number) {
-            $app = EducationApplication::with(['education', 'onlineEducation', 'certification', 'seminarTraining'])->find($application->id);
-            $data['certificate_number'] = $this->generateCertificateNumber(now(), $app->program);
-        } elseif (!$isCompleted) {
+        $program = $application->relationLoaded('education') || $application->relationLoaded('onlineEducation')
+            || $application->relationLoaded('seminarTraining') ? $application->program
+            : EducationApplication::with(['education', 'onlineEducation', 'certification', 'seminarTraining'])->find($application->id)?->program;
+
+        $data = [
+            'is_completed' => $isCompleted,
+            'receipt_status' => $this->resolveReceiptStatus($isCompleted, $program),
+        ];
+        if ($isCompleted) {
+            $data['completed_at'] = now();
+            if (!$application->certificate_number) {
+                $app = EducationApplication::with(['education', 'onlineEducation', 'certification', 'seminarTraining'])->find($application->id);
+                $data['certificate_number'] = $this->generateCertificateNumber(now(), $app->program);
+            }
+        } else {
+            $data['completed_at'] = null;
             $data['certificate_number'] = null;
         }
         $application->update($data);
+    }
+
+    /**
+     * 이수 여부·교육기간에 따른 접수상태 결정 (수료/미수료/신청완료)
+     */
+    private function resolveReceiptStatus(bool $isCompleted, $program): string
+    {
+        if ($isCompleted) {
+            return '수료';
+        }
+        if ($program && $program->period_end) {
+            $endOfPeriod = $program->period_end instanceof \Carbon\Carbon
+                ? $program->period_end->copy()->endOfDay()
+                : \Carbon\Carbon::parse($program->period_end)->endOfDay();
+            if ($endOfPeriod->isPast()) {
+                return '미수료';
+            }
+        }
+        return '신청완료';
     }
 
     /**
@@ -482,6 +511,7 @@ class EducationApplicationService
                 'roommate_member_id',
                 'roommate_name',
                 'roommate_phone',
+                'receipt_status',
             ]);
 
             // 신청번호 자동 생성
@@ -493,6 +523,10 @@ class EducationApplicationService
             $data['is_survey_completed'] = $request->has('is_survey_completed') ? (bool)$request->is_survey_completed : false;
             $data['has_cash_receipt'] = $request->has('has_cash_receipt') ? (bool)$request->has_cash_receipt : false;
             $data['has_tax_invoice'] = $request->has('has_tax_invoice') ? (bool)$request->has_tax_invoice : false;
+
+            if (!isset($data['receipt_status']) || $data['receipt_status'] === '') {
+                $data['receipt_status'] = $data['is_completed'] ? '수료' : '신청완료';
+            }
 
             // payment_method는 모델의 casts가 자동으로 JSON 처리
             if (!$request->has('payment_method') || !is_array($request->payment_method)) {
@@ -508,6 +542,18 @@ class EducationApplicationService
             }
 
             $program = $this->resolveProgramFromRequest($request);
+
+            if ($program instanceof Education && $request->filled('member_type') && $request->filled('accommodation_type')) {
+                $feeAmount = $this->resolveEducationParticipationFee($program, $request->member_type, $request->accommodation_type);
+                if ($feeAmount !== null) {
+                    $data['participation_fee'] = $feeAmount;
+                    $data['fee_type'] = $request->member_type . ' ' . $request->accommodation_type;
+                }
+            }
+
+            if ($data['is_completed']) {
+                $data['completed_at'] = now();
+            }
 
             if ($program) {
                 if ($program instanceof \App\Models\OnlineEducation) {
@@ -638,8 +684,35 @@ class EducationApplicationService
 
             $program = $application->program;
 
-            if ($data['is_completed'] && !$application->certificate_number) {
-                $data['certificate_number'] = $this->generateCertificateNumber(now(), $program);
+            if ($program instanceof Education && $request->filled('member_type') && $request->filled('accommodation_type')) {
+                $feeAmount = $this->resolveEducationParticipationFee($program, $request->member_type, $request->accommodation_type);
+                if ($feeAmount !== null) {
+                    $data['participation_fee'] = $feeAmount;
+                    $data['fee_type'] = $request->member_type . ' ' . $request->accommodation_type;
+                }
+            }
+
+            if ($data['is_completed']) {
+                if (!$application->completed_at) {
+                    $data['completed_at'] = now();
+                }
+                if (!$application->certificate_number) {
+                    $data['certificate_number'] = $this->generateCertificateNumber(now(), $program);
+                }
+            } else {
+                $data['completed_at'] = null;
+            }
+
+            $validReceiptStatuses = ['접수취소', '신청완료', '수료', '미수료'];
+            if ($request->filled('receipt_status') && in_array($request->receipt_status, $validReceiptStatuses, true)) {
+                $data['receipt_status'] = $request->receipt_status;
+                if ($data['receipt_status'] === '접수취소') {
+                    $data['cancelled_at'] = $application->cancelled_at ?? now();
+                } else {
+                    $data['cancelled_at'] = null;
+                }
+            } else {
+                $data['receipt_status'] = $this->resolveReceiptStatus($data['is_completed'], $program);
             }
 
             if ($program) {
@@ -792,5 +865,35 @@ class EducationApplicationService
             return SeminarTraining::find($request->seminar_training_id);
         }
         return null;
+    }
+
+    /**
+     * 교육 프로그램에서 회원구분·숙박옵션에 따른 참가비 금액을 반환합니다.
+     */
+    private function resolveEducationParticipationFee(Education $program, string $memberType, string $accommodationType): ?float
+    {
+        $isGuest = ($memberType === '비회원교');
+        $key = $isGuest ? 'guest' : 'member';
+        if ($accommodationType === '2인1실') {
+            $key .= '_twin';
+        } elseif ($accommodationType === '1인실') {
+            $key .= '_single';
+        } else {
+            $key .= '_no_stay';
+        }
+        $column = match ($key) {
+            'member_twin' => 'fee_member_twin',
+            'member_single' => 'fee_member_single',
+            'member_no_stay' => 'fee_member_no_stay',
+            'guest_twin' => 'fee_guest_twin',
+            'guest_single' => 'fee_guest_single',
+            'guest_no_stay' => 'fee_guest_no_stay',
+            default => null,
+        };
+        if (!$column) {
+            return null;
+        }
+        $value = $program->{$column} ?? null;
+        return $value !== null ? (float) $value : null;
     }
 }

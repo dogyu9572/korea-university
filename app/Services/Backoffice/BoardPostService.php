@@ -201,12 +201,24 @@ class BoardPostService
     }
 
     /**
-     * HTML 내용 정리
+     * HTML 내용 정리 (에디터 bold/italic/strikethrough 등 유지)
+     * strip_tags는 태그명 대소문자 구분하므로, 먼저 태그를 소문자로 통일한 뒤 제거
      */
     private function sanitizeContent(string $content): string
     {
-        $allowedTags = '<p><br><strong><em><u><ol><ul><li><h1><h2><h3><h4><h5><h6><blockquote><pre><code><table><thead><tbody><tr><td><th><a><img><div><span><iframe><video><source>';
+        $content = $this->normalizeHtmlTagCase($content);
+        $allowedTags = '<p><br><strong><b><em><i><u><s><strike><ol><ul><li><h1><h2><h3><h4><h5><h6><blockquote><pre><code><table><thead><tbody><tr><td><th><a><img><div><span><iframe><video><source>';
         return strip_tags($content, $allowedTags);
+    }
+
+    /**
+     * HTML 태그명을 소문자로 통일 (strip_tags 대소문자 구분 대응)
+     */
+    private function normalizeHtmlTagCase(string $content): string
+    {
+        return preg_replace_callback('/<\/?([a-zA-Z][a-zA-Z0-9]*)\b([^>]*)>/', function (array $m) {
+            return strtolower($m[1]) === '!doctype' ? $m[0] : (str_starts_with($m[0], '</') ? '</' . strtolower($m[1]) . $m[2] . '>' : '<' . strtolower($m[1]) . $m[2] . '>');
+        }, $content);
     }
 
     /**

@@ -22,7 +22,7 @@
 
         if (!main) return;
 
-        const selectors = ['.round_tabs', '.board_top', '.thum_list', '.board_bottom'];
+        const selectors = ['.search_wrap', '.round_tabs', '.board_top', '.thum_list', '.board_bottom'];
         const frag = doc.querySelector('main.sub_wrap');
 
         if (!frag) return;

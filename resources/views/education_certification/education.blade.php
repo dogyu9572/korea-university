@@ -2,7 +2,7 @@
 @section('content')
 <main class="sub_wrap inner">
     <div class="education_wrap">
-        {!! $education_guide ?? '' !!}
+        {!! preg_replace('/style=(["\'])(?:(?!\1).)*?\1/i', '', $education_guide ?? '') !!}
     </div>
 </main>
 @endsection

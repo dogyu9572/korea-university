@@ -2,7 +2,9 @@
 
 namespace App\Http\Requests\EducationCertification;
 
+use Illuminate\Contracts\Validation\Validator;
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\ValidationException;
 
 class OnlineEducationApplicationRequest extends FormRequest
 {
@@ -12,6 +14,32 @@ class OnlineEducationApplicationRequest extends FormRequest
     public function authorize(): bool
     {
         return $this->user('member') !== null;
+    }
+
+    protected function prepareForValidation(): void
+    {
+        $merge = [];
+        if ($this->has('has_cash_receipt')) {
+            $merge['has_cash_receipt'] = $this->input('has_cash_receipt') === '1' || $this->input('has_cash_receipt') === true ? '1' : '0';
+        }
+        if ($this->has('has_tax_invoice')) {
+            $merge['has_tax_invoice'] = $this->input('has_tax_invoice') === '1' || $this->input('has_tax_invoice') === true ? '1' : '0';
+        }
+        if ($merge !== []) {
+            $this->merge($merge);
+        }
+    }
+
+    protected function failedValidation(Validator $validator): void
+    {
+        $redirect = redirect()
+            ->route('education_certification.application_ec_e_learning', [
+                'online_education_id' => (int) $this->input('online_education_id'),
+            ])
+            ->withErrors($validator)
+            ->withInput();
+
+        throw new ValidationException($validator, $redirect);
     }
 
     /**
@@ -32,15 +60,15 @@ class OnlineEducationApplicationRequest extends FormRequest
             'refund_bank_name' => ['required', 'string', 'max:50'],
             'refund_account_number' => ['required', 'string', 'max:50'],
             'has_cash_receipt' => ['nullable', 'boolean'],
-            'cash_receipt_purpose' => ['nullable', 'string', 'in:소득공제용,사업자지출증빙용'],
-            'cash_receipt_number' => ['nullable', 'string', 'max:50'],
+            'cash_receipt_purpose' => ['required_if:has_cash_receipt,1', 'nullable', 'string', 'in:소득공제용,사업자지출증빙용'],
+            'cash_receipt_number' => ['required_if:has_cash_receipt,1', 'nullable', 'string', 'max:50'],
             'has_tax_invoice' => ['nullable', 'boolean'],
             'company_name' => ['required_if:has_tax_invoice,1', 'nullable', 'string', 'max:100'],
             'registration_number' => ['required_if:has_tax_invoice,1', 'nullable', 'string', 'max:50'],
             'contact_person_name' => ['required_if:has_tax_invoice,1', 'nullable', 'string', 'max:50'],
-            'contact_person_email' => ['nullable', 'email', 'max:100'],
-            'contact_person_phone' => ['nullable', 'string', 'max:20'],
-            'business_registration' => ['nullable', 'file', 'mimes:pdf,jpg,jpeg,png', 'max:2048'],
+            'contact_person_email' => ['required_if:has_tax_invoice,1', 'nullable', 'email', 'max:100'],
+            'contact_person_phone' => ['required_if:has_tax_invoice,1', 'nullable', 'string', 'max:20'],
+            'business_registration' => ['required_if:has_tax_invoice,1', 'nullable', 'file', 'mimes:pdf,jpg,jpeg,png', 'max:2048'],
             'attachments.*' => ['nullable', 'file', 'mimes:pdf,jpg,jpeg,png', 'max:2048'],
         ];
     }

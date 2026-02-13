@@ -8,9 +8,9 @@
 			<div class="member_area">
 				<div class="tit">LOGIN</div>
 				<div class="inputs">
+					<input type="text" name="email" class="text h56 w100p" placeholder="이메일을 입력해주세요." value="{{ old('email', $remembered_email_value ?? '') }}" autocomplete="username">
 					@if (session('success'))<p class="join_field_error" style="color:#0a0;font-size:0.875rem;margin-bottom:0.25rem;">{{ session('success') }}</p>@endif
 					@error('email')<p class="join_field_error" style="color:#c00;font-size:0.875rem;margin-bottom:0.25rem;">{{ $message }}</p>@enderror
-					<input type="text" name="email" class="text h56 w100p" placeholder="이메일을 입력해주세요." value="{{ old('email', $remembered_email_value ?? '') }}" autocomplete="username">
 					<div class="btn_set">
 						<input type="password" name="password" class="text h56 w100p pw" placeholder="비밀번호를 입력해주세요." autocomplete="current-password">
 						<button type="button" class="btn_trans_text">인풋 문구 보기</button>

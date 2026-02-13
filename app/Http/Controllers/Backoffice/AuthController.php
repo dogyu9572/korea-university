@@ -76,8 +76,12 @@ class AuthController extends Controller
         $request->session()->put('session_reset', true);
         
         $request->session()->regenerate();
-        
-        return redirect()->intended('/backoffice');
+
+        $intended = $request->session()->pull('url.intended');
+        if ($intended && str_starts_with($intended, url('/backoffice'))) {
+            return redirect($intended);
+        }
+        return redirect('/backoffice');
     }
 
     /**

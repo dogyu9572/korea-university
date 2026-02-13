@@ -148,6 +148,20 @@
                 </div>
             </div>
             <div class="member-form-row">
+                <label class="member-form-label">접수상태</label>
+                <div class="member-form-field">
+                    <select name="receipt_status" class="board-form-control @error('receipt_status') is-invalid @enderror">
+                        <option value="신청완료" @selected(old('receipt_status', $app?->receipt_status ?? '') == '신청완료')>신청완료</option>
+                        <option value="수료" @selected(old('receipt_status', $app?->receipt_status ?? '') == '수료')>수료</option>
+                        <option value="미수료" @selected(old('receipt_status', $app?->receipt_status ?? '') == '미수료')>미수료</option>
+                        <option value="접수취소" @selected(old('receipt_status', $app?->receipt_status ?? '') == '접수취소')>접수취소</option>
+                    </select>
+                    @error('receipt_status')
+                        <div class="invalid-feedback">{{ $message }}</div>
+                    @enderror
+                </div>
+            </div>
+            <div class="member-form-row">
                 <label class="member-form-label">설문조사 여부</label>
                 <div class="member-form-field">
                     <div class="board-radio-group">

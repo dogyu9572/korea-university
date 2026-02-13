@@ -93,7 +93,18 @@
             </div>
 
             <div class="table-responsive">
-                <table class="board-table">
+                <table class="board-table" style="table-layout: fixed; width: 100%;">
+                    <colgroup>
+                        <col style="width: 5%;">
+                        <col style="width: 10%;">
+                        <col style="width: 10%;">
+                        <col style="width: 8%;">
+                        <col style="width: 27%;">
+                        <col style="width: 12%;">
+                        <col style="width: 8%;">
+                        <col style="width: 8%;">
+                        <col style="width: 12%;">
+                    </colgroup>
                     <thead>
                         <tr>
                             <th>No</th>
@@ -114,7 +125,7 @@
                                 <td>{{ $program->education_class ?? '-' }}</td>
                                 <td>{{ $program->application_status }}</td>
                                 <td>-</td>
-                                <td class="text-left">{{ $program->name }}</td>
+                                <td class="text-left" style="overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">{{ $program->name }}</td>
                                 <td>
                                     @if($program->period_start)
                                         @php

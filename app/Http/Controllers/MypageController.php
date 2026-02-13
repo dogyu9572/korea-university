@@ -44,6 +44,10 @@ class MypageController extends Controller
     {
         $request->validate([
             'application_id' => 'required|integer|exists:education_applications,id',
+            'cancel_agreed' => 'required|accepted',
+        ], [
+            'cancel_agreed.required' => '수강취소 안내 내용에 동의해 주세요.',
+            'cancel_agreed.accepted' => '수강취소 안내 내용에 동의해 주세요.',
         ]);
 
         $memberId = Auth::guard('member')->id();

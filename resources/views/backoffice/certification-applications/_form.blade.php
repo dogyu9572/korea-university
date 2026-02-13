@@ -146,11 +146,27 @@
             <div class="member-form-row member-form-row-inline">
                 <div class="member-form-inline-item">
                     <label class="member-form-label">성적</label>
-                    {{ $app?->score !== null ? $app->score : '' }}
+                    <div class="member-form-field">
+                        <input type="number" class="board-form-control @error('score') is-invalid @enderror"
+                               name="score" value="{{ old('score', $app?->score !== null ? $app->score : '') }}" min="0" placeholder="점수">
+                        @error('score')
+                            <div class="invalid-feedback">{{ $message }}</div>
+                        @enderror
+                    </div>
                 </div>
                 <div class="member-form-inline-item">
                     <label class="member-form-label">합격여부</label>
-                    {{ $app && $app->score !== null ? ($app->qualification_display_status ?? '') : '' }}
+                    <div class="member-form-field">
+                        <select name="pass_status" class="board-form-control @error('pass_status') is-invalid @enderror">
+                            <option value="">선택</option>
+                            <option value="합격" @selected(old('pass_status', $app?->pass_status ?? '') === '합격')>합격</option>
+                            <option value="불합격" @selected(old('pass_status', $app?->pass_status ?? '') === '불합격')>불합격</option>
+                            <option value="미정" @selected(old('pass_status', $app?->pass_status ?? '') === '미정')>미정</option>
+                        </select>
+                        @error('pass_status')
+                            <div class="invalid-feedback">{{ $message }}</div>
+                        @enderror
+                    </div>
                 </div>
             </div>
             <div class="member-form-row member-form-row-inline">
@@ -177,6 +193,20 @@
                             <div class="invalid-feedback">{{ $message }}</div>
                         @enderror
                     </div>
+                </div>
+            </div>
+            <div class="member-form-row">
+                <label class="member-form-label">접수상태</label>
+                <div class="member-form-field">
+                    <select name="receipt_status" class="board-form-control @error('receipt_status') is-invalid @enderror">
+                        <option value="신청완료" @selected(old('receipt_status', $app?->receipt_status ?? '') == '신청완료')>신청완료</option>
+                        <option value="수료" @selected(old('receipt_status', $app?->receipt_status ?? '') == '수료')>수료</option>
+                        <option value="미수료" @selected(old('receipt_status', $app?->receipt_status ?? '') == '미수료')>미수료</option>
+                        <option value="접수취소" @selected(old('receipt_status', $app?->receipt_status ?? '') == '접수취소')>접수취소</option>
+                    </select>
+                    @error('receipt_status')
+                        <div class="invalid-feedback">{{ $message }}</div>
+                    @enderror
                 </div>
             </div>
             <div class="member-form-row member-form-row-inline">

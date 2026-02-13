@@ -34,13 +34,17 @@ class EducationCertificationController extends Controller
 
     public function application_ec(Request $request)
     {
+        $allowedTabs = ['all', 'education', 'certification', 'online'];
+        $currentTab = $request->get('tab', 'all');
+        $currentTab = in_array($currentTab, $allowedTabs, true) ? $currentTab : 'all';
+
         $programs = $this->applicationService->getList($request);
         $tabCounts = $this->applicationService->getTabCounts();
         $periodYears = $this->applicationService->getPeriodYears();
 
         return view('education_certification.application_ec', array_merge(
             $this->menuMeta(),
-            compact('programs', 'tabCounts', 'periodYears')
+            compact('programs', 'tabCounts', 'periodYears', 'currentTab')
         ));
     }
 
@@ -187,6 +191,13 @@ class EducationCertificationController extends Controller
 
         $onlineEducation = $this->applicationService->getOnlineEducationProgram($onlineEducationId);
         $member = $request->user('member');
+
+        if ($member && $this->applicationService->hasMemberAppliedForOnlineEducation($member->id, $onlineEducationId)) {
+            return redirect()
+                ->route('education_certification.application_ec', ['tab' => 'online'])
+                ->with('error', '이미 해당 온라인교육을 신청하셨습니다.');
+        }
+
         $viewData = array_merge($this->menuMeta(), [
             'onlineEducation' => $onlineEducation,
             'member' => $member,

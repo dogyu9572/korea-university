@@ -141,11 +141,11 @@
                 <dt>현금영수증 발행</dt>
                 <dd class="radios">
                     <label class="radio">
-                        <input type="radio" name="has_cash_receipt" value="1" @checked(old('has_cash_receipt', '1') === '1')>
+                        <input type="radio" name="has_cash_receipt" value="1" @checked(old('has_cash_receipt') === '1')>
                         <i></i><span>발행</span>
                     </label>
                     <label class="radio">
-                        <input type="radio" name="has_cash_receipt" value="0" @checked(old('has_cash_receipt') === '0')>
+                        <input type="radio" name="has_cash_receipt" value="0" @checked(old('has_cash_receipt', '0') === '0')>
                         <i></i><span>미발행</span>
                     </label>
                 </dd>
@@ -163,6 +163,9 @@
                             <i></i><span>사업자 지출증빙용</span>
                         </label>
                     </dd>
+                    @error('cash_receipt_purpose')
+                        <p class="join_field_error" style="color:#c00;font-size:0.875rem;margin-top:0.25rem;">{{ $message }}</p>
+                    @enderror
                 </dl>
                 <dl>
                     <dt>발행번호</dt>
@@ -179,11 +182,11 @@
                 <dt>세금계산서 발행</dt>
                 <dd class="radios">
                     <label class="radio">
-                        <input type="radio" name="has_tax_invoice" value="1" @checked(old('has_tax_invoice', '1') === '1')>
+                        <input type="radio" name="has_tax_invoice" value="1" @checked(old('has_tax_invoice') === '1')>
                         <i></i><span>발행</span>
                     </label>
                     <label class="radio">
-                        <input type="radio" name="has_tax_invoice" value="0" @checked(old('has_tax_invoice', '1') === '0')>
+                        <input type="radio" name="has_tax_invoice" value="0" @checked(old('has_tax_invoice', '0') === '0')>
                         <i></i><span>미발행</span>
                     </label>
                 </dd>

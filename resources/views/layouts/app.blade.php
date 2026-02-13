@@ -227,12 +227,12 @@
 			<div class="inner">
 				<a href="/terms/privacy_policy">개인정보처리방침</a>
 				<a href="/terms/email_collection">이메일무단수집거부</a>
-				<dl class="family_site">
+				<!-- <dl class="family_site">
 					<dt><button type="button">FAMILY SITE</button></dt>
 					<dd>
 						<a href="#this">FAMILY SITE</a>
 					</dd>
-				</dl>
+				</dl> -->
 			</div>
 		</div>
 		<div class="info">
