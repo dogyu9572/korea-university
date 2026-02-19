@@ -100,6 +100,7 @@ class SeminarTrainingApplicationRequest extends FormRequest
             'roommate_member_id' => ['nullable', 'integer', 'exists:members,id'],
             'roommate_name' => ['nullable', 'string', 'max:100'],
             'roommate_phone' => ['nullable', 'string', 'max:20'],
+            'request_notes' => ['nullable', 'string', 'max:2000'],
         ];
     }
 
@@ -125,6 +126,7 @@ class SeminarTrainingApplicationRequest extends FormRequest
             'roommate_member_id' => '룸메이트 회원',
             'roommate_name' => '룸메이트 이름',
             'roommate_phone' => '룸메이트 휴대폰',
+            'request_notes' => '요청사항',
         ];
     }
 

@@ -62,6 +62,7 @@ class EducationApplication extends Model
         'roommate_member_id',
         'roommate_name',
         'roommate_phone',
+        'request_notes',
         'cancelled_at',
         'receipt_status',
     ];

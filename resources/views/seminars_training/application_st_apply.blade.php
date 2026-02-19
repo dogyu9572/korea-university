@@ -221,6 +221,9 @@
 
 	<div class="otit">증빙서류 발행 여부</div>
 	<div class="glbox dl_slice in_inputs dt_long">
+		{{-- 현금영수증 발행: 현재 미사용. 노출 시 아래 주석 해제 --}}
+		<input type="hidden" name="has_cash_receipt" value="0">
+		{{--
 		<dl>
 			<dt>현금영수증 발행</dt>
 			<dd class="radios">
@@ -262,6 +265,7 @@
 			</dl>
 		</div>
 		<p class="ne">입금 확인 후 국세청으로 발행 처리됩니다.</p>
+		--}}
 
 		<dl class="mt40">
 			<dt>세금계산서 발행</dt>
@@ -325,6 +329,16 @@
 			</dl>
 		</div>
 		<p class="ne">세금계산서는 입금 확인 후 3영업일 이내 이메일로 발송됩니다.</p>
+
+		<dl class="mt40">
+			<dt>요청사항</dt>
+			<dd>
+				<textarea name="request_notes" class="w1" rows="4" maxlength="2000" >{{ old('request_notes') }}</textarea>
+				@error('request_notes')
+					<p class="join_field_error" style="color:#c00;font-size:0.875rem;margin-top:0.25rem;">{{ $message }}</p>
+				@enderror
+			</dd>
+		</dl>
 	</div>
 
 	<div class="btns_tac">

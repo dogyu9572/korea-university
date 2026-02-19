@@ -35,6 +35,7 @@
                     ['insert', ['link', 'picture', 'video']],
                     ['view', ['fullscreen', 'codeview', 'help']]
                 ],
+                styleTags: ['p', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'blockquote', 'pre'],
                 callbacks: {
                     onImageUpload: function(files) {
                         uploadImage(files[0], this);

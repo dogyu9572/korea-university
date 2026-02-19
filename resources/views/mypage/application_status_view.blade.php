@@ -160,7 +160,7 @@
 		</dl>
 		<dl>
 			<dt>발행 상태</dt>
-			<dd>{{ $application->has_cash_receipt ? '발행완료' : '발행전' }}</dd>
+			<dd>{{ $application->payment_status === '입금완료' ? '발행완료' : '신청완료' }}</dd>
 		</dl>
 	</div>
 	<div class="obtit">세금계산서 발행 정보</div>
@@ -187,7 +187,7 @@
 		</dl>
 		<dl>
 			<dt>발행 상태</dt>
-			<dd>{{ $application->has_tax_invoice ? '발행완료' : ($application->tax_invoice_status ?? '미신청') }}</dd>
+			<dd>{{ $application->payment_status === '입금완료' ? '발행완료' : '신청완료' }}</dd>
 		</dl>
 	</div>
 	<!-- //공통사항 -->

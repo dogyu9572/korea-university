@@ -66,6 +66,7 @@ class EducationApplicationUpdateRequest extends FormRequest
             'roommate_member_id' => 'nullable|exists:members,id',
             'roommate_name' => 'nullable|string|max:100',
             'roommate_phone' => 'nullable|string|max:20',
+            'request_notes' => 'nullable|string|max:2000',
         ];
     }
 

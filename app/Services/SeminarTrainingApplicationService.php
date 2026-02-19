@@ -233,6 +233,7 @@ class SeminarTrainingApplicationService
                     'roommate_member_id' => $request->input('roommate_member_id') ? (int) $request->input('roommate_member_id') : null,
                     'roommate_name' => $request->filled('roommate_name') ? trim((string) $request->input('roommate_name')) : null,
                     'roommate_phone' => $request->filled('roommate_phone') ? trim((string) $request->input('roommate_phone')) : null,
+                    'request_notes' => $request->filled('request_notes') ? trim((string) $request->input('request_notes')) : null,
                 ]
             );
 

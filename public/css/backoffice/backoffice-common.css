@@ -28,13 +28,13 @@
     margin-left: auto; /* 버튼을 오른쪽으로 밀어냄 */
 }
 
-/* 게시판 카드 */
+/* 게시판 카드 - overflow: visible로 Summernote 드롭다운이 잘리지 않도록 */
 .board-card {
     background: white;
     border-radius: 12px;
     box-shadow: 0 2px 20px rgba(0,0,0,0.08);
     border: 1px solid #e9ecef;
-    overflow: hidden;
+    overflow: visible;
 }
 
 .board-card-header {

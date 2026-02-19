@@ -673,6 +673,7 @@ class EducationApplicationService
                 'roommate_member_id',
                 'roommate_name',
                 'roommate_phone',
+                'request_notes',
             ]);
 
             // boolean 처리 (input() 사용하여 폼값 정확히 반영)

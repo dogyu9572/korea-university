@@ -181,6 +181,15 @@
                     </div>
                 </div>
             </div>
+            <div class="member-form-row">
+                <label class="member-form-label">요청내용</label>
+                <div class="member-form-field">
+                    <textarea name="request_notes" class="board-form-control" rows="4" maxlength="2000" placeholder="신청자가 입력한 세미나 관련 요청사항">{{ old('request_notes', $app?->request_notes ?? '') }}</textarea>
+                    @error('request_notes')
+                        <div class="invalid-feedback">{{ $message }}</div>
+                    @enderror
+                </div>
+            </div>
             <div class="member-form-row member-form-row-inline">
                 <div class="member-form-inline-item">
                     <label class="member-form-label">이수증/수료증 번호</label>

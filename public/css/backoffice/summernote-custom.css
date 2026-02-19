@@ -106,12 +106,12 @@
     min-width: 70px !important;
 }
 
-/* 에디터 프레임 */
+/* 에디터 프레임 - overflow: visible로 드롭다운이 잘리지 않도록 */
 .note-editor.note-frame {
     border: 1px solid #e9ecef !important;
     border-radius: 6px !important;
     box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
-    overflow: hidden;
+    overflow: visible !important;
 }
 
 /* 에디터 내용 영역 */
@@ -136,13 +136,13 @@
     position: absolute !important;
 }
 
-/* Summernote tooltip 완전 비활성화 */
+/* Summernote tooltip 완전 비활성화 (dropdown-toggle 제외: 화살표 보존) */
 .note-tooltip,
 .note-popover,
-.note-toolbar .note-btn[title]:hover::after,
-.note-toolbar .note-btn[title]:hover::before,
-.note-toolbar .note-btn[data-original-title]:hover::after,
-.note-toolbar .note-btn[data-original-title]:hover::before {
+.note-toolbar .note-btn[title]:not(.dropdown-toggle):hover::after,
+.note-toolbar .note-btn[title]:not(.dropdown-toggle):hover::before,
+.note-toolbar .note-btn[data-original-title]:not(.dropdown-toggle):hover::after,
+.note-toolbar .note-btn[data-original-title]:not(.dropdown-toggle):hover::before {
     display: none !important;
     visibility: hidden !important;
     opacity: 0 !important;
@@ -237,12 +237,7 @@
 .note-toolbar {
     position: relative !important;
     z-index: 1001 !important;
-}
-
-/* 드롭다운 메뉴가 다른 요소에 가려지지 않도록 */
-.note-dropdown-menu {
-    z-index: 9998 !important;
-    position: absolute !important;
+    overflow: visible !important;
 }
 
 /* Summernote 모달 완전 분리 */
