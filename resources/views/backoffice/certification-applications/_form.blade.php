@@ -365,22 +365,19 @@
                 </div>
             </div>
             <div class="member-form-row">
-                <label class="member-form-label">현금영수증</label>
+                <label class="member-form-label">현금영수증 발행여부</label>
                 <div class="member-form-field">
-                    <div class="board-radio-group">
-                        <div class="board-radio-item">
-                            <input type="radio" id="has_cash_receipt_y" name="has_cash_receipt" value="1" class="board-radio-input" @checked(old('has_cash_receipt', $app?->has_cash_receipt ?? 0) == 1)>
-                            <label for="has_cash_receipt_y">Y</label>
-                        </div>
-                        <div class="board-radio-item">
-                            <input type="radio" id="has_cash_receipt_n" name="has_cash_receipt" value="0" class="board-radio-input" @checked(old('has_cash_receipt', $app?->has_cash_receipt ?? 0) == 0)>
-                            <label for="has_cash_receipt_n">N</label>
-                        </div>
-                    </div>
+                    <select name="has_cash_receipt" class="board-form-control @error('has_cash_receipt') is-invalid @enderror" id="has_cash_receipt_select">
+                        <option value="0" @selected((int)(old('has_cash_receipt', $app?->has_cash_receipt ?? 0)) === 0)>미발행</option>
+                        <option value="1" @selected((int)(old('has_cash_receipt', $app?->has_cash_receipt ?? 0)) === 1)>발행완료</option>
+                    </select>
+                    @error('has_cash_receipt')
+                        <div class="invalid-feedback">{{ $message }}</div>
+                    @enderror
                 </div>
             </div>
             <div class="member-form-row">
-                <label class="member-form-label">용도선택 / 발행번호</label>
+                <label class="member-form-label">현금영수증 발행 정보</label>
                 <div class="member-form-field">
                     <div class="form-row-inline">
                         <div class="board-radio-group">

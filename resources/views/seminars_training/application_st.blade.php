@@ -3,6 +3,10 @@
 <main class="sub_wrap inner" id="application-st-list">
 	<div class="stitle tal">세미나 · 해외연수 신청</div>
 
+	@if(session('error'))
+	<p class="msg_error" style="margin-bottom:1rem;" id="application-st-error-msg">{{ session('error') }}</p>
+	@endif
+
 	@php
 		$currentTab = request('tab', 'all');
 		$currentSort = request('sort', 'created_at');

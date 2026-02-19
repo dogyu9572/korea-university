@@ -37,9 +37,10 @@ class SeminarTrainingApplicationService
 
         $paginator = $query->paginate(self::PER_PAGE)->withQueryString();
 
-        $paginator->getCollection()->each(function ($item) {
+        $appliedIds = $this->getAppliedSeminarTrainingIdsForCurrentMember();
+        $paginator->getCollection()->each(function ($item) use ($appliedIds) {
             $item->program_type = 'seminar_training';
-            $item->card_data = $this->prepareSeminarTrainingCardData($item);
+            $item->card_data = $this->prepareSeminarTrainingCardData($item, $appliedIds);
         });
 
         return $paginator;
@@ -93,7 +94,12 @@ class SeminarTrainingApplicationService
         $this->assertProgramAvailability($program, 'seminar_training_id');
     }
 
-    public function prepareSeminarTrainingCardData(SeminarTraining $st): array
+    /**
+     * 목록 카드용 표시 데이터. 이미 신청한 프로그램은 신청완료 버튼으로 표시합니다.
+     *
+     * @param array<int> $appliedSeminarTrainingIds 현재 회원이 이미 신청한 seminar_training_id 목록
+     */
+    public function prepareSeminarTrainingCardData(SeminarTraining $st, array $appliedSeminarTrainingIds = []): array
     {
         $enrolled = $st->applications_count ?? 0;
         $capacity = $st->capacity ?? 0;
@@ -101,6 +107,11 @@ class SeminarTrainingApplicationService
         $periodText = $st->period_start && $st->period_end
             ? format_period_ko($st->period_start, $st->period_end)
             : format_period_ko($st->period_start, null, $st->period_time);
+
+        $alreadyApplied = in_array($st->id, $appliedSeminarTrainingIds, true);
+        $btn = $alreadyApplied
+            ? ['class' => 'btn btn_end', 'text' => '신청완료', 'url' => 'javascript:void(0);', 'already_applied' => true]
+            : get_application_button_state($this->getEffectiveApplicationStatusForDisplay($st), 'seminar_training', $st->id);
 
         return [
             'type_class' => ($st->type ?? '') === '해외연수' ? 'c6' : 'c5',
@@ -116,13 +127,16 @@ class SeminarTrainingApplicationService
             'education_class' => $st->education_class ?? '-',
             'location' => $st->location ?? '-',
             'fee_text' => format_fee_with_option_names($st),
-            'btn' => get_application_button_state($this->getEffectiveApplicationStatusForDisplay($st), 'seminar_training', $st->id),
+            'btn' => $btn,
             'view_url' => route('seminars_training.application_st_view', $st->id),
             'thumb' => $st->thumbnail_path ?: '/images/sample.jpg',
         ];
     }
 
-    public function prepareSeminarTrainingDetailView(SeminarTraining $st): array
+    /**
+     * 상세 페이지용 표시 데이터. 이미 신청한 경우 신청완료 버튼으로 표시합니다.
+     */
+    public function prepareSeminarTrainingDetailView(SeminarTraining $st, bool $alreadyApplied = false): array
     {
         $enrolled = $st->applications_count ?? 0;
         $capacity = $st->capacity ?? 0;
@@ -131,7 +145,9 @@ class SeminarTrainingApplicationService
             ? format_period_ko($st->period_start, $st->period_end)
             : format_period_ko($st->period_start, null, $st->period_time);
 
-        $btn = get_application_button_state($this->getEffectiveApplicationStatusForDisplay($st), 'seminar_training', $st->id);
+        $btn = $alreadyApplied
+            ? ['class' => 'btn btn_end', 'text' => '신청완료', 'url' => 'javascript:void(0);']
+            : get_application_button_state($this->getEffectiveApplicationStatusForDisplay($st), 'seminar_training', $st->id);
 
         return [
             'type_class' => ($st->type ?? '') === '해외연수' ? 'c6' : 'c5',
@@ -153,8 +169,41 @@ class SeminarTrainingApplicationService
             'btn_class' => $btn['class'],
             'btn_text' => $btn['text'],
             'apply_url' => $btn['url'],
+            'already_applied' => $alreadyApplied,
             'thumb' => $st->thumbnail_path ?: '/images/sample.jpg',
         ];
+    }
+
+    /**
+     * 현재 로그인 회원이 이미 신청한 세미나·해외연수(seminar_training_id) ID 목록을 반환합니다.
+     *
+     * @return array<int>
+     */
+    public function getAppliedSeminarTrainingIdsForCurrentMember(): array
+    {
+        $memberId = auth('member')?->id();
+        if (!$memberId) {
+            return [];
+        }
+
+        return EducationApplication::query()
+            ->where('member_id', $memberId)
+            ->whereNotNull('seminar_training_id')
+            ->whereNull('cancelled_at')
+            ->pluck('seminar_training_id')
+            ->all();
+    }
+
+    /**
+     * 해당 회원이 이미 해당 세미나·해외연수를 신청했는지 여부를 반환합니다.
+     */
+    public function hasMemberAppliedForSeminarTraining(int $memberId, int $seminarTrainingId): bool
+    {
+        return EducationApplication::query()
+            ->where('member_id', $memberId)
+            ->where('seminar_training_id', $seminarTrainingId)
+            ->whereNull('cancelled_at')
+            ->exists();
     }
 
     public function submitSeminarTrainingApplication(Request $request, Member $member): EducationApplication
@@ -385,6 +434,7 @@ class SeminarTrainingApplicationService
         $exists = EducationApplication::query()
             ->where($column, $programId)
             ->where('member_id', $memberId)
+            ->whereNull('cancelled_at')
             ->lockForUpdate()
             ->exists();
 

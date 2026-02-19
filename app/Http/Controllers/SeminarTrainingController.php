@@ -41,13 +41,15 @@ class SeminarTrainingController extends Controller
         ));
     }
 
-    public function application_st_view(int $id)
+    public function application_st_view(int $id, Request $request)
     {
         $program = $this->applicationService->getSeminarTrainingDetail($id);
         if (!$program) {
             throw new NotFoundHttpException();
         }
-        $viewData = $this->applicationService->prepareSeminarTrainingDetailView($program);
+        $member = $request->user('member');
+        $alreadyApplied = $member && $this->applicationService->hasMemberAppliedForSeminarTraining($member->id, $program->id);
+        $viewData = $this->applicationService->prepareSeminarTrainingDetailView($program, $alreadyApplied);
 
         return view('seminars_training.application_st_view', array_merge(
             $this->menuMeta(),
@@ -64,6 +66,13 @@ class SeminarTrainingController extends Controller
 
         $program = $this->applicationService->getSeminarTrainingProgram($seminarTrainingId);
         $member = $request->user('member');
+
+        if ($member && $this->applicationService->hasMemberAppliedForSeminarTraining($member->id, $program->id)) {
+            return redirect()
+                ->route('seminars_training.application_st')
+                ->with('error', '이미 신청한 프로그램입니다.');
+        }
+
         $stApplyDisplay = TempUploadSessionHelper::getDisplayInfo($request, 'seminar_training_apply_temp_files');
         $viewData = array_merge($this->menuMeta(), [
             'program' => $program,

@@ -7,6 +7,7 @@ use App\Support\TempUploadSessionHelper;
 use Illuminate\Contracts\Validation\Validator;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Http\Exceptions\HttpResponseException;
+use Illuminate\Validation\Rule;
 use Illuminate\Validation\ValidationException;
 
 class EducationProgramApplicationRequest extends FormRequest
@@ -111,7 +112,19 @@ class EducationProgramApplicationRequest extends FormRequest
             'contact_person_name' => ['required_if:has_tax_invoice,1', 'nullable', 'string', 'max:50'],
             'contact_person_email' => ['required_if:has_tax_invoice,1', 'nullable', 'email', 'max:100'],
             'contact_person_phone' => ['required_if:has_tax_invoice,1', 'nullable', 'string', 'max:20'],
-            'business_registration' => ['required_if:has_tax_invoice,1', 'nullable', 'file', 'mimes:pdf,jpg,jpeg,png', 'max:2048'],
+            'business_registration' => [
+                Rule::requiredIf(function () {
+                    if ($this->input('has_tax_invoice') != '1') {
+                        return false;
+                    }
+                    $temp = $this->session()->get('education_apply_temp_files');
+                    return ! is_array($temp) || empty($temp['business_registration']);
+                }),
+                'nullable',
+                'file',
+                'mimes:pdf,jpg,jpeg,png',
+                'max:2048',
+            ],
             'attachments.*' => ['nullable', 'file', 'mimes:pdf,jpg,jpeg,png', 'max:2048'],
         ];
     }

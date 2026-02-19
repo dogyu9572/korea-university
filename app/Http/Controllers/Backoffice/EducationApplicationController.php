@@ -457,6 +457,11 @@ class EducationApplicationController extends BaseController
             $file = fopen('php://output', 'w');
             fprintf($file, chr(0xEF).chr(0xBB).chr(0xBF));
 
+            $phoneForCsv = function ($value) {
+                $v = $value ?? '';
+                return $v !== '' && preg_match('/^0/', (string) $v) ? "\t" . $v : $v;
+            };
+
             if ($isCertification) {
                 fputcsv($file, [
                     'No', '신청번호', '학교명', '신청자명', '신청자 ID', '휴대폰 번호', '결제상태', '신청일시', '세금계산서', '성적', '합격여부',
@@ -469,7 +474,7 @@ class EducationApplicationController extends BaseController
                         $application->affiliation ?? '',
                         $application->applicant_name ?? '',
                         $application->member->login_id ?? '',
-                        $application->phone_number ?? '',
+                        $phoneForCsv($application->phone_number),
                         $application->payment_status ?? '',
                         $application->application_date ? $application->application_date->format('Y-m-d H:i:s') : '',
                         $application->tax_invoice_status ?? '',
@@ -498,7 +503,7 @@ class EducationApplicationController extends BaseController
                         $application->affiliation ?? '',
                         $application->applicant_name ?? '',
                         $application->member->login_id ?? '',
-                        $application->phone_number ?? '',
+                        $phoneForCsv($application->phone_number),
                         $roommateDisplay ?: '',
                         $application->tax_invoice_status ?? '',
                         $application->payment_status ?? '',
@@ -521,7 +526,7 @@ class EducationApplicationController extends BaseController
                         $application->affiliation ?? '',
                         $application->applicant_name ?? '',
                         $application->member->login_id ?? '',
-                        $application->phone_number ?? '',
+                        $phoneForCsv($application->phone_number),
                         $application->email ?? '',
                         $application->payment_status ?? '',
                         $application->application_date ? $application->application_date->format('Y-m-d H:i:s') : '',
@@ -540,7 +545,7 @@ class EducationApplicationController extends BaseController
                         $application->registration_number ?? '',
                         $application->contact_person_name ?? '',
                         $application->contact_person_email ?? '',
-                        $application->contact_person_phone ?? '',
+                        $phoneForCsv($application->contact_person_phone),
                         $application->refund_account_holder ?? '',
                         $application->refund_bank_name ?? '',
                         $application->refund_account_number ?? '',
@@ -722,7 +727,11 @@ class EducationApplicationController extends BaseController
         if (!$education_application->certification_id) {
             abort(404, '자격증 신청이 아닙니다.');
         }
-        $education_application->load(['certification', 'member', 'examVenue']);
+        $education_application->load([
+            'certification:id,name,exam_date,exam_venue',
+            'member',
+            'examVenue',
+        ]);
         return view($view, [
             'gNum' => '99',
             'sNum' => '00',

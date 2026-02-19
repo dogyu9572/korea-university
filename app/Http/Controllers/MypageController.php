@@ -201,6 +201,7 @@ class MypageController extends Controller
         } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
             throw new NotFoundHttpException('해당 신청 내역을 찾을 수 없습니다.', $e);
         }
+        $application->load(['certification:id,name,exam_date,exam_venue']);
         return view('print.admission_ticket', $this->printViewData($application, '수험표'));
     }
 

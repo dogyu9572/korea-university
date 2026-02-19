@@ -39,6 +39,29 @@ function isSeminarApplyForm(form) {
     return (form.action || '').toString().indexOf('application_st_apply/store') !== -1;
 }
 
+/** 1인실/비숙박 선택 시 룸메이트 영역 숨김, 2인1실일 때만 표시 */
+function setupRoommateSectionToggle() {
+    var section = document.getElementById('roommate_section');
+    var form = document.querySelector('.application_form');
+    if (!section || !form) {
+        return;
+    }
+    var noRoommateTypesStr = section.getAttribute('data-no-roommate-types') || '';
+    var noRoommateTypes = noRoommateTypesStr ? noRoommateTypesStr.split(',').map(function (s) { return s.trim(); }) : [];
+
+    function updateVisibility() {
+        var checked = form.querySelector('input[name="fee_type"]:checked');
+        var feeType = checked ? (checked.value || '').trim() : '';
+        var hide = noRoommateTypes.indexOf(feeType) !== -1;
+        section.style.display = hide ? 'none' : '';
+    }
+
+    updateVisibility();
+    form.querySelectorAll('input[name="fee_type"]').forEach(function (radio) {
+        radio.addEventListener('change', updateVisibility);
+    });
+}
+
 function setupFormSubmit() {
     document.querySelectorAll('form.application_form').forEach(function (form) {
         if (!isSeminarApplyForm(form)) {
@@ -262,6 +285,13 @@ function setupRoommateSearch() {
 }
 
 document.addEventListener('DOMContentLoaded', function () {
+    // 유효성 검사 실패 후 복귀 시 룸메이트 입력값 복원 표시 (hidden은 old()로 채워지므로 성공 메시지만 표시)
+    var roommateIdEl = document.getElementById('roommate_member_id');
+    var roommateSuccessMsg = document.getElementById('roommateSuccessMsg');
+    if (roommateIdEl && roommateIdEl.value && roommateSuccessMsg) {
+        roommateSuccessMsg.classList.remove('hide');
+    }
+
     // 유효성 검사 실패 시 첫 번째 에러 위치로 스크롤 (맨 위로 가지 않도록 즉시 실행)
     if (document.querySelector('.application_form[data-join-errors]')) {
         var errs = document.querySelectorAll('.application_form .join_field_error');
@@ -287,6 +317,7 @@ document.addEventListener('DOMContentLoaded', function () {
     setupFormSubmit();
     setupReceiptToggles();
     setupPhoneFormat();
+    setupRoommateSectionToggle();
     setupRoommateSearch();
 
     var btnRoommateApply = document.getElementById('btnRoommateApply');

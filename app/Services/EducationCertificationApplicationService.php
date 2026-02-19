@@ -241,6 +241,7 @@ class EducationCertificationApplicationService
                     'participation_fee' => $participationFee,
                     'fee_type' => $feeType,
                     'payment_method' => $program->payment_methods ?? null,
+                    'tax_invoice_status' => !empty($billing['has_tax_invoice']) ? '신청완료' : '미신청',
                 ]
             );
 
@@ -309,6 +310,7 @@ class EducationCertificationApplicationService
                     'payment_method' => $program->payment_methods ?? null,
                     'exam_venue_id' => (int) $request->input('exam_venue_id'),
                     'birth_date' => Carbon::parse($request->input('birth_date'))->format('Y-m-d'),
+                    'tax_invoice_status' => !empty($billing['has_tax_invoice']) ? '신청완료' : '미신청',
                 ]
             );
 

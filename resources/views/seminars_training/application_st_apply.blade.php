@@ -135,19 +135,25 @@
 			<p class="join_field_error" style="color:#c00;font-size:0.875rem;margin-top:0.25rem;">{{ $message }}</p>
 		@enderror
 	</div>
-	<div class="obtit">룸메이트 선택</div>
-	<div class="glbox dl_slice in_inputs">
-		<dl>
-			<dt>룸메이트 휴대폰번호 입력</dt>
-			<dd class="inbtn">
-				<input type="hidden" name="roommate_member_id" id="roommate_member_id" value="{{ old('roommate_member_id', '') }}">
-				<input type="hidden" name="roommate_name" id="roommate_name" value="{{ old('roommate_name', '') }}">
-				<input type="hidden" name="roommate_phone" id="roommate_phone" value="{{ old('roommate_phone', '') }}">
-				<input type="text" class="text" id="roommate_phone_input" placeholder="010-1234-5678">
-				<button type="button" class="btn" data-action="roommate-search">조회하기</button>
-				<p class="ne w100p mt0 hide" id="roommateSuccessMsg">룸메이트가 성공적으로 신청되었습니다.</p>
-			</dd>
-		</dl>
+	@php
+		$initialFeeType = old('fee_type', $defaultFeeType ?? '');
+		$hideRoommateInitial = in_array($initialFeeType, ['member_single', 'member_no_stay', 'guest_single', 'guest_no_stay']);
+	@endphp
+	<div id="roommate_section" class="roommate_section" data-no-roommate-types="member_single,member_no_stay,guest_single,guest_no_stay" @if($hideRoommateInitial) style="display:none" @endif>
+		<div class="obtit">룸메이트 선택</div>
+		<div class="glbox dl_slice in_inputs">
+			<dl>
+				<dt>룸메이트 휴대폰번호 입력</dt>
+				<dd class="inbtn">
+					<input type="hidden" name="roommate_member_id" id="roommate_member_id" value="{{ old('roommate_member_id', '') }}">
+					<input type="hidden" name="roommate_name" id="roommate_name" value="{{ old('roommate_name', '') }}">
+					<input type="hidden" name="roommate_phone" id="roommate_phone" value="{{ old('roommate_phone', '') }}">
+					<input type="text" class="text" id="roommate_phone_input" placeholder="010-1234-5678" value="{{ old('roommate_phone', '') }}">
+					<button type="button" class="btn" data-action="roommate-search">조회하기</button>
+					<p class="ne w100p mt0 hide" id="roommateSuccessMsg">룸메이트가 성공적으로 신청되었습니다.</p>
+				</dd>
+			</dl>
+		</div>
 	</div>
 
 	<div class="otit">결제 및 환불 안내</div>

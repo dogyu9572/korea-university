@@ -318,25 +318,6 @@
             </div>
             @if(!$isFree)
             <div class="member-form-row">
-                <label class="member-form-label">세금계산서 발행여부</label>
-                <div class="member-form-field">
-                    @php
-                        $taxInvoiceStatus = trim((string)(old('tax_invoice_status', $app?->tax_invoice_status ?? '미신청')));
-                        if ($taxInvoiceStatus === '') {
-                            $taxInvoiceStatus = '미신청';
-                        }
-                    @endphp
-                    <select name="tax_invoice_status" class="board-form-control @error('tax_invoice_status') is-invalid @enderror">
-                        <option value="미신청" @selected($taxInvoiceStatus === '미신청')>미신청</option>
-                        <option value="신청완료" @selected($taxInvoiceStatus === '신청완료')>신청완료</option>
-                        <option value="발행완료" @selected($taxInvoiceStatus === '발행완료')>발행완료</option>
-                    </select>
-                    @error('tax_invoice_status')
-                        <div class="invalid-feedback">{{ $message }}</div>
-                    @enderror
-                </div>
-            </div>
-            <div class="member-form-row">
                 <label class="member-form-label">현금영수증 발행여부</label>
                 <div class="member-form-field">
                     <select name="has_cash_receipt" class="board-form-control @error('has_cash_receipt') is-invalid @enderror" id="has_cash_receipt_select">
@@ -374,6 +355,25 @@
                             @enderror
                         </div>
                     </div>
+                </div>
+            </div>
+            <div class="member-form-row">
+                <label class="member-form-label">세금계산서 발행여부</label>
+                <div class="member-form-field">
+                    @php
+                        $taxInvoiceStatus = trim((string)(old('tax_invoice_status', $app?->tax_invoice_status ?? '미신청')));
+                        if ($taxInvoiceStatus === '') {
+                            $taxInvoiceStatus = '미신청';
+                        }
+                    @endphp
+                    <select name="tax_invoice_status" class="board-form-control @error('tax_invoice_status') is-invalid @enderror">
+                        <option value="미신청" @selected($taxInvoiceStatus === '미신청')>미신청</option>
+                        <option value="신청완료" @selected($taxInvoiceStatus === '신청완료')>신청완료</option>
+                        <option value="발행완료" @selected($taxInvoiceStatus === '발행완료')>발행완료</option>
+                    </select>
+                    @error('tax_invoice_status')
+                        <div class="invalid-feedback">{{ $message }}</div>
+                    @enderror
                 </div>
             </div>
             <div class="member-form-row">

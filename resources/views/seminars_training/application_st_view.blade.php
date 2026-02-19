@@ -42,7 +42,11 @@
 				</dl>
 			</div>
 			<div class="btns">
+				@if(!empty($viewData['already_applied']))
+				<button type="button" class="{{ $viewData['btn_class'] }}" data-already-applied="1">{{ $viewData['btn_text'] }}</button>
+				@else
 				<a href="{{ $viewData['apply_url'] }}" class="{{ $viewData['btn_class'] }}">{{ $viewData['btn_text'] }}</a>
+				@endif
 			</div>
 		</div>
 

@@ -101,8 +101,8 @@
 	</div>
 	<!-- //공통사항 -->
 
-	@if($application->seminar_training_id)
-	<!-- 세미나만 노출 -->
+	@if($application->seminar_training_id && !in_array($application->fee_type, ['member_single', 'member_no_stay', 'guest_single', 'guest_no_stay']))
+	<!-- 세미나만 노출 (2인1실일 때만 룸메이트 정보 표시) -->
 	<div class="otit">세미나/해외연수 룸메이트 정보</div>
 	<div class="roommate_info">
 		@if($application->roommate_name || $application->roommate_phone)

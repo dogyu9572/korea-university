@@ -126,6 +126,11 @@ class SeminarTrainingService
                 $data['deposit_deadline_days'] = null;
             }
 
+            if ($request->hasFile('thumbnail')) {
+                $thumbnailPath = $request->file('thumbnail')->store('seminar_trainings/thumbnails', 'public');
+                $data['thumbnail_path'] = Storage::url($thumbnailPath);
+            }
+
             $program = SeminarTraining::create($data);
 
             if ($request->hasFile('attachments')) {
@@ -225,6 +230,20 @@ class SeminarTrainingService
             }
             if ($request->deposit_deadline_days === '' || $request->deposit_deadline_days === null) {
                 $data['deposit_deadline_days'] = null;
+            }
+
+            if ($request->has('delete_thumbnail') && $request->delete_thumbnail == '1') {
+                if ($program->thumbnail_path) {
+                    $this->deleteFile($program->thumbnail_path);
+                }
+                $data['thumbnail_path'] = null;
+            }
+            if ($request->hasFile('thumbnail')) {
+                if ($program->thumbnail_path) {
+                    $this->deleteFile($program->thumbnail_path);
+                }
+                $thumbnailPath = $request->file('thumbnail')->store('seminar_trainings/thumbnails', 'public');
+                $data['thumbnail_path'] = Storage::url($thumbnailPath);
             }
 
             $program->update($data);

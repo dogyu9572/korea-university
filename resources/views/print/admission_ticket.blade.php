@@ -5,7 +5,8 @@
 	@php
 		$cert = $application->certification;
 		$examDateStr = $cert && $cert->exam_date ? $cert->exam_date->format('Y.m.d') . ' ' . $cert->exam_date->format('H:i') : '';
-		$venueName = $application->examVenue ? $application->examVenue->name : ($cert && $cert->exam_venue ? $cert->exam_venue : '');
+		$venueRaw = $application->examVenue ? $application->examVenue->name : ($cert && $cert->exam_venue ? $cert->exam_venue : '');
+		$venueName = strip_tags((string) $venueRaw);
 		$birthStr = $application->birth_date ? $application->birth_date->format('Y.m.d') : '';
 		$num = $application->exam_ticket_number ?? $application->application_number ?? '';
 	@endphp

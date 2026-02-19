@@ -16,25 +16,37 @@ class TempUploadSessionHelper
     private const PREFIX = 'temp_upload_session';
 
     /**
-     * 요청에 포함된 파일을 임시 저장하고 세션에 경로·파일명을 저장합니다.
+     * 요청에 포함된 파일만 임시 저장하고 세션에 반영합니다.
+     * 요청에 파일이 없는 키는 세션에서 제거해, 이전 제출의 파일이 그대로 보이지 않게 합니다.
      *
      * @param  array<int, string>  $fileKeys  저장할 파일 필드명 목록 (예: ['business_registration'])
      */
     public static function saveToSession(Request $request, array $fileKeys, string $sessionKey): void
     {
-        $saved = [];
         $dir = self::PREFIX . '/' . Str::slug($sessionKey);
+        $current = $request->session()->get($sessionKey);
+        $data = is_array($current) ? $current : [];
 
         foreach ($fileKeys as $key) {
             $file = $request->file($key);
             if ($file && $file->isValid()) {
                 $stored = $file->store($dir, self::DISK);
-                $saved[$key] = ['path' => $stored, 'original_name' => $file->getClientOriginalName()];
+                $data[$key] = ['path' => $stored, 'original_name' => $file->getClientOriginalName()];
+            } else {
+                if (isset($data[$key])) {
+                    $path = $data[$key]['path'] ?? null;
+                    if ($path) {
+                        Storage::disk(self::DISK)->delete($path);
+                    }
+                    unset($data[$key]);
+                }
             }
         }
 
-        if ($saved !== []) {
-            $request->session()->put($sessionKey, $saved);
+        if ($data !== []) {
+            $request->session()->put($sessionKey, $data);
+        } else {
+            $request->session()->forget($sessionKey);
         }
     }
 

@@ -38,6 +38,23 @@
             </div>
 
             <div class="member-form-row">
+                <label class="member-form-label">썸네일</label>
+                <div class="member-form-field">
+                    <input type="file" class="board-form-control @error('thumbnail') is-invalid @enderror" id="thumbnail" name="thumbnail" accept="image/*">
+                    @if($isEdit && $program->thumbnail_path)
+                        <div class="mt-2 thumbnail-container">
+                            <img src="{{ $program->thumbnail_path }}" alt="썸네일" class="thumbnail-image">
+                            <button type="button" class="btn-delete-simple delete-thumbnail-btn">삭제</button>
+                            <input type="hidden" name="delete_thumbnail" id="delete_thumbnail" value="0">
+                        </div>
+                    @endif
+                    @error('thumbnail')
+                        <div class="invalid-feedback">{{ $message }}</div>
+                    @enderror
+                </div>
+            </div>
+
+            <div class="member-form-row">
                 <label class="member-form-label">교육기간</label>
                 <div class="member-form-field">
                     <div class="period-time-row">
