@@ -44,81 +44,8 @@
 	
 </main>
 
-<script>
-const MAX_FILES = 3;
-const MAX_SIZE = 10 * 1024 * 1024; // 10MB
-
-$(document).on("change", ".file_inputs input[type='file']", function () {
-	const $input = $(this);
-	const $wrap = $input.closest(".file_inputs");
-	const $fileInput = $wrap.find(".file_input");
-
-	let files = Array.from(this.files);
-
-	// 개수 제한
-	if (files.length > MAX_FILES) {
-		alert("파일은 최대 3개까지 선택할 수 있습니다.");
-		$input.val("");
-		return;
-	}
-
-	// 용량 제한
-	for (let file of files) {
-		if (file.size > MAX_SIZE) {
-			alert(`"${file.name}" 파일은 10MB를 초과할 수 없습니다.`);
-			$input.val("");
-			return;
-		}
-	}
-
-	// UI 갱신
-	$fileInput.empty().addClass("w100p");
-
-	if (files.length === 0) {
-		$fileInput.text("선택된 파일 없음");
-		return;
-	}
-
-	files.forEach((file, index) => {
-		$fileInput.append(`
-			<div class="file_item" data-index="${index}">
-				<button type="button" class="btn_remove">${file.name}</button>
-			</div>
-		`);
-	});
-});
-
-// 개별 파일 삭제
-$(document).on("click", ".btn_remove", function () {
-	const $item = $(this).closest(".file_item");
-	const removeIndex = $item.data("index");
-	const $wrap = $(this).closest(".file_inputs");
-	const $input = $wrap.find("input[type='file']");
-	const $fileInput = $wrap.find(".file_input");
-
-	let files = Array.from($input[0].files);
-	files.splice(removeIndex, 1);
-
-	// FileList 재생성
-	const dataTransfer = new DataTransfer();
-	files.forEach(file => dataTransfer.items.add(file));
-	$input[0].files = dataTransfer.files;
-
-	// UI 재렌더링
-	$fileInput.empty();
-	if (files.length === 0) {
-		$fileInput.text("선택된 파일 없음");
-		return;
-	}
-
-	files.forEach((file, index) => {
-		$fileInput.append(`
-			<div class="file_item" data-index="${index}">
-				<button type="button" class="btn_remove">${file.name}</button>
-			</div>
-		`);
-	});
-});
-</script>
+@push('scripts')
+<script src="{{ asset('js/mypage/inquiry-write.js') }}"></script>
+@endpush
 
 @endsection
