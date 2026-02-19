@@ -57,6 +57,19 @@ function setupFileInputs() {
         if (!wrap) {
             return;
         }
+        if (wrap.hasAttribute('data-temp-file')) {
+            const fileKey = wrap.getAttribute('data-temp-file');
+            if (fileKey && !wrap.querySelector('input[name="clear_' + fileKey + '"]')) {
+                const hidden = document.createElement('input');
+                hidden.type = 'hidden';
+                hidden.name = 'clear_' + fileKey;
+                hidden.value = '1';
+                wrap.appendChild(hidden);
+            }
+            setFileLabel(wrap, '');
+            wrap.removeAttribute('data-temp-file');
+            return;
+        }
         const input = wrap.querySelector('input[type="file"]');
         if (input) {
             input.value = '';

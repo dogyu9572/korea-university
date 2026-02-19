@@ -9,6 +9,7 @@ use App\Models\Certification;
 use App\Models\Education;
 use App\Models\OnlineEducation;
 use App\Services\EducationCertificationApplicationService;
+use App\Support\TempUploadSessionHelper;
 use Illuminate\Http\Request;
 use Illuminate\Validation\ValidationException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
@@ -79,12 +80,14 @@ class EducationCertificationController extends Controller
         }
 
         $memberSchoolType = $this->applicationService->getMemberSchoolType($member);
+        $educationApplyDisplay = TempUploadSessionHelper::getDisplayInfo($request, 'education_apply_temp_files');
         $viewData = array_merge($this->menuMeta(), [
             'education' => $education,
             'member' => $member,
             'memberSchoolType' => $memberSchoolType,
             'feeOptions' => $this->buildEducationFeeOptions($education),
             'refundPolicies' => $this->buildEducationRefundPolicies($education),
+            'tempFileBusinessRegistration' => $educationApplyDisplay['business_registration'] ?? '',
         ]);
 
         try {
@@ -152,10 +155,13 @@ class EducationCertificationController extends Controller
         $certification = $this->applicationService->getCertificationProgram($certificationId);
         $member = $request->user('member');
         $examVenues = $this->applicationService->getCertificationExamVenues($certification);
+        $certReceiptDisplay = TempUploadSessionHelper::getDisplayInfo($request, 'certification_receipt_temp_files');
         $viewData = array_merge($this->menuMeta(), [
             'certification' => $certification,
             'member' => $member,
             'examVenues' => $examVenues,
+            'tempFileIdPhoto' => $certReceiptDisplay['id_photo'] ?? '',
+            'tempFileBusinessRegistration' => $certReceiptDisplay['business_registration'] ?? '',
         ]);
 
         try {
@@ -202,10 +208,12 @@ class EducationCertificationController extends Controller
             ? $this->applicationService->getMemberLastCashReceiptPreferences($member->id)
             : ['has_cash_receipt' => false, 'cash_receipt_purpose' => null, 'cash_receipt_number' => null];
 
+        $displayInfo = TempUploadSessionHelper::getDisplayInfo($request, 'online_education_temp_files');
         $viewData = array_merge($this->menuMeta(), [
             'onlineEducation' => $onlineEducation,
             'member' => $member,
             'cashReceiptDefaults' => $cashReceiptDefaults,
+            'tempFileBusinessRegistration' => $displayInfo['business_registration'] ?? '',
         ]);
 
         try {
@@ -231,6 +239,8 @@ class EducationCertificationController extends Controller
             return back()->withErrors($e->errors())->withInput();
         }
 
+        TempUploadSessionHelper::clear($request, 'education_apply_temp_files');
+
         $request->session()->put(self::APPLICATION_CONFIRMATION_KEY, [
             'type' => 'education',
             'program_name' => $education->name,
@@ -252,6 +262,8 @@ class EducationCertificationController extends Controller
             return back()->withErrors($e->errors())->withInput();
         }
 
+        TempUploadSessionHelper::clear($request, 'certification_receipt_temp_files');
+
         $request->session()->put(self::APPLICATION_CONFIRMATION_KEY, [
             'type' => 'certification',
             'program_name' => $certification->name,
@@ -272,6 +284,8 @@ class EducationCertificationController extends Controller
         } catch (ValidationException $e) {
             return back()->withErrors($e->errors())->withInput();
         }
+
+        TempUploadSessionHelper::clear($request, 'online_education_temp_files');
 
         $request->session()->put(self::APPLICATION_CONFIRMATION_KEY, [
             'type' => 'online',

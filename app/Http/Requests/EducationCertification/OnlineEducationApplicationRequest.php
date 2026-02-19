@@ -3,6 +3,7 @@
 namespace App\Http\Requests\EducationCertification;
 
 use App\Models\Member;
+use App\Support\TempUploadSessionHelper;
 use Illuminate\Contracts\Validation\Validator;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\ValidationException;
@@ -28,6 +29,10 @@ class OnlineEducationApplicationRequest extends FormRequest
         }
         if ($merge !== []) {
             $this->merge($merge);
+        }
+
+        if ($this->isMethod('POST') && $this->session()->has('online_education_temp_files')) {
+            TempUploadSessionHelper::restoreIntoRequest($this, 'online_education_temp_files');
         }
     }
 
@@ -57,6 +62,8 @@ class OnlineEducationApplicationRequest extends FormRequest
 
     protected function failedValidation(Validator $validator): void
     {
+        TempUploadSessionHelper::saveToSession($this, ['business_registration'], 'online_education_temp_files');
+
         $redirect = redirect()
             ->route('education_certification.application_ec_e_learning', [
                 'online_education_id' => (int) $this->input('online_education_id'),

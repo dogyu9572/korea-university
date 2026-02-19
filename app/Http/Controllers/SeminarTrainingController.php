@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Http\Requests\SeminarTraining\SeminarTrainingApplicationRequest;
 use App\Models\Member;
 use App\Services\SeminarTrainingApplicationService;
+use App\Support\TempUploadSessionHelper;
 use Illuminate\Http\Request;
 use Illuminate\Validation\ValidationException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
@@ -63,11 +64,13 @@ class SeminarTrainingController extends Controller
 
         $program = $this->applicationService->getSeminarTrainingProgram($seminarTrainingId);
         $member = $request->user('member');
+        $stApplyDisplay = TempUploadSessionHelper::getDisplayInfo($request, 'seminar_training_apply_temp_files');
         $viewData = array_merge($this->menuMeta(), [
             'program' => $program,
             'member' => $member,
             'feeOptions' => $this->applicationService->buildSeminarTrainingFeeOptions($program),
             'refundPolicies' => $this->applicationService->buildSeminarTrainingRefundPolicies($program),
+            'tempFileBusinessRegistration' => $stApplyDisplay['business_registration'] ?? '',
         ]);
 
         try {
@@ -108,6 +111,8 @@ class SeminarTrainingController extends Controller
         } catch (ValidationException $e) {
             return back()->withErrors($e->errors())->withInput();
         }
+
+        TempUploadSessionHelper::clear($request, 'seminar_training_apply_temp_files');
 
         $request->session()->put(self::APPLICATION_CONFIRMATION_KEY, [
             'type' => 'seminar_training',

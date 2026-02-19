@@ -3,8 +3,10 @@
 namespace App\Http\Requests\EducationCertification;
 
 use App\Models\Member;
+use App\Support\TempUploadSessionHelper;
 use Illuminate\Contracts\Validation\Validator;
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\ValidationException;
 
 class CertificationApplicationRequest extends FormRequest
 {
@@ -14,6 +16,27 @@ class CertificationApplicationRequest extends FormRequest
     public function authorize(): bool
     {
         return $this->user('member') !== null;
+    }
+
+    protected function prepareForValidation(): void
+    {
+        if ($this->isMethod('POST') && $this->session()->has('certification_receipt_temp_files')) {
+            TempUploadSessionHelper::restoreIntoRequest($this, 'certification_receipt_temp_files');
+        }
+    }
+
+    protected function failedValidation(Validator $validator): void
+    {
+        TempUploadSessionHelper::saveToSession($this, ['id_photo', 'business_registration'], 'certification_receipt_temp_files');
+
+        $redirect = redirect()
+            ->route('education_certification.application_ec_receipt', [
+                'certification_id' => (int) $this->input('certification_id'),
+            ])
+            ->withErrors($validator)
+            ->withInput();
+
+        throw new ValidationException($validator, $redirect);
     }
 
     public function withValidator(Validator $validator): void

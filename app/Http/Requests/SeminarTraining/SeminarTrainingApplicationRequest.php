@@ -3,15 +3,38 @@
 namespace App\Http\Requests\SeminarTraining;
 
 use App\Models\Member;
+use App\Support\TempUploadSessionHelper;
 use Illuminate\Contracts\Validation\Validator;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Http\Exceptions\HttpResponseException;
+use Illuminate\Validation\ValidationException;
 
 class SeminarTrainingApplicationRequest extends FormRequest
 {
     public function authorize(): bool
     {
         return $this->user('member') !== null;
+    }
+
+    protected function prepareForValidation(): void
+    {
+        if ($this->isMethod('POST') && $this->session()->has('seminar_training_apply_temp_files')) {
+            TempUploadSessionHelper::restoreIntoRequest($this, 'seminar_training_apply_temp_files');
+        }
+    }
+
+    protected function failedValidation(Validator $validator): void
+    {
+        TempUploadSessionHelper::saveToSession($this, ['business_registration'], 'seminar_training_apply_temp_files');
+
+        $redirect = redirect()
+            ->route('seminars_training.application_st_apply', [
+                'seminar_training_id' => (int) $this->input('seminar_training_id'),
+            ])
+            ->withErrors($validator)
+            ->withInput();
+
+        throw new ValidationException($validator, $redirect);
     }
 
     public function withValidator(Validator $validator): void
