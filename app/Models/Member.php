@@ -160,6 +160,30 @@ class Member extends Model implements AuthenticatableContract
     }
 
     /**
+     * 연락처 형식 유효 여부 (010 11자리, 02 10자리, 01x 10자리)
+     */
+    public static function isValidPhoneFormat(?string $phone): bool
+    {
+        if ($phone === null || $phone === '') {
+            return true;
+        }
+        $digits = self::normalizePhone($phone);
+        if ($digits === '') {
+            return false;
+        }
+        if (strlen($digits) === 11 && str_starts_with($digits, '010')) {
+            return true;
+        }
+        if (strlen($digits) === 10 && str_starts_with($digits, '02')) {
+            return true;
+        }
+        if (strlen($digits) === 10 && preg_match('/^01[1-9]/', $digits)) {
+            return true;
+        }
+        return false;
+    }
+
+    /**
      * 휴대폰번호 표시용 포맷 (010-1234-5678 등)
      */
     public static function formatPhoneForDisplay(?string $phone): string

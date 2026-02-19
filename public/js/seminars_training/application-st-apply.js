@@ -92,6 +92,43 @@ function setupReceiptToggles() {
     updateTax();
 }
 
+function formatPhoneInput(val) {
+    var digits = (val || '').replace(/\D/g, '');
+    if (digits.length === 0) return '';
+    if (digits.length <= 3 && digits.indexOf('010') === 0) return digits;
+    if (digits.length <= 3 && digits.indexOf('01') === 0) return digits;
+    if (digits.length <= 2 && digits.indexOf('02') === 0) return digits;
+    if (digits.length <= 2) return digits;
+    if (digits.length <= 11 && digits.indexOf('010') === 0) {
+        if (digits.length <= 7) return digits.slice(0, 3) + (digits.length > 3 ? '-' + digits.slice(3) : '');
+        return digits.slice(0, 3) + '-' + digits.slice(3, 7) + (digits.length > 7 ? '-' + digits.slice(7, 11) : '');
+    }
+    if (digits.length <= 10 && digits.indexOf('02') === 0) {
+        if (digits.length <= 5) return digits.slice(0, 2) + (digits.length > 2 ? '-' + digits.slice(2) : '');
+        return digits.slice(0, 2) + '-' + digits.slice(2, 5) + (digits.length > 5 ? '-' + digits.slice(5, 10) : '');
+    }
+    if (digits.length <= 10 && /^01[1-9]/.test(digits)) {
+        if (digits.length <= 6) return digits.slice(0, 3) + (digits.length > 3 ? '-' + digits.slice(3) : '');
+        return digits.slice(0, 3) + '-' + digits.slice(3, 6) + (digits.length > 6 ? '-' + digits.slice(6, 10) : '');
+    }
+    return digits.slice(0, 13);
+}
+
+function setupPhoneFormat() {
+    document.querySelectorAll('input[name="contact_person_phone"]').forEach(function (input) {
+        input.addEventListener('input', function () {
+            var start = this.selectionStart;
+            var oldLen = this.value.length;
+            var formatted = formatPhoneInput(this.value);
+            this.value = formatted;
+            var newLen = formatted.length;
+            var diff = newLen - oldLen;
+            var newStart = Math.max(0, Math.min(start + diff, formatted.length));
+            this.setSelectionRange(newStart, newStart);
+        });
+    });
+}
+
 function layerShow(id) {
     const el = document.getElementById(id);
     if (el) {
@@ -169,6 +206,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
     setupFileInputs();
     setupReceiptToggles();
+    setupPhoneFormat();
     setupRoommateSearch();
 
     var btnRoommateApply = document.getElementById('btnRoommateApply');

@@ -2,6 +2,8 @@
 
 namespace App\Http\Requests\SeminarTraining;
 
+use App\Models\Member;
+use Illuminate\Contracts\Validation\Validator;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Http\Exceptions\HttpResponseException;
 
@@ -10,6 +12,30 @@ class SeminarTrainingApplicationRequest extends FormRequest
     public function authorize(): bool
     {
         return $this->user('member') !== null;
+    }
+
+    public function withValidator(Validator $validator): void
+    {
+        $validator->after(function (Validator $validator) {
+            $email = $this->input('contact_person_email');
+            if (is_string($email) && $email !== '' && str_contains($email, '@')) {
+                $domain = strtolower(explode('@', $email)[1] ?? '');
+                $blocked = [
+                    'example.com', 'example.org', 'example.net', 'example.edu',
+                    'test.com', 'test.org', 'test.net',
+                    'aaa.com', 'bbb.com', 'ccc.com',
+                    'asdf.com', 'qwerty.com', 'sample.com', 'domain.com',
+                    'localhost', 'homepage.com', 'temp.com', 'fake.com',
+                ];
+                if ($domain !== '' && in_array($domain, $blocked, true)) {
+                    $validator->errors()->add('contact_person_email', '유효하지 않은 메일주소입니다.');
+                }
+            }
+            $phone = $this->input('contact_person_phone');
+            if (is_string($phone) && $phone !== '' && ! Member::isValidPhoneFormat($phone)) {
+                $validator->errors()->add('contact_person_phone', '올바른 휴대폰번호 형식이 아닙니다. (예: 010-1234-5678)');
+            }
+        });
     }
 
     protected function failedAuthorization(): void
@@ -90,6 +116,7 @@ class SeminarTrainingApplicationRequest extends FormRequest
             'required' => ':attribute을(를) 입력해주세요.',
             'required_if' => ':attribute을(를) 입력해주세요.',
             'email' => ':attribute 형식이 올바르지 않습니다.',
+            'max' => ':attribute은(는) :max자 이하여야 합니다.',
             'max.string' => ':attribute은(는) :max자 이하여야 합니다.',
             'exists' => '선택한 :attribute이(가) 올바르지 않습니다.',
             'in' => '선택한 :attribute이(가) 올바르지 않습니다.',

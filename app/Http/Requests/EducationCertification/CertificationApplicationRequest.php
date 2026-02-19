@@ -2,6 +2,8 @@
 
 namespace App\Http\Requests\EducationCertification;
 
+use App\Models\Member;
+use Illuminate\Contracts\Validation\Validator;
 use Illuminate\Foundation\Http\FormRequest;
 
 class CertificationApplicationRequest extends FormRequest
@@ -12,6 +14,30 @@ class CertificationApplicationRequest extends FormRequest
     public function authorize(): bool
     {
         return $this->user('member') !== null;
+    }
+
+    public function withValidator(Validator $validator): void
+    {
+        $validator->after(function (Validator $validator) {
+            $email = $this->input('contact_person_email');
+            if (is_string($email) && $email !== '' && str_contains($email, '@')) {
+                $domain = strtolower(explode('@', $email)[1] ?? '');
+                $blocked = [
+                    'example.com', 'example.org', 'example.net', 'example.edu',
+                    'test.com', 'test.org', 'test.net',
+                    'aaa.com', 'bbb.com', 'ccc.com',
+                    'asdf.com', 'qwerty.com', 'sample.com', 'domain.com',
+                    'localhost', 'homepage.com', 'temp.com', 'fake.com',
+                ];
+                if ($domain !== '' && in_array($domain, $blocked, true)) {
+                    $validator->errors()->add('contact_person_email', '유효하지 않은 메일주소입니다.');
+                }
+            }
+            $phone = $this->input('contact_person_phone');
+            if (is_string($phone) && $phone !== '' && ! Member::isValidPhoneFormat($phone)) {
+                $validator->errors()->add('contact_person_phone', '올바른 휴대폰번호 형식이 아닙니다. (예: 010-1234-5678)');
+            }
+        });
     }
 
     /**
@@ -82,12 +108,11 @@ class CertificationApplicationRequest extends FormRequest
             'exists' => ':attribute을(를) 올바르게 선택해주세요.',
             'date' => ':attribute을(를) 올바른 형식으로 입력해주세요.',
             'image' => ':attribute은(는) 이미지 파일(jpg, jpeg, png)만 업로드 가능합니다.',
-            'max' => [
-                'numeric' => ':attribute은(는) :max 이하여야 합니다.',
-                'file' => ':attribute은(는) :max KB 이하여야 합니다.',
-                'string' => ':attribute은(는) :max자 이하여야 합니다.',
-                'array' => ':attribute은(는) :max개 이하여야 합니다.',
-            ],
+            'max' => ':attribute은(는) :max자 이하여야 합니다.',
+            'max.numeric' => ':attribute은(는) :max 이하여야 합니다.',
+            'max.file' => ':attribute은(는) 2MB 이하여야 합니다.',
+            'max.string' => ':attribute은(는) :max자 이하여야 합니다.',
+            'max.array' => ':attribute은(는) :max개 이하여야 합니다.',
             'email' => ':attribute을(를) 올바른 형식으로 입력해주세요.',
             'in' => ':attribute을(를) 올바르게 선택해주세요.',
             'mimes' => ':attribute은(는) :values 형식만 업로드 가능합니다.',
