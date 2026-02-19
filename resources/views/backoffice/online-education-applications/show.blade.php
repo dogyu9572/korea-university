@@ -76,7 +76,7 @@
                             <label class="member-form-label">참가비</label>
                             <div class="member-form-field">
                                 <div class="board-form-control readonly-field-full">
-                                    자동 입력
+                                    {{ ($program->is_free ?? (float)($program->fee ?? 0) == 0) ? '무료' : number_format((float)($program->fee ?? 0)) . '원' }}
                                 </div>
                             </div>
                         </div>
@@ -135,6 +135,7 @@
                                         <option value="전체" @selected(request('payment_status', '전체') == '전체')>전체</option>
                                         <option value="미입금" @selected(request('payment_status') == '미입금')>미입금</option>
                                         <option value="입금완료" @selected(request('payment_status') == '입금완료')>입금완료</option>
+                                        <option value="무료" @selected(request('payment_status') == '무료')>무료</option>
                                     </select>
                                 </div>
                                 <div class="filter-group">
@@ -221,26 +222,41 @@
                                         <td>{{ $application->applicant_name }}</td>
                                         <td>{{ $application->member->login_id ?? '-' }}</td>
                                         <td>{{ $application->phone_number }}</td>
+                                        @php
+                                            $appIsFree = (float)($application->participation_fee ?? 0) == 0;
+                                        @endphp
                                         <td>
-                                            <select name="payment_status[{{ $application->id }}]" class="form-control form-control-sm table-select-sm" data-action="update-payment-status" data-application-id="{{ $application->id }}">
-                                                <option value="미입금" @selected($application->payment_status == '미입금')>미입금</option>
-                                                <option value="입금완료" @selected($application->payment_status == '입금완료')>입금완료</option>
-                                            </select>
+                                            @if($appIsFree)
+                                                무료
+                                            @else
+                                                <select name="payment_status[{{ $application->id }}]" class="form-control form-control-sm table-select-sm" data-action="update-payment-status" data-application-id="{{ $application->id }}">
+                                                    <option value="미입금" @selected($application->payment_status == '미입금')>미입금</option>
+                                                    <option value="입금완료" @selected($application->payment_status == '입금완료')>입금완료</option>
+                                                </select>
+                                            @endif
                                         </td>
-                                        <td>{{ $application->payment_date ? $application->payment_date->format('Y.m.d H:i') : '-' }}</td>
+                                        <td>{{ $appIsFree ? '-' : ($application->payment_date ? $application->payment_date->format('Y.m.d H:i') : '-') }}</td>
                                         <td>
-                                            <select name="tax_invoice_status[{{ $application->id }}]" class="form-control form-control-sm table-select-sm" data-action="update-tax-invoice-status" data-application-id="{{ $application->id }}">
-                                                <option value="미신청" @selected($application->tax_invoice_status == '미신청')>미신청</option>
-                                                <option value="신청완료" @selected($application->tax_invoice_status == '신청완료')>신청완료</option>
-                                                <option value="발행완료" @selected($application->tax_invoice_status == '발행완료')>발행완료</option>
-                                            </select>
+                                            @if($appIsFree)
+                                                -
+                                            @else
+                                                <select name="tax_invoice_status[{{ $application->id }}]" class="form-control form-control-sm table-select-sm" data-action="update-tax-invoice-status" data-application-id="{{ $application->id }}">
+                                                    <option value="미신청" @selected($application->tax_invoice_status == '미신청')>미신청</option>
+                                                    <option value="신청완료" @selected($application->tax_invoice_status == '신청완료')>신청완료</option>
+                                                    <option value="발행완료" @selected($application->tax_invoice_status == '발행완료')>발행완료</option>
+                                                </select>
+                                            @endif
                                         </td>
                                         <td>{{ $application->application_date->format('Y.m.d H:i') }}</td>
                                         <td>
+                                            @php
+                                                $displayCourseStatus = $application->cancelled_at ? '수강취소' : ($application->course_status ?? '접수');
+                                            @endphp
                                             <select name="course_status[{{ $application->id }}]" class="form-control form-control-sm table-select-sm" data-action="update-course-status" data-application-id="{{ $application->id }}">
-                                                <option value="접수" @selected(($application->course_status ?? '') == '접수')>접수</option>
-                                                <option value="승인" @selected(($application->course_status ?? '') == '승인')>승인</option>
-                                                <option value="만료" @selected(($application->course_status ?? '') == '만료')>만료</option>
+                                                <option value="접수" @selected($displayCourseStatus == '접수')>접수</option>
+                                                <option value="승인" @selected($displayCourseStatus == '승인')>승인</option>
+                                                <option value="만료" @selected($displayCourseStatus == '만료')>만료</option>
+                                                <option value="수강취소" @selected($displayCourseStatus == '수강취소')>수강취소</option>
                                             </select>
                                         </td>
                                         <td>

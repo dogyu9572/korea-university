@@ -364,7 +364,7 @@ class EducationApplicationController extends BaseController
     public function updatePaymentStatus(EducationApplication $education_application, Request $request)
     {
         $request->validate([
-            'payment_status' => 'required|in:미입금,입금완료',
+            'payment_status' => 'required|in:미입금,입금완료,무료',
         ]);
 
         $this->educationApplicationService->updateApplicationPaymentStatus($education_application, $request->payment_status);
@@ -396,6 +396,20 @@ class EducationApplicationController extends BaseController
         ]);
 
         $this->educationApplicationService->updateApplicationCompletionStatus($education_application, $request->boolean('is_completed'));
+
+        return response()->json(['success' => true]);
+    }
+
+    /**
+     * 신청별 수강상태 즉시 업데이트
+     */
+    public function updateCourseStatus(EducationApplication $education_application, Request $request)
+    {
+        $request->validate([
+            'course_status' => 'required|in:접수,승인,만료,수강취소',
+        ]);
+
+        $education_application->update(['course_status' => $request->course_status]);
 
         return response()->json(['success' => true]);
     }

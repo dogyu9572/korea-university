@@ -145,17 +145,21 @@
             </table>
         </div>
 
+        @if(!($onlineEducation->is_free ?? (float)($onlineEducation->fee ?? 0) == 0))
         <div class="otit">증빙서류 발행 여부</div>
         <div class="glbox dl_slice in_inputs dt_long">
             <dl>
                 <dt>현금영수증 발행</dt>
                 <dd class="radios">
+                    @php
+                        $defaultHasCashReceipt = old('has_cash_receipt') !== null ? old('has_cash_receipt') : ($cashReceiptDefaults['has_cash_receipt'] ?? false ? '1' : '0');
+                    @endphp
                     <label class="radio">
-                        <input type="radio" name="has_cash_receipt" value="1" @checked(old('has_cash_receipt') === '1')>
+                        <input type="radio" name="has_cash_receipt" value="1" @checked($defaultHasCashReceipt === '1')>
                         <i></i><span>발행</span>
                     </label>
                     <label class="radio">
-                        <input type="radio" name="has_cash_receipt" value="0" @checked(old('has_cash_receipt', '0') === '0')>
+                        <input type="radio" name="has_cash_receipt" value="0" @checked($defaultHasCashReceipt === '0')>
                         <i></i><span>미발행</span>
                     </label>
                 </dd>
@@ -164,12 +168,15 @@
                 <dl>
                     <dt>용도 선택</dt>
                     <dd class="radios">
+                        @php
+                            $defaultPurpose = old('cash_receipt_purpose') ?? ($cashReceiptDefaults['cash_receipt_purpose'] ?? '');
+                        @endphp
                         <label class="radio">
-                            <input type="radio" name="cash_receipt_purpose" value="소득공제용" @checked(old('cash_receipt_purpose') === '소득공제용')>
+                            <input type="radio" name="cash_receipt_purpose" value="소득공제용" @checked($defaultPurpose === '소득공제용')>
                             <i></i><span>소득공제용</span>
                         </label>
                         <label class="radio">
-                            <input type="radio" name="cash_receipt_purpose" value="사업자지출증빙용" @checked(old('cash_receipt_purpose') === '사업자지출증빙용')>
+                            <input type="radio" name="cash_receipt_purpose" value="사업자지출증빙용" @checked($defaultPurpose === '사업자지출증빙용')>
                             <i></i><span>사업자 지출증빙용</span>
                         </label>
                         @error('cash_receipt_purpose')
@@ -180,7 +187,7 @@
                 <dl>
                     <dt>발행번호</dt>
                     <dd>
-                        <input type="text" name="cash_receipt_number" class="w1 @error('cash_receipt_number') is-invalid @enderror" value="{{ old('cash_receipt_number', $member->phone_number) }}" placeholder="휴대폰번호 또는 사업자등록번호">
+                        <input type="text" name="cash_receipt_number" class="w1 @error('cash_receipt_number') is-invalid @enderror" value="{{ old('cash_receipt_number', $cashReceiptDefaults['cash_receipt_number'] ?? ($member?->phone_number ?? '')) }}" placeholder="휴대폰번호 또는 사업자등록번호">
                         @error('cash_receipt_number')
                             <p class="join_field_error" style="color:#c00;font-size:0.875rem;margin-top:0.25rem;">{{ $message }}</p>
                         @enderror
@@ -248,6 +255,7 @@
             </div>
             <p class="ne">세금계산서는 입금 확인 후 3영업일 이내 이메일로 발송됩니다.</p>
         </div>
+        @endif
 
         <div class="btns_tac">
             <a href="javascript:history.back();" class="btn btn_bwb">취소</a>

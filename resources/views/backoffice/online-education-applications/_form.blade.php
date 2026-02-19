@@ -1,6 +1,8 @@
 @php
     $app = $application ?? null;
     $isEdit = $isEdit ?? false;
+    $participationFee = (float) ($app?->participation_fee ?? (isset($program) ? ($program->fee ?? 0) : 0));
+    $isFree = $participationFee == 0;
 @endphp
 <form action="{{ $isEdit ? route('backoffice.online-education-applications.update', $app) : route('backoffice.online-education-applications.store') }}" method="POST" enctype="multipart/form-data" id="applicationForm">
     @csrf
@@ -116,6 +118,7 @@
                         <option value="접수" @selected(old('course_status', $app?->course_status ?? '접수') == '접수')>접수</option>
                         <option value="승인" @selected(old('course_status', $app?->course_status ?? '') == '승인')>승인</option>
                         <option value="만료" @selected(old('course_status', $app?->course_status ?? '') == '만료')>만료</option>
+                        <option value="수강취소" @selected(old('course_status', $app?->course_status ?? '') == '수강취소')>수강취소</option>
                     </select>
                     @error('course_status')
                         <div class="invalid-feedback">{{ $message }}</div>
@@ -241,12 +244,13 @@
                 <label class="member-form-label">참가비</label>
                 <div class="member-form-field">
                     <div class="board-form-control readonly-field form-field-flex-200">
-                        자동 입력
+                        {{ $isFree ? '무료' : number_format($participationFee) . '원' }}
                     </div>
                     <input type="hidden" id="participation_fee" name="participation_fee" value="{{ old('participation_fee', $app?->participation_fee ?? '') }}">
                     <input type="hidden" id="fee_type" name="fee_type" value="{{ old('fee_type', $app?->fee_type ?? '') }}">
                 </div>
             </div>
+            @if(!$isFree)
             <div class="member-form-row">
                 <label class="member-form-label">결제방법</label>
                 <div class="member-form-field">
@@ -275,9 +279,14 @@
                     @enderror
                 </div>
             </div>
+            @endif
             <div class="member-form-row">
                 <label class="member-form-label">결제상태 <span class="required">*</span></label>
                 <div class="member-form-field">
+                    @if($isFree)
+                        <div class="board-form-control readonly-field form-field-flex-200">무료</div>
+                        <input type="hidden" name="payment_status" value="무료">
+                    @else
                     <div class="form-row-group">
                         <div class="form-row-inline">
                             <span class="sub-label" style="margin-bottom:0;">결제상태</span>
@@ -304,15 +313,23 @@
                     @error('payment_status')
                         <div class="invalid-feedback">{{ $message }}</div>
                     @enderror
+                    @endif
                 </div>
             </div>
+            @if(!$isFree)
             <div class="member-form-row">
                 <label class="member-form-label">세금계산서 발행여부</label>
                 <div class="member-form-field">
+                    @php
+                        $taxInvoiceStatus = trim((string)(old('tax_invoice_status', $app?->tax_invoice_status ?? '미신청')));
+                        if ($taxInvoiceStatus === '') {
+                            $taxInvoiceStatus = '미신청';
+                        }
+                    @endphp
                     <select name="tax_invoice_status" class="board-form-control @error('tax_invoice_status') is-invalid @enderror">
-                        <option value="미신청" @selected(old('tax_invoice_status', $app?->tax_invoice_status ?? '미신청') == '미신청')>미신청</option>
-                        <option value="신청완료" @selected(old('tax_invoice_status', $app?->tax_invoice_status ?? '') == '신청완료')>신청완료</option>
-                        <option value="발행완료" @selected(old('tax_invoice_status', $app?->tax_invoice_status ?? '') == '발행완료')>발행완료</option>
+                        <option value="미신청" @selected($taxInvoiceStatus === '미신청')>미신청</option>
+                        <option value="신청완료" @selected($taxInvoiceStatus === '신청완료')>신청완료</option>
+                        <option value="발행완료" @selected($taxInvoiceStatus === '발행완료')>발행완료</option>
                     </select>
                     @error('tax_invoice_status')
                         <div class="invalid-feedback">{{ $message }}</div>
@@ -320,22 +337,21 @@
                 </div>
             </div>
             <div class="member-form-row">
-                <label class="member-form-label">현금영수증</label>
+                <label class="member-form-label">현금영수증 발행여부</label>
+                <div class="member-form-field">
+                    <select name="has_cash_receipt" class="board-form-control @error('has_cash_receipt') is-invalid @enderror" id="has_cash_receipt_select">
+                        <option value="0" @selected((int)(old('has_cash_receipt', $app?->has_cash_receipt ?? 0)) === 0)>미발행</option>
+                        <option value="1" @selected((int)(old('has_cash_receipt', $app?->has_cash_receipt ?? 0)) === 1)>발행완료</option>
+                    </select>
+                    @error('has_cash_receipt')
+                        <div class="invalid-feedback">{{ $message }}</div>
+                    @enderror
+                </div>
+            </div>
+            <div class="member-form-row">
+                <label class="member-form-label">현금영수증 발행 정보</label>
                 <div class="member-form-field">
                     <div class="form-row-group">
-                        <div class="form-row-inline">
-                            <span class="sub-label" style="margin-bottom:0;">현금영수증</span>
-                            <div class="board-radio-group">
-                                <div class="board-radio-item">
-                                    <input type="radio" id="has_cash_receipt_y" name="has_cash_receipt" value="1" class="board-radio-input" @checked(old('has_cash_receipt', $app?->has_cash_receipt ?? 0) == 1)>
-                                    <label for="has_cash_receipt_y">Y</label>
-                                </div>
-                                <div class="board-radio-item">
-                                    <input type="radio" id="has_cash_receipt_n" name="has_cash_receipt" value="0" class="board-radio-input" @checked(old('has_cash_receipt', $app?->has_cash_receipt ?? 0) == 0)>
-                                    <label for="has_cash_receipt_n">N</label>
-                                </div>
-                            </div>
-                        </div>
                         <div class="form-row-inline">
                             <span class="sub-label" style="margin-bottom:0;">용도선택</span>
                             <div class="board-radio-group">
@@ -436,6 +452,7 @@
                     </div>
                 </div>
             </div>
+            @endif
         </div>
     </div>
 

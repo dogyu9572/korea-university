@@ -36,7 +36,7 @@ class EducationApplicationStoreRequest extends FormRequest
             'fee_type' => 'nullable|string|max:50',
             'payment_method' => 'nullable|array',
             'payment_method.*' => 'in:무통장입금,방문카드결제,온라인카드결제',
-            'payment_status' => 'required|in:미입금,입금완료',
+            'payment_status' => 'required|in:미입금,입금완료,무료',
             'payment_date' => 'nullable|date',
             'tax_invoice_status' => 'nullable|in:미신청,신청완료,발행완료',
             'has_cash_receipt' => 'nullable|boolean',
@@ -53,7 +53,7 @@ class EducationApplicationStoreRequest extends FormRequest
             'refund_account_number' => 'nullable|string|max:50',
             'attachments.*' => 'nullable|file|max:10240',
             // 온라인교육 전용
-            'course_status' => 'nullable|string|in:접수,승인,만료',
+            'course_status' => 'nullable|string|in:접수,승인,만료,수강취소',
             'attendance_rate' => 'nullable|numeric|min:0|max:100',
             // 자격증 전용
             'score' => 'nullable|integer|min:0',

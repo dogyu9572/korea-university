@@ -405,6 +405,8 @@ Route::prefix('backoffice')->middleware(['backoffice'])->group(function () {
         ->name('backoffice.applications.update-tax-invoice-status');
     Route::patch('applications/{education_application}/completion-status', [EducationApplicationController::class, 'updateCompletionStatus'])
         ->name('backoffice.applications.update-completion-status');
+    Route::patch('applications/{education_application}/course-status', [EducationApplicationController::class, 'updateCourseStatus'])
+        ->name('backoffice.applications.update-course-status');
 
     // 온라인 교육 관리
     Route::resource('online-educations', OnlineEducationController::class, [

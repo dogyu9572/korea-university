@@ -198,9 +198,14 @@ class EducationCertificationController extends Controller
                 ->with('error', '이미 해당 온라인교육을 신청하셨습니다.');
         }
 
+        $cashReceiptDefaults = $member
+            ? $this->applicationService->getMemberLastCashReceiptPreferences($member->id)
+            : ['has_cash_receipt' => false, 'cash_receipt_purpose' => null, 'cash_receipt_number' => null];
+
         $viewData = array_merge($this->menuMeta(), [
             'onlineEducation' => $onlineEducation,
             'member' => $member,
+            'cashReceiptDefaults' => $cashReceiptDefaults,
         ]);
 
         try {

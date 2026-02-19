@@ -146,6 +146,7 @@ class ApplicationStatusService
         $application->update([
             'cancelled_at' => now(),
             'receipt_status' => '접수취소',
+            'course_status' => '수강취소',
         ]);
     }
 

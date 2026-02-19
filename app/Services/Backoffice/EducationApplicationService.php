@@ -180,7 +180,13 @@ class EducationApplicationService
             ->with(['member', 'education', 'onlineEducation', 'certification', 'seminarTraining']);
 
         if ($request->filled('payment_status') && $request->payment_status !== '전체') {
-            $query->where('payment_status', $request->payment_status);
+            if ($request->payment_status === '무료') {
+                $query->where(function ($q) {
+                    $q->where('payment_status', '무료')->orWhere('participation_fee', 0);
+                });
+            } else {
+                $query->where('payment_status', $request->payment_status);
+            }
         }
 
         if ($request->filled('search')) {
@@ -212,7 +218,13 @@ class EducationApplicationService
         }
 
         if ($request->filled('payment_status') && $request->payment_status !== '전체') {
-            $query->where('payment_status', $request->payment_status);
+            if ($request->payment_status === '무료') {
+                $query->where(function ($q) {
+                    $q->where('payment_status', '무료')->orWhere('participation_fee', 0);
+                });
+            } else {
+                $query->where('payment_status', $request->payment_status);
+            }
         }
 
         if ($request->filled('search')) {
@@ -518,11 +530,11 @@ class EducationApplicationService
             $applicationDate = $request->application_date ? \Carbon\Carbon::parse($request->application_date) : now();
             $data['application_number'] = $this->generateApplicationNumber($applicationDate);
 
-            // boolean 처리
-            $data['is_completed'] = $request->has('is_completed') ? (bool)$request->is_completed : false;
-            $data['is_survey_completed'] = $request->has('is_survey_completed') ? (bool)$request->is_survey_completed : false;
-            $data['has_cash_receipt'] = $request->has('has_cash_receipt') ? (bool)$request->has_cash_receipt : false;
-            $data['has_tax_invoice'] = $request->has('has_tax_invoice') ? (bool)$request->has_tax_invoice : false;
+            // boolean 처리 (input() 사용하여 폼값 정확히 반영)
+            $data['is_completed'] = $request->boolean('is_completed');
+            $data['is_survey_completed'] = $request->boolean('is_survey_completed');
+            $data['has_cash_receipt'] = $request->boolean('has_cash_receipt');
+            $data['has_tax_invoice'] = $request->boolean('has_tax_invoice');
 
             if (!isset($data['receipt_status']) || $data['receipt_status'] === '') {
                 $data['receipt_status'] = $data['is_completed'] ? '수료' : '신청완료';
@@ -663,11 +675,11 @@ class EducationApplicationService
                 'roommate_phone',
             ]);
 
-            // boolean 처리
-            $data['is_completed'] = $request->has('is_completed') ? (bool)$request->is_completed : false;
-            $data['is_survey_completed'] = $request->has('is_survey_completed') ? (bool)$request->is_survey_completed : false;
-            $data['has_cash_receipt'] = $request->has('has_cash_receipt') ? (bool)$request->has_cash_receipt : false;
-            $data['has_tax_invoice'] = $request->has('has_tax_invoice') ? (bool)$request->has_tax_invoice : false;
+            // boolean 처리 (input() 사용하여 폼값 정확히 반영)
+            $data['is_completed'] = $request->boolean('is_completed');
+            $data['is_survey_completed'] = $request->boolean('is_survey_completed');
+            $data['has_cash_receipt'] = $request->boolean('has_cash_receipt');
+            $data['has_tax_invoice'] = $request->boolean('has_tax_invoice');
 
             // payment_method는 모델의 casts가 자동으로 JSON 처리
             if (!$request->has('payment_method') || !is_array($request->payment_method)) {

@@ -139,7 +139,24 @@
 
 .online-application-list-table th,
 .online-application-list-table td {
-    padding: 8px 10px;
+    padding: 2px;
     overflow: hidden;
     text-overflow: ellipsis;
+}
+
+/* 교육 신청 edit 페이지 div 기반 폼 - 행·라벨 padding 2px */
+.education-applications .member-form-row {
+    padding: 2px 0;
+}
+
+.education-applications .member-form-label {
+    padding: 2px 0;
+}
+
+/* 행 hover 시 배경/여백 변화 제거 (소속기관 등 필드 호버 시 깜빡임 방지) */
+.education-applications .member-form-row:hover {
+    background-color: transparent;
+    margin: 0;
+    padding-left: 0;
+    padding-right: 0;
 }

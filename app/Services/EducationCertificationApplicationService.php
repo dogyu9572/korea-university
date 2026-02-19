@@ -59,7 +59,7 @@ class EducationCertificationApplicationService
     {
         $item = Education::query()
             ->with(['attachments'])
-            ->withCount('applications as applications_count')
+            ->withCount(['applications as applications_count' => fn ($q) => $q->whereNull('cancelled_at')])
             ->find($id);
 
         if (!$item || !$item->is_public || $item->application_status === '비공개') {
@@ -76,7 +76,7 @@ class EducationCertificationApplicationService
     {
         $item = Certification::query()
             ->with(['attachments'])
-            ->withCount('applications as applications_count')
+            ->withCount(['applications as applications_count' => fn ($q) => $q->whereNull('cancelled_at')])
             ->find($id);
 
         if (!$item || !$item->is_public || $item->application_status === '비공개') {
@@ -93,7 +93,7 @@ class EducationCertificationApplicationService
     {
         $item = OnlineEducation::query()
             ->with(['attachments', 'lectures'])
-            ->withCount('applications as applications_count')
+            ->withCount(['applications as applications_count' => fn ($q) => $q->whereNull('cancelled_at')])
             ->find($id);
 
         if (!$item || !$item->is_public || $item->application_status === '비공개') {
@@ -346,7 +346,10 @@ class EducationCertificationApplicationService
                     'participation_fee' => $participationFee,
                     'fee_type' => $program->is_free ? null : ($request->input('fee_type') ?: 'default'),
                     'payment_method' => $program->payment_methods ?? null,
+                    'payment_status' => $program->is_free ? '무료' : '미입금',
                     'course_status' => '접수',
+                    // 회원이 세금계산서 발행(Y) 선택 시 발행여부를 신청완료로 저장
+                    'tax_invoice_status' => !empty($billing['has_tax_invoice']) ? '신청완료' : '미신청',
                 ]
             );
 
@@ -570,6 +573,7 @@ class EducationCertificationApplicationService
 
         $count = EducationApplication::query()
             ->where($column, $programId)
+            ->whereNull('cancelled_at')
             ->lockForUpdate()
             ->count();
 
@@ -588,6 +592,7 @@ class EducationCertificationApplicationService
         $exists = EducationApplication::query()
             ->where($column, $programId)
             ->where('member_id', $memberId)
+            ->whereNull('cancelled_at')
             ->lockForUpdate()
             ->exists();
 
@@ -668,7 +673,7 @@ class EducationCertificationApplicationService
     private function lockEducationForApplication(int $id): ?Education
     {
         return Education::query()
-            ->withCount('applications as applications_count')
+            ->withCount(['applications as applications_count' => fn ($q) => $q->whereNull('cancelled_at')])
             ->whereKey($id)
             ->lockForUpdate()
             ->first();
@@ -680,7 +685,7 @@ class EducationCertificationApplicationService
     private function lockCertificationForApplication(int $id): ?Certification
     {
         return Certification::query()
-            ->withCount('applications as applications_count')
+            ->withCount(['applications as applications_count' => fn ($q) => $q->whereNull('cancelled_at')])
             ->whereKey($id)
             ->lockForUpdate()
             ->first();
@@ -692,7 +697,7 @@ class EducationCertificationApplicationService
     private function lockOnlineEducationForApplication(int $id): ?OnlineEducation
     {
         return OnlineEducation::query()
-            ->withCount('applications as applications_count')
+            ->withCount(['applications as applications_count' => fn ($q) => $q->whereNull('cancelled_at')])
             ->whereKey($id)
             ->lockForUpdate()
             ->first();
@@ -927,7 +932,7 @@ class EducationCertificationApplicationService
         $query = Education::query()
             ->where('is_public', true)
             ->whereNot('application_status', '비공개')
-            ->withCount('applications as applications_count');
+            ->withCount(['applications as applications_count' => fn ($q) => $q->whereNull('cancelled_at')]);
 
         if ($request && $request->filled('name')) {
             $query->where('name', 'like', '%' . $request->name . '%');
@@ -948,7 +953,7 @@ class EducationCertificationApplicationService
         $query = Certification::query()
             ->where('is_public', true)
             ->whereNot('application_status', '비공개')
-            ->withCount('applications as applications_count');
+            ->withCount(['applications as applications_count' => fn ($q) => $q->whereNull('cancelled_at')]);
 
         if ($request && $request->filled('name')) {
             $query->where('name', 'like', '%' . $request->name . '%');
@@ -966,7 +971,7 @@ class EducationCertificationApplicationService
         $query = OnlineEducation::query()
             ->where('is_public', true)
             ->whereNot('application_status', '비공개')
-            ->withCount('applications as applications_count');
+            ->withCount(['applications as applications_count' => fn ($q) => $q->whereNull('cancelled_at')]);
 
         if ($request && $request->filled('name')) {
             $query->where('name', 'like', '%' . $request->name . '%');
@@ -1010,6 +1015,7 @@ class EducationCertificationApplicationService
         return EducationApplication::query()
             ->where('member_id', $memberId)
             ->where('education_id', $educationId)
+            ->whereNull('cancelled_at')
             ->exists();
     }
 
@@ -1021,7 +1027,37 @@ class EducationCertificationApplicationService
         return EducationApplication::query()
             ->where('member_id', $memberId)
             ->where('online_education_id', $onlineEducationId)
+            ->whereNull('cancelled_at')
             ->exists();
+    }
+
+    /**
+     * 회원이 이전 신청에서 등록한 현금영수증 발행 정보(가장 최근 1건)를 반환합니다.
+     * 목록/폼 기본값 반영용.
+     *
+     * @return array{has_cash_receipt: bool, cash_receipt_purpose: ?string, cash_receipt_number: ?string}
+     */
+    public function getMemberLastCashReceiptPreferences(int $memberId): array
+    {
+        $app = EducationApplication::query()
+            ->where('member_id', $memberId)
+            ->where(function ($q) {
+                $q->where('has_cash_receipt', true)
+                    ->orWhereNotNull('cash_receipt_purpose')
+                    ->orWhereNotNull('cash_receipt_number');
+            })
+            ->orderByDesc('created_at')
+            ->first();
+
+        if (!$app) {
+            return ['has_cash_receipt' => false, 'cash_receipt_purpose' => null, 'cash_receipt_number' => null];
+        }
+
+        return [
+            'has_cash_receipt' => (bool) $app->has_cash_receipt,
+            'cash_receipt_purpose' => $app->cash_receipt_purpose,
+            'cash_receipt_number' => $app->cash_receipt_number,
+        ];
     }
 
     /**
@@ -1039,6 +1075,7 @@ class EducationCertificationApplicationService
         return EducationApplication::query()
             ->where('member_id', $memberId)
             ->whereNotNull('education_id')
+            ->whereNull('cancelled_at')
             ->pluck('education_id')
             ->all();
     }
@@ -1078,6 +1115,7 @@ class EducationCertificationApplicationService
         return EducationApplication::query()
             ->where('member_id', $memberId)
             ->whereNotNull('online_education_id')
+            ->whereNull('cancelled_at')
             ->pluck('online_education_id')
             ->all();
     }
