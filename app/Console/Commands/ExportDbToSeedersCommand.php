@@ -91,7 +91,8 @@ class ExportDbToSeedersCommand extends Command
 
     protected $signature = 'db:export-seeders
                             {--exclude-logs : 로그 테이블(user_access_logs 등) 제외}
-                            {--chunk=500 : 조회/삽입 시 청크 크기}';
+                            {--chunk=500 : 조회/삽입 시 청크 크기}
+                            {--only= : 지정한 테이블만 추출 (쉼표 구분, 예: board_bylaws,board_library). 지정 시 DatabaseSeederForServerMigration 미갱신}';
 
     protected $description = '현재 DB 데이터를 시더 파일로 추출 (회원/교육/신청 내역 제외). 서버 이관용.';
 
@@ -102,6 +103,7 @@ class ExportDbToSeedersCommand extends Command
         if ($chunkSize < 1) {
             $chunkSize = 500;
         }
+        $onlyOption = $this->option('only');
 
         $dbName = config('database.connections.mysql.database');
         $key = 'Tables_in_' . $dbName;
@@ -110,21 +112,43 @@ class ExportDbToSeedersCommand extends Command
             ->values()
             ->all();
 
-        $excluded = array_merge(
-            self::EXCLUDED_TABLES,
-            self::SYSTEM_TABLES
-        );
-        if ($excludeLogs) {
-            $excluded = array_merge($excluded, self::LOG_TABLES);
+        if ($onlyOption !== null && $onlyOption !== '') {
+            $onlyTables = array_map('trim', explode(',', $onlyOption));
+            $allTablesSet = array_flip($allTables);
+            $tables = [];
+            foreach ($onlyTables as $t) {
+                if ($t === '') {
+                    continue;
+                }
+                if (! isset($allTablesSet[$t])) {
+                    $this->warn("테이블 없음(무시): {$t}");
+                    continue;
+                }
+                $tables[] = $t;
+            }
+            if ($tables === []) {
+                $this->error('추출할 테이블이 없습니다.');
+                return self::FAILURE;
+            }
+            $updateCaller = false;
+        } else {
+            $excluded = array_merge(
+                self::EXCLUDED_TABLES,
+                self::SYSTEM_TABLES
+            );
+            if ($excludeLogs) {
+                $excluded = array_merge($excluded, self::LOG_TABLES);
+            }
+            $excluded = array_flip($excluded);
+
+            $tables = collect($allTables)
+                ->filter(fn ($table) => ! isset($excluded[$table]))
+                ->values()
+                ->all();
+
+            $tables = $this->sortTablesByFkOrder($tables);
+            $updateCaller = true;
         }
-        $excluded = array_flip($excluded);
-
-        $tables = collect($allTables)
-            ->filter(fn ($table) => ! isset($excluded[$table]))
-            ->values()
-            ->all();
-
-        $tables = $this->sortTablesByFkOrder($tables);
 
         $this->info('추출 대상 테이블: ' . count($tables) . '개');
         $seedersPath = database_path('seeders');
@@ -133,7 +157,11 @@ class ExportDbToSeedersCommand extends Command
             $this->exportTableToSeeder($table, $seedersPath, $chunkSize);
         }
 
-        $this->writeMigrationSeederCaller($tables, $seedersPath);
+        if ($updateCaller) {
+            $this->writeMigrationSeederCaller($tables, $seedersPath);
+        } else {
+            $this->line('--only 사용: DatabaseSeederForServerMigration은 수정하지 않음.');
+        }
 
         $this->info('완료. 이관 후 새 서버에서 migrate 실행 뒤, 위 시더 한 번만 실행하면 현재 데이터로 표시됩니다.');
         return self::SUCCESS;
