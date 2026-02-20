@@ -1,0 +1,617 @@
+<?php
+
+namespace Database\Seeders;
+
+use Illuminate\Database\Seeder;
+use Illuminate\Support\Facades\DB;
+
+/**
+ * 서버 이관용 시더 (db:export-seeders 로 생성됨)
+ * 테이블: admin_menus
+ */
+class AdminMenuExportSeeder extends Seeder
+{
+    public function run(): void
+    {
+        $table = 'admin_menus';
+        $chunks = [
+        array (
+  0 => 
+  array (
+    'id' => 1,
+    'parent_id' => NULL,
+    'name' => '대시보드',
+    'url' => '/backoffice',
+    'icon' => 'fa-tachometer-alt',
+    'order' => 1,
+    'is_active' => 1,
+    'permission_key' => NULL,
+    'created_at' => '2025-05-05 09:33:08',
+    'updated_at' => '2026-01-22 03:55:23',
+  ),
+  1 => 
+  array (
+    'id' => 2,
+    'parent_id' => NULL,
+    'name' => '시스템 관리',
+    'url' => NULL,
+    'icon' => 'fa-cogs',
+    'order' => 2,
+    'is_active' => 1,
+    'permission_key' => NULL,
+    'created_at' => '2025-05-05 09:33:08',
+    'updated_at' => '2026-01-22 03:55:23',
+  ),
+  2 => 
+  array (
+    'id' => 3,
+    'parent_id' => 2,
+    'name' => '기본설정',
+    'url' => '/backoffice/setting',
+    'icon' => NULL,
+    'order' => 4,
+    'is_active' => 1,
+    'permission_key' => NULL,
+    'created_at' => '2025-05-05 09:33:08',
+    'updated_at' => '2026-01-22 04:00:20',
+  ),
+  3 => 
+  array (
+    'id' => 4,
+    'parent_id' => 2,
+    'name' => '메뉴 관리',
+    'url' => '/backoffice/admin-menus',
+    'icon' => NULL,
+    'order' => 1,
+    'is_active' => 1,
+    'permission_key' => NULL,
+    'created_at' => '2025-05-05 09:33:08',
+    'updated_at' => '2025-10-09 14:41:00',
+  ),
+  4 => 
+  array (
+    'id' => 6,
+    'parent_id' => NULL,
+    'name' => '기본설정',
+    'url' => NULL,
+    'icon' => 'fa-file-alt',
+    'order' => 3,
+    'is_active' => 1,
+    'permission_key' => NULL,
+    'created_at' => '2025-05-05 09:33:08',
+    'updated_at' => '2026-01-22 03:55:23',
+  ),
+  5 => 
+  array (
+    'id' => 7,
+    'parent_id' => 2,
+    'name' => '게시판 관리',
+    'url' => '/backoffice/boards',
+    'icon' => NULL,
+    'order' => 2,
+    'is_active' => 1,
+    'permission_key' => NULL,
+    'created_at' => '2025-05-05 09:33:08',
+    'updated_at' => '2025-10-09 14:41:06',
+  ),
+  6 => 
+  array (
+    'id' => 8,
+    'parent_id' => 21,
+    'name' => '팝업 관리',
+    'url' => '/backoffice/popups',
+    'icon' => NULL,
+    'order' => 3,
+    'is_active' => 1,
+    'permission_key' => NULL,
+    'created_at' => '2025-05-05 09:33:08',
+    'updated_at' => '2026-01-22 04:07:02',
+  ),
+  7 => 
+  array (
+    'id' => 9,
+    'parent_id' => 2,
+    'name' => '게시판 템플릿 관리',
+    'url' => '/backoffice/board-templates',
+    'icon' => NULL,
+    'order' => 3,
+    'is_active' => 1,
+    'permission_key' => NULL,
+    'created_at' => '2025-05-06 09:58:14',
+    'updated_at' => '2025-10-19 14:11:43',
+  ),
+  8 => 
+  array (
+    'id' => 10,
+    'parent_id' => 19,
+    'name' => '공지사항',
+    'url' => '/backoffice/board-posts/notices',
+    'icon' => NULL,
+    'order' => 1,
+    'is_active' => 1,
+    'permission_key' => NULL,
+    'created_at' => '2025-05-06 12:44:51',
+    'updated_at' => '2026-01-22 04:02:19',
+  ),
+  9 => 
+  array (
+    'id' => 17,
+    'parent_id' => 19,
+    'name' => '자료실',
+    'url' => '/backoffice/board-posts/library',
+    'icon' => NULL,
+    'order' => 2,
+    'is_active' => 1,
+    'permission_key' => NULL,
+    'created_at' => '2025-08-21 07:20:49',
+    'updated_at' => '2026-01-22 04:04:54',
+  ),
+  10 => 
+  array (
+    'id' => 18,
+    'parent_id' => 21,
+    'name' => '메인 배너 관리',
+    'url' => '/backoffice/banners',
+    'icon' => NULL,
+    'order' => 2,
+    'is_active' => 1,
+    'permission_key' => NULL,
+    'created_at' => '2025-08-24 09:35:23',
+    'updated_at' => '2026-01-22 04:07:02',
+  ),
+  11 => 
+  array (
+    'id' => 19,
+    'parent_id' => NULL,
+    'name' => '게시판관리',
+    'url' => NULL,
+    'icon' => 'fa-chart-bar',
+    'order' => 7,
+    'is_active' => 1,
+    'permission_key' => NULL,
+    'created_at' => '2025-08-24 09:36:13',
+    'updated_at' => '2026-01-27 08:47:52',
+  ),
+  12 => 
+  array (
+    'id' => 20,
+    'parent_id' => 6,
+    'name' => '관리자 관리',
+    'url' => '/backoffice/admins',
+    'icon' => NULL,
+    'order' => 2,
+    'is_active' => 1,
+    'permission_key' => NULL,
+    'created_at' => '2025-09-19 00:19:49',
+    'updated_at' => '2025-10-09 04:28:31',
+  ),
+  13 => 
+  array (
+    'id' => 21,
+    'parent_id' => NULL,
+    'name' => '홈페이지관리',
+    'url' => NULL,
+    'icon' => 'fa-home',
+    'order' => 8,
+    'is_active' => 1,
+    'permission_key' => NULL,
+    'created_at' => '2025-09-23 07:20:08',
+    'updated_at' => '2026-01-27 08:47:52',
+  ),
+  14 => 
+  array (
+    'id' => 23,
+    'parent_id' => 6,
+    'name' => '권한 관리',
+    'url' => '/backoffice/admin-groups',
+    'icon' => NULL,
+    'order' => 3,
+    'is_active' => 1,
+    'permission_key' => NULL,
+    'created_at' => '2025-10-18 01:55:21',
+    'updated_at' => '2026-01-22 04:08:28',
+  ),
+  15 => 
+  array (
+    'id' => 39,
+    'parent_id' => 6,
+    'name' => '코드 관리',
+    'url' => '/backoffice/categories',
+    'icon' => NULL,
+    'order' => 4,
+    'is_active' => 1,
+    'permission_key' => NULL,
+    'created_at' => '2025-10-09 01:02:41',
+    'updated_at' => '2026-01-22 04:00:31',
+  ),
+  16 => 
+  array (
+    'id' => 40,
+    'parent_id' => 19,
+    'name' => 'FAQ',
+    'url' => '/backoffice/board-posts/faq',
+    'icon' => NULL,
+    'order' => 3,
+    'is_active' => 1,
+    'permission_key' => NULL,
+    'created_at' => '2025-10-26 14:20:31',
+    'updated_at' => '2026-01-22 04:05:13',
+  ),
+  17 => 
+  array (
+    'id' => 41,
+    'parent_id' => NULL,
+    'name' => '통계 관리',
+    'url' => NULL,
+    'icon' => 'fa-chart-line',
+    'order' => 9,
+    'is_active' => 1,
+    'permission_key' => NULL,
+    'created_at' => '2025-12-18 08:44:54',
+    'updated_at' => '2026-01-27 08:47:52',
+  ),
+  18 => 
+  array (
+    'id' => 42,
+    'parent_id' => 41,
+    'name' => '접속 통계',
+    'url' => '/backoffice/access-statistics',
+    'icon' => NULL,
+    'order' => 1,
+    'is_active' => 1,
+    'permission_key' => NULL,
+    'created_at' => '2025-12-18 08:46:17',
+    'updated_at' => '2026-01-29 14:20:45',
+  ),
+  19 => 
+  array (
+    'id' => 43,
+    'parent_id' => 41,
+    'name' => '사용자 접속로그',
+    'url' => '/backoffice/user-access-logs',
+    'icon' => NULL,
+    'order' => 2,
+    'is_active' => 1,
+    'permission_key' => NULL,
+    'created_at' => '2025-12-18 08:46:51',
+    'updated_at' => '2026-01-29 14:20:09',
+  ),
+  20 => 
+  array (
+    'id' => 44,
+    'parent_id' => 41,
+    'name' => '관리자 접속로그',
+    'url' => '/backoffice/admin-access-logs',
+    'icon' => NULL,
+    'order' => 3,
+    'is_active' => 1,
+    'permission_key' => NULL,
+    'created_at' => '2025-12-18 08:47:05',
+    'updated_at' => '2026-01-29 14:20:32',
+  ),
+  21 => 
+  array (
+    'id' => 45,
+    'parent_id' => 21,
+    'name' => '조직도 관리',
+    'url' => '/backoffice/organizational',
+    'icon' => NULL,
+    'order' => 4,
+    'is_active' => 1,
+    'permission_key' => NULL,
+    'created_at' => '2026-01-22 03:45:23',
+    'updated_at' => '2026-01-22 04:07:02',
+  ),
+  22 => 
+  array (
+    'id' => 46,
+    'parent_id' => 21,
+    'name' => '연혁 관리',
+    'url' => '/backoffice/history',
+    'icon' => NULL,
+    'order' => 5,
+    'is_active' => 1,
+    'permission_key' => NULL,
+    'created_at' => '2026-01-22 03:45:23',
+    'updated_at' => '2026-01-22 04:07:02',
+  ),
+  23 => 
+  array (
+    'id' => 47,
+    'parent_id' => NULL,
+    'name' => '회원관리',
+    'url' => NULL,
+    'icon' => 'fa-users',
+    'order' => 4,
+    'is_active' => 1,
+    'permission_key' => NULL,
+    'created_at' => '2026-01-22 03:45:23',
+    'updated_at' => '2026-01-22 03:55:23',
+  ),
+  24 => 
+  array (
+    'id' => 48,
+    'parent_id' => 47,
+    'name' => '회원 목록',
+    'url' => '/backoffice/members',
+    'icon' => NULL,
+    'order' => 1,
+    'is_active' => 1,
+    'permission_key' => NULL,
+    'created_at' => '2026-01-22 03:45:23',
+    'updated_at' => '2026-01-22 04:08:40',
+  ),
+  25 => 
+  array (
+    'id' => 49,
+    'parent_id' => 47,
+    'name' => '학교(회원교)관리',
+    'url' => '/backoffice/schools',
+    'icon' => NULL,
+    'order' => 3,
+    'is_active' => 1,
+    'permission_key' => NULL,
+    'created_at' => '2026-01-22 12:00:00',
+    'updated_at' => '2026-01-29 02:35:59',
+  ),
+  26 => 
+  array (
+    'id' => 50,
+    'parent_id' => 19,
+    'name' => '회원사 채용정보',
+    'url' => '/backoffice/board-posts/recruitments',
+    'icon' => NULL,
+    'order' => 5,
+    'is_active' => 1,
+    'permission_key' => NULL,
+    'created_at' => '2026-01-22 04:05:38',
+    'updated_at' => '2026-01-30 01:35:50',
+  ),
+  27 => 
+  array (
+    'id' => 51,
+    'parent_id' => 47,
+    'name' => '회원 문의',
+    'url' => '/backoffice/inquiries',
+    'icon' => NULL,
+    'order' => 4,
+    'is_active' => 1,
+    'permission_key' => NULL,
+    'created_at' => '2026-01-22 13:00:00',
+    'updated_at' => '2026-02-05 06:08:55',
+  ),
+  28 => 
+  array (
+    'id' => 52,
+    'parent_id' => 21,
+    'name' => '정관 관리',
+    'url' => '/backoffice/board-posts/bylaws',
+    'icon' => NULL,
+    'order' => 6,
+    'is_active' => 1,
+    'permission_key' => NULL,
+    'created_at' => '2026-01-22 04:06:59',
+    'updated_at' => '2026-01-22 04:07:02',
+  ),
+  29 => 
+  array (
+    'id' => 56,
+    'parent_id' => NULL,
+    'name' => '교육 관리',
+    'url' => NULL,
+    'icon' => NULL,
+    'order' => 5,
+    'is_active' => 1,
+    'permission_key' => NULL,
+    'created_at' => '2026-01-26 01:06:28',
+    'updated_at' => '2026-01-26 01:07:13',
+  ),
+  30 => 
+  array (
+    'id' => 57,
+    'parent_id' => 56,
+    'name' => '교육 안내 관리',
+    'url' => '/backoffice/education',
+    'icon' => NULL,
+    'order' => 1,
+    'is_active' => 1,
+    'permission_key' => NULL,
+    'created_at' => '2026-01-26 01:07:33',
+    'updated_at' => '2026-01-26 01:31:10',
+  ),
+  31 => 
+  array (
+    'id' => 58,
+    'parent_id' => 56,
+    'name' => '교육 목록',
+    'url' => '/backoffice/education-programs',
+    'icon' => NULL,
+    'order' => 2,
+    'is_active' => 1,
+    'permission_key' => NULL,
+    'created_at' => '2026-01-26 01:31:06',
+    'updated_at' => '2026-01-26 01:31:10',
+  ),
+  32 => 
+  array (
+    'id' => 59,
+    'parent_id' => 56,
+    'name' => '온라인 교육 목록',
+    'url' => '/backoffice/online-educations',
+    'icon' => NULL,
+    'order' => 3,
+    'is_active' => 1,
+    'permission_key' => NULL,
+    'created_at' => '2026-01-26 13:02:36',
+    'updated_at' => '2026-01-26 13:02:46',
+  ),
+  33 => 
+  array (
+    'id' => 60,
+    'parent_id' => 56,
+    'name' => '자격증 목록',
+    'url' => '/backoffice/certifications',
+    'icon' => NULL,
+    'order' => 4,
+    'is_active' => 1,
+    'permission_key' => NULL,
+    'created_at' => '2026-01-27 01:14:21',
+    'updated_at' => '2026-01-27 01:14:25',
+  ),
+  34 => 
+  array (
+    'id' => 61,
+    'parent_id' => 56,
+    'name' => '세미나/해외연수 목록',
+    'url' => '/backoffice/seminar-trainings',
+    'icon' => NULL,
+    'order' => 5,
+    'is_active' => 1,
+    'permission_key' => NULL,
+    'created_at' => '2026-01-27 02:08:02',
+    'updated_at' => '2026-01-27 02:08:29',
+  ),
+  35 => 
+  array (
+    'id' => 62,
+    'parent_id' => 56,
+    'name' => '강의 영상 관리',
+    'url' => '/backoffice/lecture-videos',
+    'icon' => NULL,
+    'order' => 6,
+    'is_active' => 1,
+    'permission_key' => NULL,
+    'created_at' => '2026-01-27 05:33:22',
+    'updated_at' => '2026-01-27 05:33:40',
+  ),
+  36 => 
+  array (
+    'id' => 63,
+    'parent_id' => NULL,
+    'name' => '신청 관리',
+    'url' => NULL,
+    'icon' => NULL,
+    'order' => 6,
+    'is_active' => 1,
+    'permission_key' => NULL,
+    'created_at' => '2026-01-27 08:47:42',
+    'updated_at' => '2026-01-27 08:47:52',
+  ),
+  37 => 
+  array (
+    'id' => 64,
+    'parent_id' => 63,
+    'name' => '교육 신청내역',
+    'url' => '/backoffice/education-applications',
+    'icon' => NULL,
+    'order' => 1,
+    'is_active' => 1,
+    'permission_key' => NULL,
+    'created_at' => '2026-01-27 08:48:08',
+    'updated_at' => '2026-01-29 02:34:27',
+  ),
+  38 => 
+  array (
+    'id' => 65,
+    'parent_id' => 63,
+    'name' => '온라인 교육 신청내역',
+    'url' => '/backoffice/online-education-applications',
+    'icon' => NULL,
+    'order' => 2,
+    'is_active' => 1,
+    'permission_key' => NULL,
+    'created_at' => '2026-01-29 02:33:37',
+    'updated_at' => '2026-01-29 02:34:27',
+  ),
+  39 => 
+  array (
+    'id' => 66,
+    'parent_id' => 63,
+    'name' => '자격증 신청내역',
+    'url' => '/backoffice/certification-applications',
+    'icon' => NULL,
+    'order' => 3,
+    'is_active' => 1,
+    'permission_key' => NULL,
+    'created_at' => '2026-01-29 02:33:55',
+    'updated_at' => '2026-01-29 02:34:27',
+  ),
+  40 => 
+  array (
+    'id' => 67,
+    'parent_id' => 63,
+    'name' => '세미나/해외연수 신청내역',
+    'url' => '/backoffice/seminar-training-applications',
+    'icon' => NULL,
+    'order' => 4,
+    'is_active' => 1,
+    'permission_key' => NULL,
+    'created_at' => '2026-01-29 02:34:12',
+    'updated_at' => '2026-01-29 02:34:27',
+  ),
+  41 => 
+  array (
+    'id' => 68,
+    'parent_id' => 47,
+    'name' => '탈퇴 회원 목록',
+    'url' => '/backoffice/withdrawn',
+    'icon' => NULL,
+    'order' => 2,
+    'is_active' => 1,
+    'permission_key' => NULL,
+    'created_at' => '2026-01-29 02:35:56',
+    'updated_at' => '2026-01-29 02:35:59',
+  ),
+  42 => 
+  array (
+    'id' => 69,
+    'parent_id' => 41,
+    'name' => '교육 통계',
+    'url' => '/backoffice/education-statistics',
+    'icon' => NULL,
+    'order' => 4,
+    'is_active' => 1,
+    'permission_key' => NULL,
+    'created_at' => '2026-01-29 14:19:38',
+    'updated_at' => '2026-02-06 02:22:55',
+  ),
+  43 => 
+  array (
+    'id' => 70,
+    'parent_id' => 41,
+    'name' => '자격증 통계',
+    'url' => '/backoffice/certification-statistics',
+    'icon' => NULL,
+    'order' => 5,
+    'is_active' => 1,
+    'permission_key' => NULL,
+    'created_at' => '2026-01-29 14:19:48',
+    'updated_at' => '2026-02-06 04:06:17',
+  ),
+  44 => 
+  array (
+    'id' => 71,
+    'parent_id' => 19,
+    'name' => '지난 행사',
+    'url' => '/backoffice/board-posts/past_events',
+    'icon' => NULL,
+    'order' => 4,
+    'is_active' => 1,
+    'permission_key' => NULL,
+    'created_at' => '2026-01-30 01:35:41',
+    'updated_at' => '2026-01-30 01:35:50',
+  ),
+)
+    ];
+
+        DB::statement('SET FOREIGN_KEY_CHECKS=0');
+        DB::table($table)->truncate();
+        DB::statement('SET FOREIGN_KEY_CHECKS=1');
+
+        foreach ($chunks as $chunk) {
+            if (count($chunk) > 0) {
+                DB::table($table)->insert($chunk);
+            }
+        }
+    }
+}
