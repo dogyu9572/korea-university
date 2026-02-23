@@ -268,7 +268,11 @@ class SeminarTrainingApplicationService
             'request_notes' => $request->filled('request_notes') ? trim((string) $request->input('request_notes')) : null,
         ]));
 
+        if ($request->filled('remove_business_registration')) {
+            $application->attachments()->where('type', 'business_registration')->delete();
+        }
         if ($request->hasFile('business_registration')) {
+            $application->attachments()->where('type', 'business_registration')->delete();
             $this->storeBusinessRegistration($application, $request->file('business_registration'));
         }
     }

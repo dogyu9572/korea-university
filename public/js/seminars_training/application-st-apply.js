@@ -158,12 +158,27 @@ function setupFileInputs() {
             wrap.removeAttribute('data-temp-file');
             return;
         }
+        if (wrap.hasAttribute('data-existing-file')) {
+            const fileKey = wrap.getAttribute('data-existing-file');
+            if (fileKey && !wrap.querySelector('input[name="remove_' + fileKey + '"]')) {
+                const hidden = document.createElement('input');
+                hidden.type = 'hidden';
+                hidden.name = 'remove_' + fileKey;
+                hidden.value = '1';
+                wrap.appendChild(hidden);
+            }
+            wrap.removeAttribute('data-existing-file');
+        }
         wrap._storedFile = null;
         const input = wrap.querySelector('input[type="file"]');
         if (input) {
             input.value = '';
         }
         setFileLabel(wrap, '');
+        var existingMsg = wrap.querySelector('.existing_file_msg');
+        if (existingMsg) {
+            existingMsg.remove();
+        }
     });
 }
 

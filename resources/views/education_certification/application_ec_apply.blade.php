@@ -298,7 +298,7 @@
 				</dl>
 				<dl>
 					<dt>사업자등록증 첨부</dt>
-					<dd class="file_inputs" @if(!empty($tempFileBusinessRegistration)) data-temp-file="business_registration" @endif>
+					<dd class="file_inputs" @if(!empty($tempFileBusinessRegistration)) data-temp-file="business_registration" @endif @if(!empty($existingBusinessRegistration ?? null)) data-existing-file="business_registration" @endif>
 						<label class="file">
 							<input type="file" name="business_registration" accept=".pdf,.jpg,.jpeg,.png">
 							<span>파일선택</span>
@@ -306,8 +306,8 @@
 						@if(!empty($tempFileBusinessRegistration))
 							<div class="file_input w100p"><button type="button">{{ $tempFileBusinessRegistration }}</button></div>
 						@elseif(!empty($existingBusinessRegistration ?? null))
-							<div class="file_input w100p"><button type="button" disabled>{{ $existingBusinessRegistration }}</button></div>
-							<p class="ne mt0" style="font-size:0.875rem;">기존 첨부 파일입니다. 변경하려면 새 파일을 선택하세요.</p>
+							<div class="file_input w100p"><button type="button">{{ $existingBusinessRegistration }}</button></div>
+							<p class="ne mt0 existing_file_msg" style="font-size:0.875rem;">기존 첨부 파일입니다. 변경하려면 새 파일을 선택하세요.</p>
 						@else
 							<div class="file_input">선택된 파일 없음</div>
 						@endif

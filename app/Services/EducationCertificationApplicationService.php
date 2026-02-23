@@ -275,7 +275,11 @@ class EducationCertificationApplicationService
             'tax_invoice_status' => !empty($billing['has_tax_invoice']) ? '신청완료' : '미신청',
         ]));
 
+        if ($request->filled('remove_business_registration')) {
+            $application->attachments()->where('type', 'business_registration')->delete();
+        }
         if ($request->hasFile('business_registration')) {
+            $application->attachments()->where('type', 'business_registration')->delete();
             $this->storeBusinessRegistration($application, $request->file('business_registration'));
         }
     }
