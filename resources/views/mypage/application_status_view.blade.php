@@ -2,6 +2,13 @@
 @section('content')
 <main class="sub_wrap inner">
 
+	@if(session('success'))
+	<p class="msg_success">{{ session('success') }}</p>
+	@endif
+	@if(session('error'))
+	<p class="msg_error">{{ session('error') }}</p>
+	@endif
+
 	<div class="stitle tal bdb">교육 신청 현황
 		<div class="btns_abso pc_vw">
 			@if($application->payment_status === '입금완료')
@@ -205,6 +212,7 @@
 	@endif
 
 	<div class="btns_tac">
+		<a href="{{ route('mypage.application_status.edit', $application->id) }}" class="btn btn_wbb">수정</a>
 		<a href="{{ route('mypage.application_status') }}" class="btn btn_bwb">목록</a>
 	</div>
 

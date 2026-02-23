@@ -255,6 +255,32 @@ class EducationCertificationApplicationService
     }
 
     /**
+     * 교육 신청 수정 (마이페이지)
+     */
+    public function updateApplication(EducationApplication $application, Request $request): void
+    {
+        $program = Education::query()->find($application->education_id);
+        if (!$program) {
+            throw new NotFoundHttpException();
+        }
+
+        $feeTypeInput = (string) $request->input('fee_type');
+        $this->assertEducationFeeMatchesMemberSchool($feeTypeInput, $application->member);
+        [$feeType, $participationFee] = $this->resolveEducationFee($program, $feeTypeInput);
+        $billing = $this->extractBillingData($request);
+
+        $application->update(array_merge($billing, [
+            'participation_fee' => $participationFee,
+            'fee_type' => $feeType,
+            'tax_invoice_status' => !empty($billing['has_tax_invoice']) ? '신청완료' : '미신청',
+        ]));
+
+        if ($request->hasFile('business_registration')) {
+            $this->storeBusinessRegistration($application, $request->file('business_registration'));
+        }
+    }
+
+    /**
      * 회원의 학교 정보를 기반으로 회원교/비회원교 구분을 반환합니다.
      * - 'member': 회원교 소속
      * - 'guest': 비회원교 소속 또는 미등록 학교

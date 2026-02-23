@@ -79,6 +79,7 @@
 		</div>
 
 		<div class="board_btm btns_tac mt80">
+			<a href="{{ route('mypage.application_status.edit', $application->id) }}" class="btn btn_wbb">수정</a>
 			<a href="{{ route('mypage.application_status') }}" class="btn btn_list">목록</a>
 		</div>
 	</div>

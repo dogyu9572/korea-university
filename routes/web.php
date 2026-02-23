@@ -21,6 +21,13 @@ use App\Http\Controllers\Backoffice\PopupController;
 // 메인 페이지
 Route::get('/', [HomeController::class, 'index'])->name('home');
 
+//사이트맵
+Route::get('/sitemap.xml', function () {
+    $content = view('sitemap')->render();
+    $xml = '<?xml version="1.0" encoding="UTF-8"?>' . $content;
+    return response($xml, 200)->header('Content-Type', 'application/xml');
+});
+
 // 교육 · 자격증 (안내 퍼블: SubController, 신청 관련: EducationCertificationController)
 Route::prefix('education_certification')->name('education_certification.')->group(function () {
     Route::get('/education', [SubController::class, 'education'])->name('education');
@@ -99,6 +106,8 @@ Route::prefix('mypage')->name('mypage.')->middleware('member')->group(function (
     Route::post('/application_status/cancel', [MypageController::class, 'application_status_cancel'])->name('application_status.cancel');
     Route::get('/application_status_view/{id}', [MypageController::class, 'application_status_view'])->name('application_status_view');
     Route::get('/application_status_view2/{id}', [MypageController::class, 'application_status_view2'])->name('application_status_view2');
+    Route::get('/application_status_edit/{id}', [MypageController::class, 'application_status_edit'])->name('application_status.edit')->whereNumber('id');
+    Route::post('/application_status_update/{id}', [MypageController::class, 'application_status_update'])->name('application_status.update')->whereNumber('id');
     Route::post('/application_status_view2/{id}/dwell', [MypageController::class, 'application_status_view2_dwell'])->name('application_status_view2.dwell')->whereNumber('id');
     Route::get('/print/receipt/{id}', [MypageController::class, 'printReceipt'])->name('print.receipt')->whereNumber('id');
     Route::get('/print/certificate_completion/{id}', [MypageController::class, 'printCertificateCompletion'])->name('print.certificate_completion')->whereNumber('id');

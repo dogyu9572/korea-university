@@ -247,6 +247,33 @@ class SeminarTrainingApplicationService
     }
 
     /**
+     * 세미나·해외연수 신청 수정 (마이페이지)
+     */
+    public function updateApplication(EducationApplication $application, Request $request): void
+    {
+        $program = SeminarTraining::query()->find($application->seminar_training_id);
+        if (!$program) {
+            throw new NotFoundHttpException();
+        }
+
+        [$feeType, $participationFee] = $this->resolveSeminarTrainingFee($program, (string) $request->input('fee_type'));
+        $billing = $this->extractBillingData($request);
+
+        $application->update(array_merge($billing, [
+            'participation_fee' => $participationFee,
+            'fee_type' => $feeType,
+            'roommate_member_id' => $request->filled('roommate_member_id') ? (int) $request->input('roommate_member_id') : null,
+            'roommate_name' => $request->filled('roommate_name') ? trim((string) $request->input('roommate_name')) : null,
+            'roommate_phone' => $request->filled('roommate_phone') ? trim((string) $request->input('roommate_phone')) : null,
+            'request_notes' => $request->filled('request_notes') ? trim((string) $request->input('request_notes')) : null,
+        ]));
+
+        if ($request->hasFile('business_registration')) {
+            $this->storeBusinessRegistration($application, $request->file('business_registration'));
+        }
+    }
+
+    /**
      * 참가비 옵션 데이터 (교육과 동일 구조)
      *
      * @return array<int, array<string, mixed>>

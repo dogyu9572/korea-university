@@ -36,7 +36,7 @@ function toggleSectionInputs(selector, enabled) {
 }
 
 function isSeminarApplyForm(form) {
-    return (form.action || '').toString().indexOf('application_st_apply') !== -1;
+    return (form.action || '').toString().indexOf('application_st_apply/store') !== -1;
 }
 
 /** 1인실/비숙박 선택 시 룸메이트 영역 숨김, 2인1실일 때만 표시 */
@@ -63,7 +63,59 @@ function setupRoommateSectionToggle() {
 }
 
 function setupFormSubmit() {
-    /* 세미나 신청: 항상 브라우저 기본 제출. 파일은 input에 있으면 그대로 전송됨. 검증 실패 시 파일은 서버 TempUploadSessionHelper로 유지. */
+    document.querySelectorAll('form.application_form').forEach(function (form) {
+        if (!isSeminarApplyForm(form)) {
+            return;
+        }
+        form.addEventListener('submit', function (event) {
+            const fileWraps = form.querySelectorAll('.file_inputs');
+            let hasStoredFile = false;
+            fileWraps.forEach(function (wrap) {
+                if (wrap._storedFile) {
+                    hasStoredFile = true;
+                }
+            });
+            if (!hasStoredFile) {
+                return;
+            }
+            event.preventDefault();
+            const fd = new FormData(form);
+            fileWraps.forEach(function (wrap) {
+                const input = wrap.querySelector('input[type="file"]');
+                if (!input || !input.name) {
+                    return;
+                }
+                fd.delete(input.name);
+                if (wrap._storedFile) {
+                    fd.append(input.name, wrap._storedFile);
+                }
+            });
+            fetch(form.action, {
+                method: 'POST',
+                body: fd,
+                redirect: 'manual',
+                headers: {
+                    'X-Requested-With': 'XMLHttpRequest',
+                    'Accept': 'text/html'
+                }
+            }).then(function (res) {
+                if (res.type === 'opaqueredirect' || res.status === 302) {
+                    var loc = res.headers.get('Location');
+                    if (loc) {
+                        window.location.href = loc;
+                    }
+                    return;
+                }
+                if (res.status === 422) {
+                    window.location.href = form.action;
+                    return;
+                }
+                alert('제출 중 오류가 발생했습니다.');
+            }).catch(function () {
+                alert('제출 중 오류가 발생했습니다.');
+            });
+        });
+    });
 }
 
 function setupFileInputs() {
@@ -104,15 +156,6 @@ function setupFileInputs() {
             wrap._storedFile = null;
             setFileLabel(wrap, '');
             wrap.removeAttribute('data-temp-file');
-            return;
-        }
-        /* 파일명 버튼 클릭: 파일 지우지 말고 선택 창만 띄움. disabled(미발행)일 땐 건드리지 않음 */
-        if (target.closest('.file_input')) {
-            var input = wrap.querySelector('input[type="file"]');
-            if (input && !input.disabled) {
-                event.preventDefault();
-                input.click();
-            }
             return;
         }
         wrap._storedFile = null;

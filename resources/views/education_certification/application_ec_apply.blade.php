@@ -3,9 +3,13 @@
 <main class="sub_wrap inner">
 	<div class="stitle tal bdb">교육 · 자격증 신청</div>
 
-	<form method="POST" action="{{ route('education_certification.application_ec_apply.store') }}" enctype="multipart/form-data" class="application_form" @if($errors->any()) data-join-errors="1" @endif>
+	@php
+		$isEdit = isset($isEdit) && $isEdit && isset($application);
+		$formAction = $isEdit ? route('mypage.application_status.update', $application->id) : route('education_certification.application_ec_apply.store');
+	@endphp
+	<form method="POST" action="{{ $formAction }}" enctype="multipart/form-data" class="application_form" @if($errors->any()) data-join-errors="1" @endif>
 		@csrf
-		<input type="hidden" name="education_id" value="{{ $education->id }}">
+		<input type="hidden" name="education_id" value="{{ $isEdit ? ($application->education_id ?? $education->id) : $education->id }}">
 		<input type="hidden" id="memberSchoolType" value="{{ $memberSchoolType ?? '' }}">
 
 		<div class="otit">교육 신청</div>
@@ -62,20 +66,20 @@
 			<dl>
 				<dt>환불 계좌 정보</dt>
 				<dd class="colm">
-					<input type="text" name="refund_account_holder" class="text w1 @error('refund_account_holder') is-invalid @enderror" placeholder="예금주명을 입력해주세요." value="{{ old('refund_account_holder') }}">
+					<input type="text" name="refund_account_holder" class="text w1 @error('refund_account_holder') is-invalid @enderror" placeholder="예금주명을 입력해주세요." value="{{ old('refund_account_holder', isset($application) ? ($application->refund_account_holder ?? '') : '') }}">
 					@error('refund_account_holder')
 						<p class="join_field_error" style="color:#c00;font-size:0.875rem;margin-top:0.25rem;">{{ $message }}</p>
 					@enderror
 					<select name="refund_bank_name" class="text w1 @error('refund_bank_name') is-invalid @enderror">
 						<option value="">은행을 선택해주세요.</option>
 						@foreach (['KB국민은행','신한은행','우리은행','하나은행','NH농협은행','IBK기업은행','카카오뱅크','토스뱅크','새마을금고','SC제일은행'] as $bank)
-							<option value="{{ $bank }}" @selected(old('refund_bank_name') === $bank)>{{ $bank }}</option>
+							<option value="{{ $bank }}" @selected(old('refund_bank_name', isset($application) ? ($application->refund_bank_name ?? '') : '') === $bank)>{{ $bank }}</option>
 						@endforeach
 					</select>
 					@error('refund_bank_name')
 						<p class="join_field_error" style="color:#c00;font-size:0.875rem;margin-top:0.25rem;">{{ $message }}</p>
 					@enderror
-					<input type="text" name="refund_account_number" class="text w1 @error('refund_account_number') is-invalid @enderror" placeholder="계좌번호를 입력해주세요." value="{{ old('refund_account_number') }}">
+					<input type="text" name="refund_account_number" class="text w1 @error('refund_account_number') is-invalid @enderror" placeholder="계좌번호를 입력해주세요." value="{{ old('refund_account_number', isset($application) ? ($application->refund_account_number ?? '') : '') }}">
 					@error('refund_account_number')
 						<p class="join_field_error" style="color:#c00;font-size:0.875rem;margin-top:0.25rem;">{{ $message }}</p>
 					@enderror
@@ -87,7 +91,7 @@
 		<div class="tbl th_bg mo_reverse_tbl">
 			@php
 				$columnLabels = !empty($feeOptions) ? collect($feeOptions[0]['items'])->pluck('label')->values()->all() : [];
-				$defaultFeeType = !empty($feeOptions[0]['items']) ? $feeOptions[0]['items'][0]['key'] : null;
+				$defaultFeeType = (isset($application) && isset($application->fee_type)) ? $application->fee_type : (!empty($feeOptions[0]['items']) ? $feeOptions[0]['items'][0]['key'] : null);
 			@endphp
 			@if(empty($feeOptions) || empty($columnLabels))
 				<p class="no_data">참가비 정보가 등록되지 않았습니다.</p>
@@ -253,11 +257,11 @@
 				<dt>세금계산서 발행</dt>
 				<dd class="radios">
 					<label class="radio">
-						<input type="radio" name="has_tax_invoice" value="1" @checked(old('has_tax_invoice') === '1')>
+						<input type="radio" name="has_tax_invoice" value="1" @checked(old('has_tax_invoice', isset($application) ? ($application->has_tax_invoice ? '1' : '0') : '0') === '1')>
 						<i></i><span>발행</span>
 					</label>
 					<label class="radio">
-						<input type="radio" name="has_tax_invoice" value="0" @checked(old('has_tax_invoice', '0') === '0')>
+						<input type="radio" name="has_tax_invoice" value="0" @checked(old('has_tax_invoice', isset($application) ? ($application->has_tax_invoice ? '1' : '0') : '0') === '0')>
 						<i></i><span>미발행</span>
 					</label>
 				</dd>
@@ -266,7 +270,7 @@
 				<dl>
 					<dt>사업자등록번호</dt>
 					<dd>
-						<input type="text" name="registration_number" class="w1 @error('registration_number') is-invalid @enderror" placeholder="사업자등록번호를 입력해주세요." value="{{ old('registration_number') }}">
+						<input type="text" name="registration_number" class="w1 @error('registration_number') is-invalid @enderror" placeholder="사업자등록번호를 입력해주세요." value="{{ old('registration_number', isset($application) ? ($application->registration_number ?? '') : '') }}">
 						@error('registration_number')
 							<p class="join_field_error" style="color:#c00;font-size:0.875rem;margin-top:0.25rem;">{{ $message }}</p>
 						@enderror
@@ -275,7 +279,7 @@
 				<dl>
 					<dt>상호명</dt>
 					<dd>
-						<input type="text" name="company_name" class="w1 @error('company_name') is-invalid @enderror" placeholder="상호명을 입력해주세요." value="{{ old('company_name') }}">
+						<input type="text" name="company_name" class="w1 @error('company_name') is-invalid @enderror" placeholder="상호명을 입력해주세요." value="{{ old('company_name', isset($application) ? ($application->company_name ?? '') : '') }}">
 						@error('company_name')
 							<p class="join_field_error" style="color:#c00;font-size:0.875rem;margin-top:0.25rem;">{{ $message }}</p>
 						@enderror
@@ -284,9 +288,9 @@
 				<dl>
 					<dt>담당자 정보</dt>
 					<dd class="colm">
-						<input type="text" name="contact_person_name" class="w1 @error('contact_person_name') is-invalid @enderror" placeholder="담당자명 입력해주세요." value="{{ old('contact_person_name') }}">
-						<input type="text" name="contact_person_email" class="w1 @error('contact_person_email') is-invalid @enderror" placeholder="이메일을 입력해주세요." value="{{ old('contact_person_email') }}" inputmode="email">
-						<input type="text" name="contact_person_phone" class="w1 @error('contact_person_phone') is-invalid @enderror" placeholder="연락처를 입력해주세요." value="{{ \App\Models\Member::formatPhoneForDisplay(old('contact_person_phone')) }}" maxlength="13" inputmode="tel" autocomplete="tel">
+						<input type="text" name="contact_person_name" class="w1 @error('contact_person_name') is-invalid @enderror" placeholder="담당자명 입력해주세요." value="{{ old('contact_person_name', isset($application) ? ($application->contact_person_name ?? '') : '') }}">
+						<input type="text" name="contact_person_email" class="w1 @error('contact_person_email') is-invalid @enderror" placeholder="이메일을 입력해주세요." value="{{ old('contact_person_email', isset($application) ? ($application->contact_person_email ?? '') : '') }}" inputmode="email">
+						<input type="text" name="contact_person_phone" class="w1 @error('contact_person_phone') is-invalid @enderror" placeholder="연락처를 입력해주세요." value="{{ \App\Models\Member::formatPhoneForDisplay(old('contact_person_phone', isset($application) ? ($application->contact_person_phone ?? '') : '')) }}" maxlength="13" inputmode="tel" autocomplete="tel">
 						@error('contact_person_name')<p class="join_field_error" style="color:#c00;font-size:0.875rem;margin-top:0.25rem;">{{ $message }}</p>@enderror
 						@error('contact_person_email')<p class="join_field_error" style="color:#c00;font-size:0.875rem;margin-top:0.25rem;">{{ $message }}</p>@enderror
 						@error('contact_person_phone')<p class="join_field_error" style="color:#c00;font-size:0.875rem;margin-top:0.25rem;">{{ $message }}</p>@enderror
@@ -301,6 +305,9 @@
 						</label>
 						@if(!empty($tempFileBusinessRegistration))
 							<div class="file_input w100p"><button type="button">{{ $tempFileBusinessRegistration }}</button></div>
+						@elseif(!empty($existingBusinessRegistration ?? null))
+							<div class="file_input w100p"><button type="button" disabled>{{ $existingBusinessRegistration }}</button></div>
+							<p class="ne mt0" style="font-size:0.875rem;">기존 첨부 파일입니다. 변경하려면 새 파일을 선택하세요.</p>
 						@else
 							<div class="file_input">선택된 파일 없음</div>
 						@endif
@@ -315,7 +322,7 @@
 
 		<div class="btns_tac">
 			<a href="javascript:history.back();" class="btn btn_bwb">취소</a>
-			<button type="submit" class="btn btn_wbb" @if(!empty($applicationDisabled)) disabled @endif>수강 신청</button>
+			<button type="submit" class="btn btn_wbb" @if(!empty($applicationDisabled) && !$isEdit) disabled @endif>{{ $isEdit ? '수정' : '수강 신청' }}</button>
 		</div>
 	</form>
 </main>

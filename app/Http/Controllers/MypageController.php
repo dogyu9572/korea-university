@@ -6,12 +6,16 @@ use App\Http\Requests\MypageInquiryStoreRequest;
 use App\Http\Requests\MypageMemberUpdateRequest;
 use App\Http\Requests\MypageSecessionRequest;
 use App\Models\EducationApplication;
+use App\Models\Education;
 use App\Services\ApplicationStatusService;
 use App\Services\Backoffice\InquiryService;
 use App\Services\Backoffice\MemberService;
+use App\Services\EducationCertificationApplicationService;
 use App\Services\QualificationStatusService;
+use App\Services\SeminarTrainingApplicationService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Validator;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 class MypageController extends Controller
@@ -110,6 +114,171 @@ class MypageController extends Controller
         }
 
         return response()->json(['ok' => true]);
+    }
+
+    /**
+     * 신청 수정 폼 (오프라인: 세미나/교육만, 온라인은 404)
+     */
+    public function application_status_edit(
+        int $id,
+        ApplicationStatusService $applicationStatusService,
+        SeminarTrainingApplicationService $seminarService,
+        EducationCertificationApplicationService $educationService
+    ) {
+        $memberId = Auth::guard('member')->id();
+        try {
+            $application = $applicationStatusService->getDetailForOfflineMember($id, $memberId);
+        } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
+            throw new NotFoundHttpException('해당 신청 내역을 찾을 수 없습니다.', $e);
+        }
+
+        $meta = $this->menuMeta('01', '교육 신청 현황');
+
+        if ($application->seminar_training_id) {
+            $program = $application->seminarTraining;
+            if (!$program) {
+                throw new NotFoundHttpException('해당 프로그램 정보를 찾을 수 없습니다.');
+            }
+            $member = $application->member;
+            $existingBiz = $application->attachments()->where('type', 'business_registration')->first();
+            $existingBusinessRegistration = $existingBiz ? $existingBiz->name : '';
+            $viewData = array_merge($meta, [
+                'isEdit' => true,
+                'application' => $application,
+                'program' => $program,
+                'member' => $member,
+                'feeOptions' => $seminarService->buildSeminarTrainingFeeOptions($program),
+                'refundPolicies' => $seminarService->buildSeminarTrainingRefundPolicies($program),
+                'tempFileBusinessRegistration' => '',
+                'existingBusinessRegistration' => $existingBusinessRegistration,
+            ]);
+            return view('seminars_training.application_st_apply', $viewData);
+        }
+
+        if ($application->education_id) {
+            $education = $application->education;
+            if (!$education) {
+                throw new NotFoundHttpException('해당 교육 정보를 찾을 수 없습니다.');
+            }
+            $member = $application->member;
+            $memberSchoolType = $educationService->getMemberSchoolType($member);
+            $existingBiz = $application->attachments()->where('type', 'business_registration')->first();
+            $existingBusinessRegistration = $existingBiz ? $existingBiz->name : '';
+            $viewData = array_merge($meta, [
+                'isEdit' => true,
+                'application' => $application,
+                'education' => $education,
+                'member' => $member,
+                'memberSchoolType' => $memberSchoolType,
+                'feeOptions' => $this->buildEducationFeeOptionsForEdit($education),
+                'refundPolicies' => $this->buildEducationRefundPoliciesForEdit($education),
+                'tempFileBusinessRegistration' => '',
+                'existingBusinessRegistration' => $existingBusinessRegistration,
+            ]);
+            return view('education_certification.application_ec_apply', $viewData);
+        }
+
+        throw new NotFoundHttpException('수정할 수 있는 신청이 아닙니다.');
+    }
+
+    /**
+     * 신청 수정 저장
+     */
+    public function application_status_update(
+        int $id,
+        Request $request,
+        ApplicationStatusService $applicationStatusService,
+        SeminarTrainingApplicationService $seminarService,
+        EducationCertificationApplicationService $educationService
+    ) {
+        $memberId = Auth::guard('member')->id();
+        try {
+            $application = $applicationStatusService->getDetailForOfflineMember($id, $memberId);
+        } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
+            throw new NotFoundHttpException('해당 신청 내역을 찾을 수 없습니다.', $e);
+        }
+
+        if ($application->seminar_training_id) {
+            $request->merge(['seminar_training_id' => $application->seminar_training_id]);
+            $rules = (new \App\Http\Requests\SeminarTraining\SeminarTrainingApplicationRequest())->rules();
+            if ($application->attachments()->where('type', 'business_registration')->exists()) {
+                $rules['business_registration'] = ['nullable', 'file', 'mimes:pdf,jpg,jpeg,png', 'max:2048'];
+            }
+            $validator = Validator::make($request->all(), $rules, (new \App\Http\Requests\SeminarTraining\SeminarTrainingApplicationRequest())->messages(), (new \App\Http\Requests\SeminarTraining\SeminarTrainingApplicationRequest())->attributes());
+            if ($validator->fails()) {
+                return redirect()->route('mypage.application_status.edit', $id)->withErrors($validator)->withInput();
+            }
+            $seminarService->updateApplication($application, $request);
+            return redirect()->route('mypage.application_status_view', $id)->with('success', '수정되었습니다.');
+        }
+
+        if ($application->education_id) {
+            $request->merge(['education_id' => $application->education_id]);
+            $rules = (new \App\Http\Requests\EducationCertification\EducationProgramApplicationRequest())->rules();
+            if ($application->attachments()->where('type', 'business_registration')->exists()) {
+                $rules['business_registration'] = ['nullable', 'file', 'mimes:pdf,jpg,jpeg,png', 'max:2048'];
+            }
+            $validator = Validator::make($request->all(), $rules, (new \App\Http\Requests\EducationCertification\EducationProgramApplicationRequest())->messages(), (new \App\Http\Requests\EducationCertification\EducationProgramApplicationRequest())->attributes());
+            if ($validator->fails()) {
+                return redirect()->route('mypage.application_status.edit', $id)->withErrors($validator)->withInput();
+            }
+            $educationService->updateApplication($application, $request);
+            return redirect()->route('mypage.application_status_view', $id)->with('success', '수정되었습니다.');
+        }
+
+        throw new NotFoundHttpException('수정할 수 있는 신청이 아닙니다.');
+    }
+
+    private function buildEducationFeeOptionsForEdit(Education $education): array
+    {
+        $groups = [
+            [
+                'label' => '회원교(1인당)',
+                'items' => [
+                    ['key' => 'member_twin', 'label' => '2인 1실', 'amount' => $education->fee_member_twin],
+                    ['key' => 'member_single', 'label' => '1인실', 'amount' => $education->fee_member_single],
+                    ['key' => 'member_no_stay', 'label' => '비숙박', 'amount' => $education->fee_member_no_stay],
+                ],
+            ],
+            [
+                'label' => '비회원교(1인당)',
+                'items' => [
+                    ['key' => 'guest_twin', 'label' => '2인 1실', 'amount' => $education->fee_guest_twin],
+                    ['key' => 'guest_single', 'label' => '1인실', 'amount' => $education->fee_guest_single],
+                    ['key' => 'guest_no_stay', 'label' => '비숙박', 'amount' => $education->fee_guest_no_stay],
+                ],
+            ],
+        ];
+        return collect($groups)
+            ->map(function (array $group) {
+                $items = collect($group['items'])->filter(fn ($item) => $item['amount'] !== null)
+                    ->map(function ($item) {
+                        $item['display_amount'] = number_format((float) $item['amount']);
+                        return $item;
+                    })->values()->all();
+                if (empty($items)) return null;
+                return ['label' => $group['label'], 'items' => $items];
+            })
+            ->filter()->values()->all();
+    }
+
+    private function buildEducationRefundPoliciesForEdit(Education $education): array
+    {
+        $policies = [
+            ['label' => '2인 1실', 'fee' => $education->refund_twin_fee, 'deadline' => $education->refund_twin_deadline],
+            ['label' => '1인실', 'fee' => $education->refund_single_fee, 'deadline' => $education->refund_single_deadline],
+            ['label' => '비숙박', 'fee' => $education->refund_no_stay_fee, 'deadline' => $education->refund_no_stay_deadline],
+            ['label' => '당일 취소', 'fee' => $education->refund_same_day_fee, 'deadline' => null],
+        ];
+        return collect($policies)
+            ->filter(fn ($policy) => $policy['fee'] !== null)
+            ->map(function ($policy) {
+                return [
+                    'label' => $policy['label'],
+                    'fee' => number_format((float) $policy['fee']),
+                    'deadline' => $policy['deadline'] ?: '-',
+                ];
+            })->values()->all();
     }
 
     private function printViewData(EducationApplication $application, string $sName): array
