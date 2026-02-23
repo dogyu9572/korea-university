@@ -7,6 +7,7 @@ use App\Support\TempUploadSessionHelper;
 use Illuminate\Contracts\Validation\Validator;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Http\Exceptions\HttpResponseException;
+use Illuminate\Support\ViewErrorBag;
 use Illuminate\Validation\ValidationException;
 
 class SeminarTrainingApplicationRequest extends FormRequest
@@ -25,12 +26,26 @@ class SeminarTrainingApplicationRequest extends FormRequest
 
     protected function failedValidation(Validator $validator): void
     {
-        TempUploadSessionHelper::saveToSession($this, ['business_registration'], 'seminar_training_apply_temp_files');
+        try {
+            TempUploadSessionHelper::saveToSession($this, ['business_registration'], 'seminar_training_apply_temp_files');
+        } catch (\Throwable $e) {
+            report($e);
+        }
 
-        $redirect = redirect()
-            ->route('seminars_training.application_st_apply', [
-                'seminar_training_id' => (int) $this->input('seminar_training_id'),
-            ])
+        $redirectUrl = route('seminars_training.application_st_apply', [
+            'seminar_training_id' => (int) $this->input('seminar_training_id'),
+        ]);
+
+        if ($this->ajax() || $this->wantsJson()) {
+            $this->session()->flash('errors', (new ViewErrorBag)->put('default', $validator->errors()));
+            $this->session()->flashInput($this->except(array_merge(['_token'], array_keys($this->allFiles()))));
+
+            throw new HttpResponseException(
+                response()->json(['success' => false, 'redirect' => $redirectUrl], 422)
+            );
+        }
+
+        $redirect = redirect($redirectUrl)
             ->withErrors($validator)
             ->withInput();
 

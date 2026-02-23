@@ -488,6 +488,23 @@
                             <button type="button" class="btn btn-outline-secondary btn-sm ml-1">추가</button>
                             <button type="button" class="btn btn-outline-danger btn-sm ml-1" data-action="clear-attachment-files">삭제</button>
                         </div>
+                        @if($isEdit && $app?->attachments->count() > 0)
+                            <div class="mt-2">
+                                <span class="sub-label" style="margin-bottom:0;">등록된 파일:</span>
+                                @foreach($app?->attachments as $index => $attachment)
+                                    <span class="attachment-item-inline">
+                                        <a href="{{ $attachment->path }}" target="_blank">{{ $attachment->name }}</a>
+                                        <button type="button" class="btn btn-outline-danger btn-sm delete-attachment-btn ms-1" data-attachment-id="{{ $attachment->id }}">
+                                            삭제
+                                        </button>
+                                    </span>
+                                    @if($index < $app?->attachments->count() - 1), @endif
+                                @endforeach
+                                @foreach($app?->attachments as $attachment)
+                                    <input type="hidden" name="delete_attachments[]" id="delete_attachment_{{ $attachment->id }}" value="">
+                                @endforeach
+                            </div>
+                        @endif
                     </div>
                 </div>
             </div>

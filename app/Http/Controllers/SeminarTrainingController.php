@@ -7,6 +7,7 @@ use App\Models\Member;
 use App\Services\SeminarTrainingApplicationService;
 use App\Support\TempUploadSessionHelper;
 use Illuminate\Http\Request;
+use Illuminate\Support\ViewErrorBag;
 use Illuminate\Validation\ValidationException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
@@ -113,12 +114,37 @@ class SeminarTrainingController extends Controller
     {
         $program = $this->applicationService->getSeminarTrainingProgram((int) $request->input('seminar_training_id'));
         $member = $request->user('member');
+        $isAjax = $request->ajax() || $request->wantsJson();
 
         try {
             $this->applicationService->ensureSeminarTrainingCanApply($program);
             $application = $this->applicationService->submitSeminarTrainingApplication($request, $member);
         } catch (ValidationException $e) {
+            if ($isAjax) {
+                $redirectUrl = route('seminars_training.application_st_apply', [
+                    'seminar_training_id' => (int) $request->input('seminar_training_id'),
+                ]);
+                $request->session()->flash('errors', (new ViewErrorBag)->put('default', $e->errors()));
+                $request->session()->flashInput($request->except(array_merge(['_token'], array_keys($request->allFiles()))));
+
+                return response()->json(['success' => false, 'redirect' => $redirectUrl], 422);
+            }
+
             return back()->withErrors($e->errors())->withInput();
+        } catch (\Throwable $e) {
+            report($e);
+            $redirectUrl = route('seminars_training.application_st_apply', [
+                'seminar_training_id' => (int) $request->input('seminar_training_id'),
+            ]);
+            if ($isAjax) {
+                return response()->json([
+                    'success' => false,
+                    'redirect' => $redirectUrl,
+                    'message' => '제출 중 오류가 발생했습니다. 다시 시도해 주세요.',
+                ], 500);
+            }
+
+            return redirect($redirectUrl)->with('error', '제출 중 오류가 발생했습니다. 다시 시도해 주세요.');
         }
 
         TempUploadSessionHelper::clear($request, 'seminar_training_apply_temp_files');
@@ -128,6 +154,13 @@ class SeminarTrainingController extends Controller
             'program_name' => $program->name,
             'application_number' => $application->application_number,
         ]);
+
+        if ($isAjax) {
+            return response()->json([
+                'success' => true,
+                'redirect' => route('seminars_training.application_st_apply_end'),
+            ]);
+        }
 
         return redirect()->route('seminars_training.application_st_apply_end');
     }
