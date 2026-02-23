@@ -215,8 +215,8 @@
 				@endif
 			</tbody>
 		</table>
-		<p class="ne">시험 취소는 시험일 3일 전까지 가능하며, 이후에는 환불이 제한됩니다.</p>
-		<p class="ne mt0">무통장입금 시 환불은 영업일 기준 3~5일 내 처리됩니다.</p>
+		<!-- <p class="ne">시험 취소는 시험일 3일 전까지 가능하며, 이후에는 환불이 제한됩니다.</p>
+		<p class="ne mt0">무통장입금 시 환불은 영업일 기준 3~5일 내 처리됩니다.</p> -->
 	</div>
 
 	<div class="otit">증빙서류 발행 여부</div>
@@ -328,7 +328,7 @@
 				</dd>
 			</dl>
 		</div>
-		<p class="ne">세금계산서는 입금 확인 후 3영업일 이내 이메일로 발송됩니다.</p>
+		<p class="ne">전자계산서는 입금 확인 후 담당자 이메일로 발송됩니다.</p>
 
 		<dl class="mt40">
 			<dt>요청사항</dt>
@@ -339,6 +339,15 @@
 				@enderror
 			</dd>
 		</dl>
+		<div class="mt40">
+			<label class="check">
+				<input type="checkbox" name="traveler_registration_agreed" value="1" @checked(old('traveler_registration_agreed') === '1')>
+				<i></i><span>여행자 보험(행사 기간동안) 가입에 동의합니다.</span>
+			</label>
+		</div>
+		@error('traveler_registration_agreed')
+			<p class="join_field_error" style="color:#c00;font-size:0.875rem;margin-top:0.25rem;">{{ $message }}</p>
+		@enderror
 	</div>
 
 	<div class="btns_tac">

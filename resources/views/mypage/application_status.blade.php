@@ -11,7 +11,7 @@
 	<p class="msg_error">{{ session('error') }}</p>
 	@endif
 	
-	<form method="GET" action="{{ route('mypage.application_status') }}" class="search_wrap">
+	<form method="GET" action="{{ route('mypage.application_status') }}" class="search_wrap dt_slim">
 		<dl>
 			<dt>교육명</dt>
 			<dd><input type="text" name="name" class="text w100p" placeholder="교육명을 입력해주세요." value="{{ request('name') }}"></dd>

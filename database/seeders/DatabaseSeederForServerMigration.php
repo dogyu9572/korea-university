@@ -20,9 +20,9 @@ class DatabaseSeederForServerMigration extends Seeder
         $this->call(AdminGroupExportSeeder::class);
         $this->call(AdminMenuExportSeeder::class);
         $this->call(BoardSkinExportSeeder::class);
+        $this->call(CategoryExportSeeder::class);
         $this->call(BoardTemplateExportSeeder::class);
         $this->call(SettingExportSeeder::class);
-        $this->call(CategoryExportSeeder::class);
         $this->call(UserMenuPermissionExportSeeder::class);
         $this->call(AdminGroupMenuPermissionExportSeeder::class);
         $this->call(BoardExportSeeder::class);
@@ -42,6 +42,7 @@ class DatabaseSeederForServerMigration extends Seeder
         $this->call(InquiryFileExportSeeder::class);
         $this->call(InquiryReplyFileExportSeeder::class);
         $this->call(HistoryExportSeeder::class);
+        $this->call(EducationContentExportSeeder::class);
         $this->call(OrganizationalMemberExportSeeder::class);
     }
 }

@@ -69,7 +69,7 @@ class SeminarTrainingApplicationService
     {
         $item = SeminarTraining::query()
             ->with(['attachments'])
-            ->withCount('applications as applications_count')
+            ->withCount(['applications as applications_count' => fn ($q) => $q->whereNull('cancelled_at')])
             ->find($id);
 
         if (!$item || !$item->is_public || $item->application_status === '비공개') {
@@ -329,7 +329,7 @@ class SeminarTrainingApplicationService
         $query = SeminarTraining::query()
             ->where('is_public', true)
             ->whereNot('application_status', '비공개')
-            ->withCount('applications as applications_count');
+            ->withCount(['applications as applications_count' => fn ($q) => $q->whereNull('cancelled_at')]);
 
         if ($request && $request->filled('name')) {
             $query->where('name', 'like', '%' . $request->name . '%');
@@ -420,6 +420,7 @@ class SeminarTrainingApplicationService
 
         $count = EducationApplication::query()
             ->where($column, $programId)
+            ->whereNull('cancelled_at')
             ->lockForUpdate()
             ->count();
 
@@ -522,7 +523,7 @@ class SeminarTrainingApplicationService
     private function lockSeminarTrainingForApplication(int $id): ?SeminarTraining
     {
         return SeminarTraining::query()
-            ->withCount('applications as applications_count')
+            ->withCount(['applications as applications_count' => fn ($q) => $q->whereNull('cancelled_at')])
             ->whereKey($id)
             ->lockForUpdate()
             ->first();

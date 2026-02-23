@@ -56,7 +56,7 @@ class MemberController extends Controller
             session()->forget('sns_join_data');
             Auth::guard('member')->login($member, false);
             $request->session()->regenerate();
-            return redirect()->route('home')->with('success', '회원가입이 완료되었습니다.');
+            return redirect()->route('member.join_end')->with('success', '회원가입이 완료되었습니다.');
         }
 
         try {
@@ -67,7 +67,7 @@ class MemberController extends Controller
             return redirect()->back()->withInput($request->except('_token'))->withErrors($e->errors());
         }
         $memberService->createMember($memberJoinRequest->getMemberData());
-        return redirect()->route('home')->with('success', '회원가입이 완료되었습니다.');
+        return redirect()->route('member.join_end')->with('success', '회원가입이 완료되었습니다.');
     }
 
     /** 이메일 중복 확인 (AJAX) - 로그인 회원이면 본인 제외 */
@@ -111,31 +111,58 @@ class MemberController extends Controller
     /** 로그인 폼 */
     public function login()
     {
-        $baseUrl = rtrim(url('/'), '/');
-        $loginUrl = route('member.login');
+        $appHost = parse_url(url('/'), PHP_URL_HOST);
+        $loginPath = parse_url(route('member.login'), PHP_URL_PATH) ?: '/';
+        $joinPath = parse_url(route('member.join'), PHP_URL_PATH) ?: '/';
 
-        // 리다이렉트 시 쿼리로 넘어온 intended가 있으면 세션에 저장 (로그인 후 해당 페이지로 복귀)
+        $isSameSiteUrl = function ($url) use ($appHost, $loginPath, $joinPath) {
+            if (!$url || !$appHost) {
+                return false;
+            }
+            $host = parse_url($url, PHP_URL_HOST);
+            $path = parse_url($url, PHP_URL_PATH) ?: '/';
+            $isLoginPage = ($path === $loginPath);
+            $isJoinPage = ($path === $joinPath);
+            return $host === $appHost && !$isLoginPage && !$isJoinPage;
+        };
+
+        $isJoinPageUrl = function ($url) use ($appHost, $joinPath) {
+            if (!$url || !$appHost) {
+                return false;
+            }
+            $host = parse_url($url, PHP_URL_HOST);
+            $path = parse_url($url, PHP_URL_PATH) ?: '/';
+            return $host === $appHost && $path === $joinPath;
+        };
+
+        // 리다이렉트 시 쿼리로 넘어온 intended가 있으면 세션에 저장 (가입 페이지에서 왔으면 메인으로 갈 URL 저장)
         if (request()->filled('intended')) {
             $decoded = urldecode(request()->input('intended'));
-            if (str_starts_with($decoded, $baseUrl) && $decoded !== $loginUrl && !str_starts_with($decoded, $loginUrl . '?')) {
+            if ($isJoinPageUrl($decoded)) {
+                request()->session()->put('url.intended', route('home'));
+            } elseif ($isSameSiteUrl($decoded)) {
                 request()->session()->put('url.intended', $decoded);
             }
         }
-        // intended 없고 세션에도 없을 때: Referer를 intended로 저장
+        // intended 없고 세션에도 없을 때: Referer 처리 (가입 페이지에서 왔으면 메인으로)
         if (!request()->session()->has('url.intended')) {
             $referer = request()->header('Referer');
-            if ($referer && str_starts_with($referer, $baseUrl) && $referer !== $loginUrl && !str_starts_with($referer, $loginUrl . '?')) {
+            if ($referer && $isJoinPageUrl($referer)) {
+                request()->session()->put('url.intended', route('home'));
+            } elseif ($referer && $isSameSiteUrl($referer)) {
                 request()->session()->put('url.intended', $referer);
             }
         }
 
-        // 로그인 후 복귀할 URL (폼 hidden으로 전달해 세션 유실 시에도 동작)
+        // 로그인 후 복귀할 URL (폼 hidden으로 전달)
         $intendedRedirect = '';
         if (request()->session()->has('url.intended')) {
             $intendedRedirect = request()->session()->get('url.intended');
         } elseif (request()->filled('intended')) {
             $decoded = urldecode(request()->input('intended'));
-            if (str_starts_with($decoded, $baseUrl) && $decoded !== $loginUrl && !str_starts_with($decoded, $loginUrl . '?')) {
+            if ($isJoinPageUrl($decoded)) {
+                $intendedRedirect = route('home');
+            } elseif ($isSameSiteUrl($decoded)) {
                 $intendedRedirect = $decoded;
             }
         }
@@ -181,15 +208,16 @@ class MemberController extends Controller
         $redirectUrl = route('mypage.application_status');
         if ($intendedUrl) {
             $intendedUrl = trim($intendedUrl);
-            // 같은 호스트인지 확인 (http/https 차이 무시)
             $appHost = parse_url(url('/'), PHP_URL_HOST);
             $intendedHost = parse_url($intendedUrl, PHP_URL_HOST);
             $intendedPath = parse_url($intendedUrl, PHP_URL_PATH) ?: '/';
             $loginPath = parse_url(route('member.login'), PHP_URL_PATH);
+            $joinPath = parse_url(route('member.join'), PHP_URL_PATH);
             $isSameSite = $appHost && $intendedHost && $appHost === $intendedHost;
             $isNotLoginPage = $intendedPath !== $loginPath;
+            $isJoinPage = $intendedPath === $joinPath;
             if ($isSameSite && $isNotLoginPage) {
-                $redirectUrl = $intendedUrl;
+                $redirectUrl = $isJoinPage ? route('home') : $intendedUrl;
             }
         }
         $redirect = redirect()->to($redirectUrl);

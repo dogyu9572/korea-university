@@ -70,7 +70,7 @@
 	.header .sitemap .menus .snb a.on span:after {left:0; right:auto; width:100%;}
 	.header .sitemap .btns_abso {position:absolute; bottom:0; right:0; display:flex; gap:16px;}
 	.header .sitemap .btns_abso a {font-size:17px; color:#464C53; font-weight:500; line-height:34px; height:36px; padding:0 18px; border-radius:18px; border:#CDD1D5 1px solid; display:flex; align-items:center; gap:4px;}
-	.header .sitemap .btns_abso a:after {content:""; display:block; width:18px; height:18px; background:#464C53; mask:url('/images/arrow_link.svg') no-repeat 50% 50% / contain; -webkit-mask:url('/images/arrow_link.svg') no-repeat 50% 50% / contain;}
+	.header .sitemap .btns_abso a:after {content:""; display:block; width:18px; height:18px; background:#464C53; mask:url('http://kucra.or.kr/images/arrow_link.svg') no-repeat 50% 50% / contain; -webkit-mask:url('http://kucra.or.kr/images/arrow_link.svg') no-repeat 50% 50% / contain;}
 	.header .sitemap .btns_abso a:last-child:before {content:""; position:absolute; top:-68px; right:0; width:140px; aspect-ratio:35/19; background:url('/images/bg_abso.svg') no-repeat 50% 50% / contain;}
 /* footer */
 	.footer {position:relative; background:#292F32;}
@@ -112,6 +112,7 @@
 	.mvisual_wrap .txt strong {position:relative; display:block; font-size:52px; color:#fff; line-height:1.35;}
 	.mvisual_wrap .txt strong.bar:before {content:""; position:absolute; bottom:0; left:0; width:100%; height:24px; background:#E6F1FF1a; border-radius:12px;}
 	.mvisual_wrap .navi {margin-top:50px; gap:4px; font-size:0; align-items:center; pointer-events:auto;}
+	.mvisual_wrap .navi.opacity {opacity:0;}
 	.mvisual_wrap .navi .slick-dots {display:flex; gap:8px; margin-right:11px;}
 	.mvisual_wrap .navi .paging button {display:block; width:8px; height:8px; background:#ffffff80; border-radius:4px;}
 	.mvisual_wrap .navi .paging .slick-active button {background:#fff; width:32px;}
@@ -146,7 +147,7 @@
 	.mtit i {width:6px; height:6px; background:#1E2124; border-radius:50%; margin:0 8px;}
 	.mtit:after {content:""; display:block; width:8px; aspect-ratio:1/1; background:#034DA2; border-radius:8px; margin-bottom:auto;}
 	.mcon .more {position:absolute; top:0; right:0; width:46px; height:46px; border:#CDD1D5 1px solid; border-radius:50%; font-size:0;}
-	.mcon .more:before {content:""; display:block; width:100%; height:100%; background:#1E2124; mask:url('/images/btn_more.svg') no-repeat 50% 50%; -webkit-mask:url('/images/btn_more.svg') no-repeat 50% 50%; transition:.2s linear;}
+	.mcon .more:before {content:""; display:block; width:100%; height:100%; background:#1E2124; mask:url('http://kucra.or.kr/images/btn_more.svg') no-repeat 50% 50%; -webkit-mask:url('http://kucra.or.kr/images/btn_more.svg') no-repeat 50% 50%; transition:.2s linear;}
 	.mcon p {font-size:20px; color:#464C53; line-height:1.6;}
 	.slick-track {min-width:100%;}
 	.mc01_slide {position:relative; margin:16px -15px 0;}
@@ -177,7 +178,7 @@
 	.mc02:after {top:-372px; right:0; width:574px; height:644px; background:url('/images/bg_mc02.svg') no-repeat 50% 50% / contain;}
 	.mc02 .inner {gap:64px}
 	.mc02 .left {width:calc(50% + 20px);}
-	.mc02 .left .list {position:relative; margin-top:32px; border:#CDD1D5 1px solid; border-radius:20px; padding:32px; background:#fff;}
+	.mc02 .left .list {position:relative; margin-top:32px; border:#CDD1D5 1px solid; border-radius:20px; padding:32px; background:#fff; height:341px;}
 	.mc02 .left .list .more {top:-122px;}
 	.mc02 .left .jq_tab {display:flex; gap:8px; margin-bottom:8px;}
 	.mc02 .left .jq_tab button {display:block; font-size:17px; color:#464C53; line-height:36px; height:36px; padding:0 18px; border-radius:18px; background:#F4F5F6;}
@@ -256,7 +257,7 @@
 	.tbl_tac th,
 	.tbl_tac td {text-align:center; padding:20px 16px;}
 	.tbl .btn_outlink {display:block; font-size:0; width:36px; height:36px; background:#F7F7F7; border:#E6E8EA 1px solid; border-radius:50%; margin:0 auto; padding:0 !important;}
-	.tbl .btn_outlink:before {content:""; display:block; width:100%; height:100%; background:#6D7882; mask:url('/images/btn_outlink.svg') no-repeat 50% 50%; -webkit-mask:url('/images/btn_outlink.svg') no-repeat 50% 50%; transition:.2s linear;}
+	.tbl .btn_outlink:before {content:""; display:block; width:100%; height:100%; background:#6D7882; mask:url('http://kucra.or.kr/images/btn_outlink.svg') no-repeat 50% 50%; -webkit-mask:url('http://kucra.or.kr/images/btn_outlink.svg') no-repeat 50% 50%; transition:.2s linear;}
 	.tbl tbody td.intbl table {border-top:#1E2124 1px solid;}
 	.tbl tbody td.intbl th,
 	.tbl tbody td.intbl td {padding:14px 24px; height:56px; font-size:17px;}
@@ -301,10 +302,10 @@
 	.btn_search:after,
 	.btn_reset:after,
 	.btn_write:after {content:""; display:block; width:18px; height:18px;}
-	.btn_link:after {mask:url('/images/arrow_link.svg') no-repeat 50% 50% / contain; -webkit-mask:url('/images/arrow_link.svg') no-repeat 50% 50% / contain;}
-	.btn_search:after {mask:url('/images/btn_search.svg') no-repeat 50% 50% / contain; -webkit-mask:url('/images/btn_search.svg') no-repeat 50% 50% / contain;}
-	.btn_reset:after {mask:url('/images/btn_reset.svg') no-repeat 50% 50% / contain; -webkit-mask:url('/images/btn_reset.svg') no-repeat 50% 50% / contain;}
-	.btn_write:after {mask:url('/images/btn_write.svg') no-repeat 50% 50% / contain; -webkit-mask:url('/images/btn_write.svg') no-repeat 50% 50% / contain;}
+	.btn_link:after {mask:url('http://kucra.or.kr/images/arrow_link.svg') no-repeat 50% 50% / contain; -webkit-mask:url('http://kucra.or.kr/images/arrow_link.svg') no-repeat 50% 50% / contain;}
+	.btn_search:after {mask:url('http://kucra.or.kr/images/btn_search.svg') no-repeat 50% 50% / contain; -webkit-mask:url('http://kucra.or.kr/images/btn_search.svg') no-repeat 50% 50% / contain;}
+	.btn_reset:after {mask:url('http://kucra.or.kr/images/btn_reset.svg') no-repeat 50% 50% / contain; -webkit-mask:url('http://kucra.or.kr/images/btn_reset.svg') no-repeat 50% 50% / contain;}
+	.btn_write:after {mask:url('http://kucra.or.kr/images/btn_write.svg') no-repeat 50% 50% / contain; -webkit-mask:url('http://kucra.or.kr/images/btn_write.svg') no-repeat 50% 50% / contain;}
 	.btns_tac.colm .btn {width:100%;}
 	.btn_wbb {color:#fff !important; background-color:#0A195B !important; border-color:#0A195B !important;}
 	.btn_wbb:after {background:#fff;}
@@ -325,6 +326,8 @@
 	.search_wrap dt {position:relative; width:168px; font-size:18px; font-weight:500; line-height:50px; padding-left:12px;}
 	.search_wrap dt:before {content:""; position:absolute; top:23px; left:0; width:4px; height:4px; background:#6D7882; border-radius:50%;}
 	.search_wrap dd {width:calc(100% - 168px); font-size:16px;}
+	.search_wrap.dt_slim dt {width:100px;}
+	.search_wrap.dt_slim dd {width:calc(100% - 100px);}
 	.search_wrap .filter_opcl {border-top:#CDD1D5cc 1px dashed; border-bottom:#CDD1D5cc 1px dashed; margin:24px 0; padding:24px 0;}
 	.search_wrap .filter_opcl .btn_opcl {display:flex; align-items:center; gap:13px; font-size:20px; color:#1E2124; font-weight:600; line-height:1.6; padding-left:32px; background:url('/images/icon_filter.svg') no-repeat 0 50%;}
 	.search_wrap .filter_opcl .btn_opcl:after {content:""; display:block; width:18px; aspect-ratio:1/1; background:url('/images/arrow_filter.svg') no-repeat 50% 50%; transition:.2s linear;}
@@ -389,7 +392,7 @@
 /* 게시판 목록 */
 	.board_list thead th {background:none !important;}
 	.board_list a {color:#1E2124;}
-	.board_list .down i {display:block; width:18px; height:18px; margin:0 auto; background:#6D7882; mask:url('/images/icon_download.svg') no-repeat 50% 50%; -webkit-mask:url('/images/icon_download.svg') no-repeat 50% 50%;}
+	.board_list .down i {display:block; width:18px; height:18px; margin:0 auto; background:#6D7882; mask:url('http://kucra.or.kr/images/icon_download.svg') no-repeat 50% 50%; -webkit-mask:url('http://kucra.or.kr/images/icon_download.svg') no-repeat 50% 50%;}
 	.board_list .notice .num {font-size:0; line-height:0;}
 	.board_list .notice .num:before {content:"공지"; display:block; width:74px; height:28px; line-height:28px; font-size:14px; color:#fff; font-weight:600; background:#034DA2 url('/images/icon_notice.svg') no-repeat 16px 50%; border-radius:14px; margin:0 auto; padding-left:34px; text-align:left;}
 	.board_list .tal {white-space:nowrap; overflow:hidden; text-overflow:ellipsis;}
@@ -425,7 +428,7 @@
 	.board_view .board_btm .arrow:before,
 	.board_view .board_btm .arrow:after {content:""; position:absolute; top:50%; width:32px; height:32px; border-radius:50%; transition:.2s linear;}
 	.board_view .board_btm .arrow:before {background:#fff;}
-	.board_view .board_btm .arrow:after {background:#1E2124; mask:url('/images/arrow_board_view.svg') no-repeat 50% 50%; -webkit-mask:url('/images/arrow_board_view.svg') no-repeat 50% 50%;}
+	.board_view .board_btm .arrow:after {background:#1E2124; mask:url('http://kucra.or.kr/images/arrow_board_view.svg') no-repeat 50% 50%; -webkit-mask:url('http://kucra.or.kr/images/arrow_board_view.svg') no-repeat 50% 50%;}
 	.board_view .board_btm .arrow strong {position:absolute; top:50%; font-weight:600; transform:translateY(-50%);}
 	.board_view .board_btm .arrow p {color:#464C53; line-height:inherit; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;}
 	.board_view .board_btm .prev {left:0; padding-left:102px;}
@@ -442,7 +445,7 @@
 	.download_area a + a {margin-top:8px;}
 	.download_area a:before {content:""; position:absolute; top:50%; left:20px; width:32px; height:32px; background:#E8ECFC url('/images/icon_download.svg') no-repeat 50% 50%; border-radius:50%; transform:translateY(-50%);}
 	.download_area.type_gbox a {background:#F8F9FB; border:0; padding:16px 16px 16px 74px;}
-	.download_area.type_gbox a:before {left:48px; width:18px; height:18px; background:#464C53; mask:url('/images/icon_download.svg') no-repeat 50% 50% / contain; -webkit-mask:url('/images/icon_download.svg') no-repeat 50% 50% / contain; border-radius:0;}
+	.download_area.type_gbox a:before {left:48px; width:18px; height:18px; background:#464C53; mask:url('http://kucra.or.kr/images/icon_download.svg') no-repeat 50% 50% / contain; -webkit-mask:url('http://kucra.or.kr/images/icon_download.svg') no-repeat 50% 50% / contain; border-radius:0;}
 /* box */
 	.gbox {background:#F7F7F7; border-radius:20px; padding:24px 32px;}
 	.glbox {border:#CDD1D5 1px solid; border-radius:20px; padding:32px;}
@@ -465,7 +468,7 @@
 	label.check {position:relative; display:inline-block; vertical-align:top; padding-left:28px; line-height:30px;}
 	label.check input {display:none;}
 	label.check i {position:absolute; top:50%; left:0; width:20px; height:20px; background:#fff; border:#CDD1D5 1px solid; border-radius:2px; transform:translateY(-50%); transition:.2s linear;}
-	label.check i:before {content:""; position:absolute; top:0; left:0; width:100%; height:100%; background:#CDD1D5; mask:url('/images/icon_chk.svg') no-repeat 50% 50%; -webkit-mask:url('/images/icon_chk.svg') no-repeat 50% 50%; transition:.2s linear;}
+	label.check i:before {content:""; position:absolute; top:0; left:0; width:100%; height:100%; background:#CDD1D5; mask:url('http://kucra.or.kr/images/icon_chk.svg') no-repeat 50% 50%; -webkit-mask:url('http://kucra.or.kr/images/icon_chk.svg') no-repeat 50% 50%; transition:.2s linear;}
 	label.check span {display:block; font-size:17px; color:#464C53; transition:.2s linear;}
 	label.check span strong {color:#0A195B; font-weight:500;}
 	label.check input:checked + i {background:#0A195B; border-color:#0A195B;}
@@ -860,7 +863,7 @@
 	.application_list dt {color:#1E2124; font-weight:500; width:72px;}
 	.application_list dd {color:#464C53; width:calc(100% - 72px);}
 	.application_list .btns {display:flex; gap:10px; padding:0 24px 24px;}
-	.application_list .btns .btn {width:calc(50% - 5px); font-size:16px; font-weight:500; line-height:48px; height:50px; border-radius:6px;}
+	.application_list .btns .btn {flex:1 1 calc(50% - 5px); font-size:16px; font-weight:500; line-height:48px; height:50px; border-radius:6px;}
 	.application_list .btn {display:block; font-size:15px; font-weight:500; line-height:32px; height:34px; width:80px; text-align:center; border:1px solid; border-radius:4px; text-align:center;}
 	.application_list .btn_view {color:#fff; background:#1E2124; border-color:#1E2124;}
 	.application_list .btn_cancel {color:#464C53; background:#fff; border-color:#CDD1D5;}
@@ -905,7 +908,7 @@
 	.roommate_info .i2 dd {gap:8px;}
 	.roommate_info dd .affili {display:flex; align-items:center; gap:8px; font-size:16px;}
 	.roommate_info dd .affili strong {position:relative; font-weight:600; padding-left:28px;}
-	.roommate_info dd .affili strong:before {content:""; position:absolute; top:0; left:0; width:16px; height:100%; background:#1E2124; mask:url('/images/icon_organizational01.svg') no-repeat 50% 50% / contain; -webkit-mask:url('/images/icon_organizational01.svg') no-repeat 50% 50% / contain;}
+	.roommate_info dd .affili strong:before {content:""; position:absolute; top:0; left:0; width:16px; height:100%; background:#1E2124; mask:url('http://kucra.or.kr/images/icon_organizational01.svg') no-repeat 50% 50% / contain; -webkit-mask:url('http://kucra.or.kr/images/icon_organizational01.svg') no-repeat 50% 50% / contain;}
 	.roommate_info dd .affili p {font-size:inherit;}
 	.roommate_info dd .state {font-size:14px; color:#034DA2; font-weight:600; line-height:28px; height:28px; width:48px; text-align:center; background:#EBF5FF; border-radius:14px;}
 	.roommate_info dd .abso {position:absolute; top:50%; right:0; transform:translateY(-50%);}
@@ -964,7 +967,7 @@
 	.print_head .num {font-size:14px;}
 	.print_head .btns {display:flex; gap:8px;}
 	.print_head .btns .btn {font-size:14px; font-weight:600; line-height:32px; height:34px; width:80px; text-align:center; border-radius:4px; border:1px solid;}
-	.print_head .btns .btn_print:after {background:#1E2124; mask:url('/images/icon_print.svg') no-repeat 50% 50% / contain; -webkit-mask:url('/images/icon_print.svg') no-repeat 50% 50% / contain;}
+	.print_head .btns .btn_print:after {background:#1E2124; mask:url('http://kucra.or.kr/images/icon_print.svg') no-repeat 50% 50% / contain; -webkit-mask:url('http://kucra.or.kr/images/icon_print.svg') no-repeat 50% 50% / contain;}
 	.print_title {font-size:44px; color:#000; font-weight:700; text-align:center; margin:80px 0;}
 	.print_btm {margin-top:120px; text-align:center; line-height:1.75;}
 	.print_btm .date {font-size:14px; color:#000c; font-weight:500;}

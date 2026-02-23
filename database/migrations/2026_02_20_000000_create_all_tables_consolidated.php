@@ -1070,7 +1070,8 @@ return new class extends Migration
     {
         Schema::create('education_application_attachments', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('education_application_id')->constrained('education_applications')->onDelete('cascade');
+            $table->unsignedBigInteger('education_application_id');
+            $table->foreign('education_application_id', 'edu_app_att_app_id_fk')->references('id')->on('education_applications')->onDelete('cascade');
             $table->string('path');
             $table->string('name');
             $table->string('type')->default('business_registration');

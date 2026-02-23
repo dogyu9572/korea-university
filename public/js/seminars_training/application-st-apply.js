@@ -36,7 +36,7 @@ function toggleSectionInputs(selector, enabled) {
 }
 
 function isSeminarApplyForm(form) {
-    return (form.action || '').toString().indexOf('application_st_apply/store') !== -1;
+    return (form.action || '').toString().indexOf('application_st_apply') !== -1;
 }
 
 /** 1인실/비숙박 선택 시 룸메이트 영역 숨김, 2인1실일 때만 표시 */
@@ -71,6 +71,10 @@ function setupFormSubmit() {
             const fileWraps = form.querySelectorAll('.file_inputs');
             let hasStoredFile = false;
             fileWraps.forEach(function (wrap) {
+                var inDisabledSection = wrap.closest('[data-tax-box]') && wrap.closest('[data-tax-box]').querySelector('input:not([type="hidden"]), select, textarea') && wrap.closest('[data-tax-box]').querySelector('input:not([type="hidden"]), select, textarea').disabled;
+                if (inDisabledSection) {
+                    return;
+                }
                 if (wrap._storedFile) {
                     hasStoredFile = true;
                 }
@@ -95,7 +99,6 @@ function setupFormSubmit() {
                 body: fd,
                 redirect: 'manual',
                 headers: {
-                    'X-Requested-With': 'XMLHttpRequest',
                     'Accept': 'text/html'
                 }
             }).then(function (res) {
@@ -107,7 +110,7 @@ function setupFormSubmit() {
                     return;
                 }
                 if (res.status === 422) {
-                    window.location.href = form.action;
+                    window.location.href = form.action + (form.action.indexOf('?') !== -1 ? '&' : '?') + 'seminar_training_id=' + (form.querySelector('input[name="seminar_training_id"]') && form.querySelector('input[name="seminar_training_id"]').value);
                     return;
                 }
                 alert('제출 중 오류가 발생했습니다.');

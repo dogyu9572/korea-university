@@ -606,12 +606,12 @@ class AdminMenuExportSeeder extends Seeder
 
         DB::statement('SET FOREIGN_KEY_CHECKS=0');
         DB::table($table)->truncate();
-        DB::statement('SET FOREIGN_KEY_CHECKS=1');
 
         foreach ($chunks as $chunk) {
             if (count($chunk) > 0) {
                 DB::table($table)->insert($chunk);
             }
+        DB::statement('SET FOREIGN_KEY_CHECKS=1');
         }
     }
 }

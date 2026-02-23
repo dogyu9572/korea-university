@@ -215,7 +215,7 @@ $(document).ready (function () {
 			]
 		});
 		if (slideCount <= 1) {
-			$wrapper.find('.navi').hide(); 
+			$wrapper.find('.navi').addClass('opacity'); 
 			$this.slick('slickPause');
 		}
 	});

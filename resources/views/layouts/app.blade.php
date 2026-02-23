@@ -20,6 +20,10 @@
     <title>@yield('title', '사단법인 전국대학연구·산학협력관리자협회')</title>
 
     <!-- Styles -->
+	<link rel="preload" href="css/font/Pretendard-Regular.woff2" as="font" type="font/woff2" crossorigin>
+	<link rel="preload" href="css/font/Pretendard-Medium.woff2" as="font" type="font/woff2" crossorigin>
+	<link rel="preload" href="css/font/Pretendard-SemiBold.woff2" as="font" type="font/woff2" crossorigin>
+	<link rel="preload" href="css/font/Pretendard-Bold.woff2" as="font" type="font/woff2" crossorigin>
 	<link rel="stylesheet" href="/css/font.css" media="all">
     <link rel="stylesheet" href="{{ asset('css/styles.css?v2') }}">
     <link rel="stylesheet" href="{{ asset('css/reactive.css?v2') }}">
@@ -87,7 +91,13 @@
 					</form>
 				@else
 					<a href="{{ route('member.join') }}" class="i1">SIGN UP</a>
-					<a href="{{ route('member.login') }}" class="i2">LOGIN</a>
+					@php
+	$loginRoute = route('member.login');
+	$currentFull = request()->fullUrl();
+	$isLoginPage = $currentFull === $loginRoute || str_starts_with($currentFull, $loginRoute . '?') || str_starts_with($currentFull, $loginRoute . '#');
+	$loginHref = $isLoginPage ? $loginRoute : $loginRoute . '?intended=' . urlencode($currentFull);
+@endphp
+					<a href="{{ $loginHref }}" class="i2">LOGIN</a>
 				@endauth
 			</div>
 			<a href="javascript:void(0);" class="btn_menu">

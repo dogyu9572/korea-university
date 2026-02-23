@@ -101,6 +101,7 @@ class SeminarTrainingApplicationRequest extends FormRequest
             'roommate_name' => ['nullable', 'string', 'max:100'],
             'roommate_phone' => ['nullable', 'string', 'max:20'],
             'request_notes' => ['nullable', 'string', 'max:2000'],
+            'traveler_registration_agreed' => ['required', 'accepted'],
         ];
     }
 
@@ -127,6 +128,7 @@ class SeminarTrainingApplicationRequest extends FormRequest
             'roommate_name' => '룸메이트 이름',
             'roommate_phone' => '룸메이트 휴대폰',
             'request_notes' => '요청사항',
+            'traveler_registration_agreed' => '여행자 가입 동의',
         ];
     }
 
@@ -146,6 +148,7 @@ class SeminarTrainingApplicationRequest extends FormRequest
             'exists' => '선택한 :attribute이(가) 올바르지 않습니다.',
             'in' => '선택한 :attribute이(가) 올바르지 않습니다.',
             'mimes' => ':attribute은(는) :values 형식만 가능합니다.',
+            'accepted' => ':attribute에 체크해주세요.',
         ];
     }
 }
