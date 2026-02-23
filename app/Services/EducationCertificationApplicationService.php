@@ -272,6 +272,7 @@ class EducationCertificationApplicationService
         $application->update(array_merge($billing, [
             'participation_fee' => $participationFee,
             'fee_type' => $feeType,
+            'gender' => $request->input('gender'),
             'tax_invoice_status' => !empty($billing['has_tax_invoice']) ? '신청완료' : '미신청',
         ]));
 
@@ -412,6 +413,7 @@ class EducationCertificationApplicationService
             'affiliation' => $affiliation,
             'phone_number' => $phone,
             'email' => $email,
+            'gender' => $request->input('gender'),
             'application_date' => $now,
             'is_completed' => false,
             'is_survey_completed' => false,

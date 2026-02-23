@@ -403,6 +403,8 @@ Route::prefix('backoffice')->middleware(['backoffice'])->group(function () {
         ->name('backoffice.applications.update-payment-status');
     Route::patch('applications/{education_application}/tax-invoice-status', [EducationApplicationController::class, 'updateTaxInvoiceStatus'])
         ->name('backoffice.applications.update-tax-invoice-status');
+    Route::patch('applications/{education_application}/cash-receipt-status', [EducationApplicationController::class, 'updateCashReceiptStatus'])
+        ->name('backoffice.applications.update-cash-receipt-status');
     Route::patch('applications/{education_application}/completion-status', [EducationApplicationController::class, 'updateCompletionStatus'])
         ->name('backoffice.applications.update-completion-status');
     Route::patch('applications/{education_application}/course-status', [EducationApplicationController::class, 'updateCourseStatus'])

@@ -387,6 +387,24 @@ class EducationApplicationController extends BaseController
     }
 
     /**
+     * 신청별 현금영수증 상태 즉시 업데이트
+     */
+    public function updateCashReceiptStatus(EducationApplication $education_application, Request $request)
+    {
+        $request->validate([
+            'cash_receipt_status' => 'required|in:미신청,신청완료,발행완료',
+        ]);
+
+        $status = $request->cash_receipt_status;
+        $education_application->update([
+            'cash_receipt_status' => $status,
+            'has_cash_receipt' => in_array($status, ['신청완료', '발행완료'], true),
+        ]);
+
+        return response()->json(['success' => true]);
+    }
+
+    /**
      * 신청별 이수 여부 즉시 업데이트
      */
     public function updateCompletionStatus(EducationApplication $education_application, Request $request)

@@ -58,6 +58,22 @@
                 <dd><input type="text" name="email" class="text w1" value="{{ old('email', $member->email) }}" readonly inputmode="email"></dd>
             </dl>
             <dl>
+                <dt>성별</dt>
+                <dd class="radios">
+                    <label class="radio">
+                        <input type="radio" name="gender" value="남" @checked(old('gender') === '남')>
+                        <i></i><span>남성</span>
+                    </label>
+                    <label class="radio">
+                        <input type="radio" name="gender" value="여" @checked(old('gender') === '여')>
+                        <i></i><span>여성</span>
+                    </label>
+                    @error('gender')
+                        <p class="join_field_error" style="color:#c00;font-size:0.875rem;margin-top:0.25rem;">{{ $message }}</p>
+                    @enderror
+                </dd>
+            </dl>
+            <dl>
                 <dt>생년월일</dt>
                 <dd>
                     <input type="date" name="birth_date" class="text w1 @error('birth_date') is-invalid @enderror" value="{{ old('birth_date', optional($member->birth_date)->format('Y-m-d')) }}">

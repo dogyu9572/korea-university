@@ -96,6 +96,10 @@
 			<dd>{{ $application->email ?? '' }}</dd>
 		</dl>
 		<dl>
+			<dt>성별</dt>
+			<dd>{{ $application->gender ?? '' }}</dd>
+		</dl>
+		<dl>
 			<dt>환불 계좌 정보</dt>
 			<dd>
 				@if($application->refund_account_holder || $application->refund_bank_name || $application->refund_account_number)

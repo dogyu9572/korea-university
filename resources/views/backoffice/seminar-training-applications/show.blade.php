@@ -209,6 +209,7 @@
                                     <th>휴대폰 번호</th>
                                     <th>룸메이트</th>
                                     <th>세금계산서</th>
+                                    <th>현금영수증</th>
                                     <th>결제상태</th>
                                     <th>신청일시</th>
                                     <th>이수 여부</th>
@@ -231,10 +232,37 @@
                                         <td>{{ $application->phone_number }}</td>
                                         <td>{{ $application->roommate_name ? $application->roommate_name . ($application->roommate_phone ? ' / ' . $application->roommate_phone : '') : '-' }}</td>
                                         <td>
+                                            @php
+                                                $taxStatus = trim((string)($application->tax_invoice_status ?? ''));
+                                                if ($taxStatus === '') {
+                                                    if (!$application->has_tax_invoice) {
+                                                        $taxStatus = '미신청';
+                                                    } else {
+                                                        $taxStatus = ($application->payment_status === '입금완료') ? '발행완료' : '신청완료';
+                                                    }
+                                                }
+                                            @endphp
                                             <select name="tax_invoice_status[{{ $application->id }}]" class="form-control form-control-sm table-select-sm" data-action="update-tax-invoice-status" data-application-id="{{ $application->id }}">
-                                                <option value="미신청" @selected(($application->tax_invoice_status ?? '') == '미신청')>미신청</option>
-                                                <option value="신청완료" @selected(($application->tax_invoice_status ?? '') == '신청완료')>신청완료</option>
-                                                <option value="발행완료" @selected(($application->tax_invoice_status ?? '') == '발행완료')>발행완료</option>
+                                                <option value="미신청" @selected($taxStatus === '미신청')>미신청</option>
+                                                <option value="신청완료" @selected($taxStatus === '신청완료')>신청완료</option>
+                                                <option value="발행완료" @selected($taxStatus === '발행완료')>발행완료</option>
+                                            </select>
+                                        </td>
+                                        <td>
+                                            @php
+                                                $cashStatus = trim((string)($application->cash_receipt_status ?? ''));
+                                                if ($cashStatus === '') {
+                                                    if (!$application->has_cash_receipt) {
+                                                        $cashStatus = '미신청';
+                                                    } else {
+                                                        $cashStatus = ($application->payment_status === '입금완료') ? '발행완료' : '신청완료';
+                                                    }
+                                                }
+                                            @endphp
+                                            <select name="cash_receipt_status[{{ $application->id }}]" class="form-control form-control-sm table-select-sm" data-action="update-cash-receipt-status" data-application-id="{{ $application->id }}">
+                                                <option value="미신청" @selected($cashStatus === '미신청')>미신청</option>
+                                                <option value="신청완료" @selected($cashStatus === '신청완료')>신청완료</option>
+                                                <option value="발행완료" @selected($cashStatus === '발행완료')>발행완료</option>
                                             </select>
                                         </td>
                                         <td>
@@ -274,7 +302,7 @@
                                     </tr>
                                 @empty
                                     <tr>
-                                        <td colspan="15" class="text-center">등록된 신청 내역이 없습니다.</td>
+                                        <td colspan="16" class="text-center">등록된 신청 내역이 없습니다.</td>
                                     </tr>
                                 @endforelse
                             </tbody>

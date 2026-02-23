@@ -110,6 +110,24 @@
                 </div>
             </div>
             <div class="member-form-row">
+                <label class="member-form-label">성별</label>
+                <div class="member-form-field">
+                    <div class="board-radio-group">
+                        <div class="board-radio-item">
+                            <input type="radio" id="gender_m" name="gender" value="남" class="board-radio-input" @checked(old('gender', $app?->gender ?? '') === '남')>
+                            <label for="gender_m">남성</label>
+                        </div>
+                        <div class="board-radio-item">
+                            <input type="radio" id="gender_f" name="gender" value="여" class="board-radio-input" @checked(old('gender', $app?->gender ?? '') === '여')>
+                            <label for="gender_f">여성</label>
+                        </div>
+                    </div>
+                    @error('gender')
+                        <div class="invalid-feedback">{{ $message }}</div>
+                    @enderror
+                </div>
+            </div>
+            <div class="member-form-row">
                 <label class="member-form-label">신청일시 <span class="required">*</span></label>
                 <div class="member-form-field">
                     <input type="datetime-local" class="board-form-control @error('application_date') is-invalid @enderror"
@@ -397,11 +415,25 @@
             <div class="member-form-row">
                 <label class="member-form-label">현금영수증 발행여부</label>
                 <div class="member-form-field">
-                    <select name="has_cash_receipt" class="board-form-control @error('has_cash_receipt') is-invalid @enderror" id="has_cash_receipt_select">
-                        <option value="0" @selected((int)(old('has_cash_receipt', $app?->has_cash_receipt ?? 0)) === 0)>미발행</option>
-                        <option value="1" @selected((int)(old('has_cash_receipt', $app?->has_cash_receipt ?? 0)) === 1)>발행완료</option>
+                    @php
+                        $cashReceiptStatus = trim((string)(old('cash_receipt_status', $app?->cash_receipt_status ?? '')));
+                        if ($cashReceiptStatus === '' && isset($app)) {
+                            if (!$app->has_cash_receipt) {
+                                $cashReceiptStatus = '미신청';
+                            } else {
+                                $cashReceiptStatus = ($app->payment_status === '입금완료') ? '발행완료' : '신청완료';
+                            }
+                        }
+                        if ($cashReceiptStatus === '') {
+                            $cashReceiptStatus = '미신청';
+                        }
+                    @endphp
+                    <select name="cash_receipt_status" class="board-form-control @error('cash_receipt_status') is-invalid @enderror" id="cash_receipt_status_select">
+                        <option value="미신청" @selected($cashReceiptStatus === '미신청')>미신청</option>
+                        <option value="신청완료" @selected($cashReceiptStatus === '신청완료')>신청완료</option>
+                        <option value="발행완료" @selected($cashReceiptStatus === '발행완료')>발행완료</option>
                     </select>
-                    @error('has_cash_receipt')
+                    @error('cash_receipt_status')
                         <div class="invalid-feedback">{{ $message }}</div>
                     @enderror
                 </div>

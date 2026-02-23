@@ -198,6 +198,30 @@ function updateTaxInvoiceStatus(applicationId, status) {
         });
 }
 
+function updateCashReceiptStatus(applicationId, status) {
+    const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content');
+    const url = getApplicationUpdateBaseUrl() + '/' + applicationId + '/cash-receipt-status';
+    fetch(url, {
+        method: 'PATCH',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRF-TOKEN': csrfToken,
+            'Accept': 'application/json'
+        },
+        body: JSON.stringify({ cash_receipt_status: status })
+    })
+        .then(function (r) { return r.json(); })
+        .then(function (data) {
+            if (data.success) {
+                return;
+            }
+            alert('저장 중 오류가 발생했습니다.');
+        })
+        .catch(function () {
+            alert('저장 중 오류가 발생했습니다.');
+        });
+}
+
 // 수강상태 업데이트
 function updateCourseStatus(applicationId, status) {
     const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content');
@@ -752,6 +776,12 @@ function initShowPageHandlers() {
         if (taxEl && taxEl.nodeName === 'SELECT') {
             var id = taxEl.getAttribute('data-application-id');
             if (id) updateTaxInvoiceStatus(id, taxEl.value);
+            return;
+        }
+        const cashEl = e.target.closest('[data-action="update-cash-receipt-status"]');
+        if (cashEl && cashEl.nodeName === 'SELECT') {
+            var id = cashEl.getAttribute('data-application-id');
+            if (id) updateCashReceiptStatus(id, cashEl.value);
             return;
         }
         const courseEl = e.target.closest('[data-action="update-course-status"]');

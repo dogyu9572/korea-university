@@ -495,6 +495,7 @@ class EducationApplicationService
                 'payment_status',
                 'payment_date',
                 'tax_invoice_status',
+                'cash_receipt_status',
                 'has_cash_receipt',
                 'cash_receipt_purpose',
                 'cash_receipt_number',
@@ -636,6 +637,7 @@ class EducationApplicationService
                 'affiliation',
                 'phone_number',
                 'email',
+                'gender',
                 'application_date',
                 'is_completed',
                 'is_survey_completed',
@@ -645,6 +647,7 @@ class EducationApplicationService
                 'payment_status',
                 'payment_date',
                 'tax_invoice_status',
+                'cash_receipt_status',
                 'has_cash_receipt',
                 'cash_receipt_purpose',
                 'cash_receipt_number',
@@ -679,7 +682,11 @@ class EducationApplicationService
             // boolean 처리 (input() 사용하여 폼값 정확히 반영)
             $data['is_completed'] = $request->boolean('is_completed');
             $data['is_survey_completed'] = $request->boolean('is_survey_completed');
-            $data['has_cash_receipt'] = $request->boolean('has_cash_receipt');
+            if ($request->filled('cash_receipt_status')) {
+                $data['has_cash_receipt'] = in_array($request->input('cash_receipt_status'), ['신청완료', '발행완료'], true);
+            } else {
+                $data['has_cash_receipt'] = $request->boolean('has_cash_receipt');
+            }
             $data['has_tax_invoice'] = $request->boolean('has_tax_invoice');
 
             // payment_method는 모델의 casts가 자동으로 JSON 처리

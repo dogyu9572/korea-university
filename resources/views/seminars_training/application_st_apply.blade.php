@@ -63,6 +63,22 @@
 			</dd>
 		</dl>
 		<dl>
+			<dt>성별</dt>
+			<dd class="radios">
+				<label class="radio">
+					<input type="radio" name="gender" value="남" @checked(old('gender', isset($application) ? ($application->gender ?? '') : '') === '남')>
+					<i></i><span>남성</span>
+				</label>
+				<label class="radio">
+					<input type="radio" name="gender" value="여" @checked(old('gender', isset($application) ? ($application->gender ?? '') : '') === '여')>
+					<i></i><span>여성</span>
+				</label>
+				@error('gender')
+					<p class="join_field_error" style="color:#c00;font-size:0.875rem;margin-top:0.25rem;">{{ $message }}</p>
+				@enderror
+			</dd>
+		</dl>
+		<dl>
 			<dt>환불 계좌 정보</dt>
 			<dd class="colm">
 				<input type="text" name="refund_account_holder" class="text w1 @error('refund_account_holder') is-invalid @enderror" placeholder="예금주명을 입력해주세요." value="{{ old('refund_account_holder', isset($application) ? ($application->refund_account_holder ?? '') : '') }}">

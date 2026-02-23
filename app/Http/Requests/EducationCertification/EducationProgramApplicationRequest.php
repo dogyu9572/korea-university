@@ -100,6 +100,7 @@ class EducationProgramApplicationRequest extends FormRequest
             'affiliation' => ['nullable', 'string', 'max:100'],
             'phone_number' => ['nullable', 'string', 'max:20'],
             'email' => ['nullable', 'email', 'max:100'],
+            'gender' => ['required', 'string', 'in:남,여'],
             'refund_account_holder' => ['required', 'string', 'max:50'],
             'refund_bank_name' => ['required', 'string', 'max:50'],
             'refund_account_number' => ['required', 'string', 'max:50'],
@@ -133,6 +134,7 @@ class EducationProgramApplicationRequest extends FormRequest
     {
         return [
             'fee_type' => '참가비 유형',
+            'gender' => '성별',
             'refund_account_holder' => '환불 계좌 예금주명',
             'refund_bank_name' => '환불 계좌 은행명',
             'refund_account_number' => '환불 계좌번호',

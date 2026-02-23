@@ -102,6 +102,24 @@
                     </div>
                 </div>
             </div>
+            <div class="member-form-row">
+                <label class="member-form-label">성별</label>
+                <div class="member-form-field">
+                    <div class="board-radio-group">
+                        <div class="board-radio-item">
+                            <input type="radio" id="gender_m" name="gender" value="남" class="board-radio-input" @checked(old('gender', $app?->gender ?? '') === '남')>
+                            <label for="gender_m">남성</label>
+                        </div>
+                        <div class="board-radio-item">
+                            <input type="radio" id="gender_f" name="gender" value="여" class="board-radio-input" @checked(old('gender', $app?->gender ?? '') === '여')>
+                            <label for="gender_f">여성</label>
+                        </div>
+                    </div>
+                    @error('gender')
+                        <div class="invalid-feedback">{{ $message }}</div>
+                    @enderror
+                </div>
+            </div>
             <div class="member-form-row member-form-row-inline">
                 <div class="member-form-inline-item">
                     <label class="member-form-label">생년월일</label>
