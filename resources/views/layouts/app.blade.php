@@ -20,10 +20,10 @@
     <title>@yield('title', '사단법인 전국대학연구·산학협력관리자협회')</title>
 
     <!-- Styles -->
-	<link rel="preload" href="css/font/Pretendard-Regular.woff2" as="font" type="font/woff2" crossorigin>
-	<link rel="preload" href="css/font/Pretendard-Medium.woff2" as="font" type="font/woff2" crossorigin>
-	<link rel="preload" href="css/font/Pretendard-SemiBold.woff2" as="font" type="font/woff2" crossorigin>
-	<link rel="preload" href="css/font/Pretendard-Bold.woff2" as="font" type="font/woff2" crossorigin>
+	<link rel="preload" href="https://kucra.or.kr/css/font/Pretendard-Regular.woff" as="font" type="font/woff" crossorigin>
+	<link rel="preload" href="https://kucra.or.kr/css/font/Pretendard-Medium.woff" as="font" type="font/woff" crossorigin>
+	<link rel="preload" href="https://kucra.or.kr/css/font/Pretendard-SemiBold.woff" as="font" type="font/woff" crossorigin>
+	<link rel="preload" href="https://kucra.or.kr/css/font/Pretendard-Bold.woff" as="font" type="font/woff" crossorigin>
 	<link rel="stylesheet" href="/css/font.css" media="all">
     <link rel="stylesheet" href="{{ asset('css/styles.css?v2') }}">
     <link rel="stylesheet" href="{{ asset('css/reactive.css?v2') }}">

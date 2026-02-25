@@ -6,7 +6,6 @@ use App\Models\Member;
 use App\Support\TempUploadSessionHelper;
 use Illuminate\Contracts\Validation\Validator;
 use Illuminate\Foundation\Http\FormRequest;
-use Illuminate\Validation\Rule;
 use Illuminate\Validation\ValidationException;
 
 class CertificationApplicationRequest extends FormRequest
@@ -89,23 +88,11 @@ class CertificationApplicationRequest extends FormRequest
             'cash_receipt_number' => ['required_if:has_cash_receipt,1', 'nullable', 'string', 'max:50'],
             'has_tax_invoice' => ['nullable', 'boolean'],
             'company_name' => ['required_if:has_tax_invoice,1', 'nullable', 'string', 'max:100'],
-            'registration_number' => ['required_if:has_tax_invoice,1', 'nullable', 'string', 'max:50'],
+            'registration_number' => ['nullable', 'string', 'max:50'],
             'contact_person_name' => ['required_if:has_tax_invoice,1', 'nullable', 'string', 'max:50'],
             'contact_person_email' => ['required_if:has_tax_invoice,1', 'nullable', 'email', 'max:100'],
             'contact_person_phone' => ['required_if:has_tax_invoice,1', 'nullable', 'string', 'max:20'],
-            'business_registration' => [
-                Rule::requiredIf(function () {
-                    if ($this->input('has_tax_invoice') != '1') {
-                        return false;
-                    }
-                    $temp = $this->session()->get('certification_receipt_temp_files');
-                    return ! is_array($temp) || empty($temp['business_registration']);
-                }),
-                'nullable',
-                'file',
-                'mimes:pdf,jpg,jpeg,png',
-                'max:2048',
-            ],
+            'business_registration' => ['nullable', 'file', 'mimes:pdf,jpg,jpeg,png', 'max:2048'],
             'attachments.*' => ['nullable', 'file', 'mimes:pdf,jpg,jpeg,png', 'max:2048'],
         ];
     }

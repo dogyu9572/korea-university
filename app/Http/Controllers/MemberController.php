@@ -233,12 +233,20 @@ class MemberController extends Controller
     /** 네이버 로그인 redirect */
     public function redirectToNaver()
     {
+        session(['oauth_callback_provider' => 'naver']);
         return Socialite::driver('naver')->redirect();
     }
 
-    /** 네이버 로그인 callback */
+    /** OAuth 공통 callback (등록된 URL이 /login/naver/callback 하나일 때 네이버·카카오 모두 이 주소로 옴) */
     public function handleNaverCallback(MemberAuthService $memberAuthService)
     {
+        $provider = session('oauth_callback_provider', 'naver');
+        session()->forget('oauth_callback_provider');
+
+        if ($provider === 'kakao') {
+            return $this->handleKakaoCallback($memberAuthService);
+        }
+
         try {
             $providerUser = Socialite::driver('naver')->user();
         } catch (\Exception $e) {
@@ -258,15 +266,16 @@ class MemberController extends Controller
         return redirect()->route('member.join')->withInput($snsJoinData);
     }
 
-    /** 카카오 로그인 redirect (이름·이메일·전화번호 동의 요청, 동의항목 ID: name, account_email, phone_number) */
+    /** 카카오 로그인 redirect (이름·이메일·전화번호 동의 요청; 콜백은 등록된 /login/naver/callback 사용) */
     public function redirectToKakao()
     {
+        session(['oauth_callback_provider' => 'kakao']);
         return Socialite::driver('kakao')
             ->scopes(['name', 'account_email', 'phone_number'])
             ->redirect();
     }
 
-    /** 카카오 로그인 callback */
+    /** 카카오 로그인 callback (직접 /login/kakao/callback 호출 시 또는 handleNaverCallback에서 위임) */
     public function handleKakaoCallback(MemberAuthService $memberAuthService)
     {
         if (request()->has('error')) {

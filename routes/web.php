@@ -126,6 +126,10 @@ Route::prefix('mypage')->name('mypage.')->middleware('member')->group(function (
     Route::post('/secession', [MypageController::class, 'secession'])->name('secession');
 });
 
+// OAuth 콜백 (네이버/카카오 개발자센터에 등록된 URL: /login/.../callback)
+Route::get('/login/naver/callback', [MemberController::class, 'handleNaverCallback'])->name('login.naver.callback.url');
+Route::get('/login/kakao/callback', [MemberController::class, 'handleKakaoCallback'])->name('login.kakao.callback.url');
+
 // 회원 (로그인/가입/ID·PW 찾기) - MemberController
 Route::prefix('member')->name('member.')->group(function () {
     Route::get('/login', [MemberController::class, 'login'])->name('login');
