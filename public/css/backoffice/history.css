@@ -119,6 +119,12 @@
     min-width: 300px;
 }
 
+.history-table textarea.history-content {
+    min-height: 60px;
+    height: auto;
+    resize: vertical;
+}
+
 .history-table .history-is-visible {
     min-width: 80px;
 }

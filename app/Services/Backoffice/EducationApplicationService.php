@@ -199,6 +199,25 @@ class EducationApplicationService
             });
         }
 
+        if ($programColumn === 'seminar_training_id' && $request->filled('affiliation')) {
+            $query->where('affiliation', 'like', '%' . $request->input('affiliation') . '%');
+        }
+
+        if ($programColumn === 'seminar_training_id' && $request->filled('accommodation')) {
+            $acc = $request->input('accommodation');
+            if ($acc === '2인1실') {
+                $query->where('fee_type', 'like', '%twin%');
+            } elseif ($acc === '1인실') {
+                $query->where('fee_type', 'like', '%single%');
+            } elseif ($acc === '비숙박') {
+                $query->where('fee_type', 'like', '%no_stay%');
+            }
+        }
+
+        if ($programColumn === 'seminar_training_id' && $request->filled('receipt_status')) {
+            $query->where('receipt_status', $request->input('receipt_status'));
+        }
+
         $query->orderBy('application_date', 'desc');
 
         return $query->paginate($request->get('per_page', 20))->withQueryString();

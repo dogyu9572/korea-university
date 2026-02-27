@@ -11,6 +11,7 @@ use App\Models\OnlineEducation;
 use App\Models\Certification;
 use App\Models\SeminarTraining;
 use App\Models\EducationApplication;
+use App\Models\School;
 use Illuminate\Http\Request;
 
 class EducationApplicationController extends BaseController
@@ -507,26 +508,47 @@ class EducationApplicationController extends BaseController
                     ]);
                 }
             } elseif ($isSeminarTraining) {
+                $affiliations = $applications->pluck('affiliation')->unique()->filter()->values()->all();
+                $branchBySchool = School::whereIn('school_name', $affiliations)
+                    ->orderBy('year', 'desc')
+                    ->get()
+                    ->groupBy('school_name')
+                    ->map(fn ($g) => $g->first()->branch);
+
                 fputcsv($file, [
-                    'No', '신청번호', '학교명', '신청자명', '신청자 ID', '휴대폰 번호', '룸메이트', '세금계산서', '결제상태', '신청일시', '이수 여부', '이수증/수료증 번호', '영수증 번호', '참가비', '입금일시'
+                    'No', '신청번호', '학교명', '지회', '신청자명', '신청자 ID', '휴대폰 번호', '이메일', '성별', '룸메이트', '숙박형태', '여행자 보험 가입 동의', '요청사항', '접수상태', '취소일시', '세금계산서', '현금영수증', '결제상태', '신청일시', '이수 여부', '설문조사 여부', '이수증/수료증 번호', '영수증 번호', '참가비', '입금일시'
                 ]);
                 foreach ($applications as $index => $application) {
                     $roommateDisplay = $application->roommate_name ?? '';
                     if ($application->roommate_phone ?? '') {
                         $roommateDisplay .= ($roommateDisplay ? ' / ' : '') . $application->roommate_phone;
                     }
+                    $ft = (string) ($application->fee_type ?? '');
+                    $accommodation = str_contains($ft, 'twin') ? '2인1실' : (str_contains($ft, 'single') ? '1인실' : (str_contains($ft, 'no_stay') ? '비숙박' : ''));
+                    $affiliation = $application->affiliation ?? '';
+                    $branch = $branchBySchool->get($affiliation, '');
                     fputcsv($file, [
                         $index + 1,
                         $application->application_number ?? '',
-                        $application->affiliation ?? '',
+                        $affiliation,
+                        $branch,
                         $application->applicant_name ?? '',
                         $application->member->login_id ?? '',
                         $phoneForCsv($application->phone_number),
+                        $application->email ?? '',
+                        $application->gender ?? '',
                         $roommateDisplay ?: '',
+                        $accommodation,
+                        '동의함',
+                        $application->request_notes ?? '',
+                        $application->receipt_status ?? '',
+                        $application->cancelled_at ? $application->cancelled_at->format('Y-m-d H:i:s') : '',
                         $application->tax_invoice_status ?? '',
+                        $application->cash_receipt_status ?? '',
                         $application->payment_status ?? '',
                         $application->application_date ? $application->application_date->format('Y-m-d H:i:s') : '',
                         $application->is_completed ? 'Y' : 'N',
+                        $application->is_survey_completed ? 'Y' : 'N',
                         $application->certificate_number ?? '',
                         $application->receipt_number ?? '',
                         $application->participation_fee ?? '',

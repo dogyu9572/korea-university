@@ -19,7 +19,7 @@
 
 <div class="board-container">
     <div class="board-header">
-        <a href="{{ route('backoffice.schools.index') }}" class="btn btn-secondary btn-sm">
+        <a href="{{ route('backoffice.schools.index', request()->query()) }}" class="btn btn-secondary btn-sm">
             <i class="fas fa-arrow-left"></i> 목록으로
         </a>
     </div>
@@ -29,6 +29,11 @@
             <form action="{{ route('backoffice.schools.update', $school->id) }}" method="POST" id="schoolForm">
                 @csrf
                 @method('PUT')
+                @foreach(['page', 'per_page', 'branch', 'year', 'is_member_school', 'school_name'] as $q)
+                    @if(request()->has($q))
+                        <input type="hidden" name="_list_{{ $q }}" value="{{ request($q) }}">
+                    @endif
+                @endforeach
 
                 <div class="member-form-section">
                     <h3 class="member-section-title">학교 정보</h3>

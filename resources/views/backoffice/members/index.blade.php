@@ -166,7 +166,7 @@
                                 <td>{{ $member->name }}</td>
                                 <td>{{ $member->phone_number }}</td>
                                 <td>{{ $member->email ?? '-' }}</td>
-                                <td>{{ $member->is_school_representative ? 'Y' : 'N' }}</td>
+                                <td>{{ $member->is_school_representative ? '대표자' : '일반회원' }}</td>
                                 <td>{{ $member->created_at->format('Y.m.d H:i') }}</td>
                                 <td>
                                     <div class="board-btn-group">

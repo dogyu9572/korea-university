@@ -141,12 +141,17 @@
                                 </td>
                                 <td>
                                     <div class="board-btn-group">
-                                        <a href="{{ route('backoffice.schools.edit', $school->id) }}" class="btn btn-primary btn-sm">
+                                        <a href="{{ route('backoffice.schools.edit', $school->id) }}?{{ http_build_query(request()->query()) }}" class="btn btn-primary btn-sm">
                                             <i class="fas fa-edit"></i> 수정
                                         </a>
                                         <form action="{{ route('backoffice.schools.destroy', $school->id) }}" method="POST" style="display: inline-block;" onsubmit="return confirm('정말 삭제하시겠습니까?');">
                                             @csrf
                                             @method('DELETE')
+                                            @foreach(['page', 'per_page', 'branch', 'year', 'is_member_school', 'school_name'] as $q)
+                                                @if(request()->has($q))
+                                                    <input type="hidden" name="_list_{{ $q }}" value="{{ request($q) }}">
+                                                @endif
+                                            @endforeach
                                             <button type="submit" class="btn btn-danger btn-sm">
                                                 <i class="fas fa-trash"></i> 삭제
                                             </button>

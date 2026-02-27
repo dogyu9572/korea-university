@@ -123,6 +123,7 @@
 			</a>
 			<div class="btns">
 				<button type="button" class="btn btn_wbb btn_print btn_print_list" data-target="popPrint">출력</button>
+				<a href="{{ route('mypage.application_status.edit', $item->id) }}" class="btn btn_wbb">수정</a>
 				@if($item->display_status !== '수료')
 				<button type="button" class="btn btn_cancel" onclick="openCancelPopup(this)">수강취소</button>
 				@endif

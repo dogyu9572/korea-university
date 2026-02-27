@@ -167,6 +167,12 @@
                 </div>
             </div>
             <div class="member-form-row">
+                <label class="member-form-label">여행자 보험 가입 동의</label>
+                <div class="member-form-field">
+                    <div class="board-form-control readonly-field">동의함</div>
+                </div>
+            </div>
+            <div class="member-form-row">
                 <label class="member-form-label">설문조사 여부</label>
                 <div class="member-form-field">
                     <div class="board-radio-group">

@@ -223,10 +223,8 @@ function updateHistory(historyId) {
     .then(response => {
         console.log('[DEBUG] 수정 응답 상태:', response.status, response.ok);
         if (response.ok || response.redirected) {
-            showSuccessMessage('연혁이 수정되었습니다.');
-            setTimeout(() => {
-                location.reload();
-            }, 1000);
+            alert('수정되었습니다.');
+            location.reload();
             return;
         }
         return response.json().then(err => {

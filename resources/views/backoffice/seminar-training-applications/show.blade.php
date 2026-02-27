@@ -147,6 +147,29 @@
                                     </select>
                                 </div>
                                 <div class="filter-group">
+                                    <label for="affiliation" class="filter-label">학교명</label>
+                                    <input type="text" id="affiliation" name="affiliation" class="filter-input" value="{{ request('affiliation') }}" placeholder="학교명">
+                                </div>
+                                <div class="filter-group">
+                                    <label for="accommodation" class="filter-label">숙박형태</label>
+                                    <select id="accommodation" name="accommodation" class="filter-select">
+                                        <option value="">전체</option>
+                                        <option value="2인1실" @selected(request('accommodation') == '2인1실')>2인1실</option>
+                                        <option value="1인실" @selected(request('accommodation') == '1인실')>1인실</option>
+                                        <option value="비숙박" @selected(request('accommodation') == '비숙박')>비숙박</option>
+                                    </select>
+                                </div>
+                                <div class="filter-group">
+                                    <label for="receipt_status" class="filter-label">접수상태</label>
+                                    <select id="receipt_status" name="receipt_status" class="filter-select">
+                                        <option value="">전체</option>
+                                        <option value="신청완료" @selected(request('receipt_status') == '신청완료')>신청완료</option>
+                                        <option value="수료" @selected(request('receipt_status') == '수료')>수료</option>
+                                        <option value="미수료" @selected(request('receipt_status') == '미수료')>미수료</option>
+                                        <option value="접수취소" @selected(request('receipt_status') == '접수취소')>접수취소</option>
+                                    </select>
+                                </div>
+                                <div class="filter-group">
                                     <label for="search" class="filter-label">검색</label>
                                     <input type="text" id="search" name="search" class="filter-input" value="{{ request('search') }}" placeholder="신청자명, 아이디">
                                 </div>
@@ -179,8 +202,8 @@
                         </a>
                     </div>
 
-                    <div class="table-responsive">
-                        <table class="board-table online-application-list-table">
+                    <div class="table-responsive" style="overflow-x: auto; -webkit-overflow-scrolling: touch;">
+                        <table class="board-table online-application-list-table" style="min-width: 1600px;">
                             <colgroup>
                                 <col style="width: 3%">
                                 <col style="width: 4%">
@@ -208,9 +231,11 @@
                                     <th>신청자 ID</th>
                                     <th>휴대폰 번호</th>
                                     <th>룸메이트</th>
+                                    <th>숙박형태</th>
                                     <th>세금계산서</th>
                                     <th>현금영수증</th>
                                     <th>결제상태</th>
+                                    <th>접수상태</th>
                                     <th>신청일시</th>
                                     <th>이수 여부</th>
                                     <th>{{ $program->certificate_type ?? '이수증' }} 발급</th>
@@ -231,6 +256,13 @@
                                         <td>{{ $application->member->login_id ?? '-' }}</td>
                                         <td>{{ $application->phone_number }}</td>
                                         <td>{{ $application->roommate_name ? $application->roommate_name . ($application->roommate_phone ? ' / ' . $application->roommate_phone : '') : '-' }}</td>
+                                        <td>
+                                            @php
+                                                $ft = (string) ($application->fee_type ?? '');
+                                                $accommodation = str_contains($ft, 'twin') ? '2인1실' : (str_contains($ft, 'single') ? '1인실' : (str_contains($ft, 'no_stay') ? '비숙박' : '-'));
+                                            @endphp
+                                            {{ $accommodation }}
+                                        </td>
                                         <td>
                                             @php
                                                 $taxStatus = trim((string)($application->tax_invoice_status ?? ''));
@@ -271,6 +303,7 @@
                                                 <option value="입금완료" @selected($application->payment_status == '입금완료')>입금완료</option>
                                             </select>
                                         </td>
+                                        <td>{{ $application->receipt_status ?? '-' }}</td>
                                         <td>{{ $application->application_date->format('Y.m.d H:i') }}</td>
                                         <td>
                                             <div class="form-row-inline">
@@ -302,7 +335,7 @@
                                     </tr>
                                 @empty
                                     <tr>
-                                        <td colspan="16" class="text-center">등록된 신청 내역이 없습니다.</td>
+                                        <td colspan="18" class="text-center">등록된 신청 내역이 없습니다.</td>
                                     </tr>
                                 @endforelse
                             </tbody>

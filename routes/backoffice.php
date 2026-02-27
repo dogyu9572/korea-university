@@ -451,11 +451,11 @@ Route::prefix('backoffice')->middleware(['backoffice'])->group(function () {
     Route::post('members/delete-multiple', [MemberController::class, 'destroyMultiple'])->name('backoffice.members.delete-multiple');
     Route::get('members/export', [MemberController::class, 'export'])->name('backoffice.members.export');
 
-    // 학교(회원교) 관리
+    // 학교(회원교) 관리 (export를 resource보다 먼저 정의해야 /schools/export가 {id}에 안 걸림)
+    Route::get('schools/export', [SchoolController::class, 'export'])->name('backoffice.schools.export');
     Route::resource('schools', SchoolController::class, [
         'names' => 'backoffice.schools'
     ]);
-    Route::get('schools/export', [SchoolController::class, 'export'])->name('backoffice.schools.export');
 
     // 회원 문의 관리
     Route::resource('inquiries', InquiryController::class, [

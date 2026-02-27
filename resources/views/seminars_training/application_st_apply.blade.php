@@ -288,7 +288,7 @@
 		--}}
 
 		<dl class="mt40">
-			<dt>세금계산서 발행</dt>
+			<dt>계산서 발행</dt>
 			<dd class="radios">
 				<label class="radio">
 					<input type="radio" name="has_tax_invoice" value="1" @checked(old('has_tax_invoice', isset($application) ? ($application->has_tax_invoice ? '1' : '0') : '0') === '1')>

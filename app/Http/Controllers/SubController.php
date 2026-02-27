@@ -107,6 +107,7 @@ class SubController extends Controller
             'school_name' => $request->get('school_name', ''),
             'branch' => $request->get('branch', ''),
             'is_member_school' => 'Y',
+            'year' => (int) date('Y'),
         ];
         $schools = $schoolService->getSchools($filters, 15);
         $branches = $schoolService->getBranches();

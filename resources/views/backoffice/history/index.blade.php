@@ -126,7 +126,7 @@
                                     <input type="text" class="board-form-control form-control-sm history-title" name="title" value="{{ $history->title ?? '' }}" placeholder="제목">
                                 </td>
                                 <td>
-                                    <input type="text" class="board-form-control form-control-sm history-content" name="content" value="{{ $history->content }}">
+                                    <textarea class="board-form-control form-control-sm history-content" name="content" rows="3">{{ $history->content }}</textarea>
                                 </td>
                                 <td>
                                     <select class="board-form-control form-control-sm history-is-visible" name="is_visible">

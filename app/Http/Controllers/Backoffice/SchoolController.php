@@ -34,9 +34,8 @@ class SchoolController extends BaseController
         $branches = $this->schoolService->getBranches();
         $branches = array_merge(['전체' => '전체'], array_combine($branches, $branches));
 
-        // 연도 목록
-        $years = $this->schoolService->getYears();
-        $years = array_merge(['전체' => '전체'], $years);
+        // 연도 목록 (array_merge는 숫자 키를 0,1,2로 바꿔서 2026→0이 됨. + 로 키 유지)
+        $years = ['전체' => '전체'] + $this->schoolService->getYears();
 
         return $this->view('backoffice.schools.index', compact('schools', 'filters', 'branches', 'years', 'perPage'));
     }
@@ -91,18 +90,32 @@ class SchoolController extends BaseController
     {
         $this->schoolService->updateSchool($id, $request->validated());
 
-        return redirect()->route('backoffice.schools.index')
+        $query = [];
+        foreach (['page', 'per_page', 'branch', 'year', 'is_member_school', 'school_name'] as $key) {
+            if ($request->has('_list_' . $key)) {
+                $query[$key] = $request->input('_list_' . $key);
+            }
+        }
+
+        return redirect()->route('backoffice.schools.index', $query)
             ->with('success', '학교 정보가 수정되었습니다.');
     }
 
     /**
      * 학교 삭제
      */
-    public function destroy(int $id)
+    public function destroy(Request $request, int $id)
     {
         $this->schoolService->deleteSchool($id);
 
-        return redirect()->route('backoffice.schools.index')
+        $query = [];
+        foreach (['page', 'per_page', 'branch', 'year', 'is_member_school', 'school_name'] as $key) {
+            if ($request->has('_list_' . $key)) {
+                $query[$key] = $request->input('_list_' . $key);
+            }
+        }
+
+        return redirect()->route('backoffice.schools.index', $query)
             ->with('success', '학교가 삭제되었습니다.');
     }
 
@@ -111,43 +124,42 @@ class SchoolController extends BaseController
      */
     public function export(Request $request)
     {
+        $yearInput = $request->get('year', '전체');
+        if ($yearInput === '' || $yearInput === 0 || $yearInput === '0') {
+            $yearInput = '전체';
+        }
         $filters = [
             'branch' => $request->get('branch', '전체'),
-            'year' => $request->get('year', '전체'),
+            'year' => $yearInput,
             'is_member_school' => $request->get('is_member_school', ''),
             'school_name' => $request->get('school_name', ''),
         ];
 
         $schools = $this->schoolService->exportSchoolsToExcel($filters);
 
-        // CSV 형식으로 다운로드
         $filename = 'schools_' . date('YmdHis') . '.csv';
         $headers = [
             'Content-Type' => 'text/csv; charset=UTF-8',
             'Content-Disposition' => 'attachment; filename="' . $filename . '"',
         ];
 
-        $callback = function() use ($schools) {
+        $callback = function () use ($schools) {
             $file = fopen('php://output', 'w');
-            
-            // BOM 추가 (한글 깨짐 방지)
-            fprintf($file, chr(0xEF).chr(0xBB).chr(0xBF));
-            
-            // 헤더
+            if ($file === false) {
+                return;
+            }
+            fprintf($file, chr(0xEF) . chr(0xBB) . chr(0xBF));
             fputcsv($file, ['No', '연도', '학교명', '지회', '회원교', 'URL']);
-            
-            // 데이터
             foreach ($schools as $index => $school) {
                 fputcsv($file, [
                     $index + 1,
-                    $school->year,
-                    $school->school_name,
-                    $school->branch,
+                    $school->year !== null ? (string) $school->year : '',
+                    (string) ($school->school_name ?? ''),
+                    (string) ($school->branch ?? ''),
                     $school->is_member_school ? 'Y' : 'N',
-                    $school->url ?? '',
+                    (string) ($school->url ?? ''),
                 ]);
             }
-            
             fclose($file);
         };
 
