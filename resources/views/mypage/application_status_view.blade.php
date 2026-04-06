@@ -9,7 +9,7 @@
 	<p class="msg_error">{{ session('error') }}</p>
 	@endif
 
-	<div class="stitle tal bdb">교육 신청 현황
+	<div class="stitle tal bdb"><h1>교육 신청 현황</h1>
 		<div class="btns_abso pc_vw">
 			@if($application->payment_status === '입금완료')
 			<a href="{{ route('mypage.print.receipt', $application->id) }}" target="_blank" class="btn btn_wbb">영수증 출력</a>
@@ -42,10 +42,12 @@
 			'해외연수' => 'semina',
 			default => 'regular',
 		};
+		$appEnd = $program->application_end ?? null;
+		$isApplicationPeriodOver = $appEnd && now()->gt($appEnd);
 	@endphp
 
 	<!-- 공통사항 -->
-	<div class="otit">교육 신청 정보</div>
+	<h2 class="otit">교육 신청 정보</h2>
 	<div class="glbox dl_tbl">
 		<dl>
 			<dt>교육구분</dt>
@@ -77,7 +79,7 @@
 		</dl>
 	</div>
 
-	<div class="otit">교육 신청자 정보</div>
+	<h2 class="otit">교육 신청자 정보</h2>
 	<div class="glbox dl_tbl">
 		<dl>
 			<dt>성명</dt>
@@ -114,7 +116,7 @@
 
 	@if($application->seminar_training_id && !in_array($application->fee_type, ['member_single', 'member_no_stay', 'guest_single', 'guest_no_stay']))
 	<!-- 세미나만 노출 (2인1실일 때만 룸메이트 정보 표시) -->
-	<div class="otit">세미나/해외연수 룸메이트 정보</div>
+	<h2 class="otit">세미나/해외연수 룸메이트 정보</h2>
 	<div class="roommate_info">
 		@if($application->roommate_name || $application->roommate_phone)
 		<dl class="i2">
@@ -132,7 +134,7 @@
 	@endif
 
 	<!-- 공통사항 -->
-	<div class="otit">결제/입금 정보</div>
+	<h2 class="otit">결제/입금 정보</h2>
 	<div class="glbox dl_tbl">
 		<dl>
 			<dt>결제상태</dt>
@@ -158,7 +160,7 @@
 		</dl>
 	</div>
 
-	<div class="otit mb0">증빙서류 발행 여부</div>
+	<h2 class="otit mb0">증빙서류 발행 여부</h2>
 	<div class="obtit">현금영수증 발행 정보</div>
 	<div class="glbox dl_tbl">
 		<dl>
@@ -174,7 +176,8 @@
 			<dd>{{ $application->payment_status === '입금완료' ? '발행완료' : '신청완료' }}</dd>
 		</dl>
 	</div>
-	<div class="obtit">세금계산서 발행 정보</div>
+	
+	<h2 class="obtit">세금계산서 발행 정보</h2>
 	<div class="glbox dl_tbl dt_long">
 		<dl>
 			<dt>사업자등록번호</dt>
@@ -205,7 +208,7 @@
 
 	@if($application->seminar_training_id && $program && $program->survey_url)
 	<!-- 세미나만 노출 -->
-	<div class="otit">교육 설문 제출</div>
+	<h2 class="otit">교육 설문 제출</h2>
 	<div class="glbox dl_tbl">
 		<dl class="aic">
 			<dt>설문 참여 링크</dt>
@@ -216,7 +219,11 @@
 	@endif
 
 	<div class="btns_tac">
+		@if(!$isApplicationPeriodOver)
 		<a href="{{ route('mypage.application_status.edit', $application->id) }}" class="btn btn_wbb">수정</a>
+		@else
+		<button type="button" class="btn btn_wbb" disabled>수정</button>
+		@endif
 		<a href="{{ route('mypage.application_status') }}" class="btn btn_bwb">목록</a>
 	</div>
 

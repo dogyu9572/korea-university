@@ -15,12 +15,14 @@
 				$periodText = $online->period_time ?? '';
 			}
 		}
+		$appEnd = $online->application_end ?? null;
+		$isApplicationPeriodOver = $appEnd && now()->gt($appEnd);
 	@endphp
 
 	<div class="board_view" data-application-id="{{ $application->id }}" data-dwell-url="{{ route('mypage.application_status_view2.dwell', ['id' => $application->id]) }}">
 		<div class="tit gbox">
-			<div class="types"><span class="type type_online">온라인교육</span></div>
-			<strong>{{ $online ? $online->name : '' }}</strong>
+			<div class="types"><h2 class="type type_online">온라인교육</h2></div>
+			<h1>{{ $online ? $online->name : '' }}</h1>
 			<dl class="date dates"><dt>교육기간</dt><dd>{{ $periodText }}</dd></dl>
 		</div>
 
@@ -39,7 +41,7 @@
 				});
 			@endphp
 			@if($lecturesWithVideo->count() > 0)
-		<div class="otit">강의 영상</div>
+		<h2 class="otit">강의 영상</h2>
 		<div class="download_area type_gbox">
 				@foreach($lecturesWithVideo as $lecture)
 					@php
@@ -67,7 +69,7 @@
 			@endif
 		@endif
 
-		<div class="otit">강의 자료 다운로드</div>
+		<h2 class="otit">강의 자료 다운로드</h2>
 		<div class="download_area type_gbox">
 			@if($online && $online->attachments->count() > 0)
 				@foreach($online->attachments as $att)
@@ -79,7 +81,11 @@
 		</div>
 
 		<div class="board_btm btns_tac mt80">
+			@if(!$isApplicationPeriodOver)
 			<a href="{{ route('mypage.application_status.edit', $application->id) }}" class="btn btn_wbb">수정</a>
+			@else
+			<button type="button" class="btn btn_wbb" disabled>수정</button>
+			@endif
 			<a href="{{ route('mypage.application_status') }}" class="btn btn_list">목록</a>
 		</div>
 	</div>

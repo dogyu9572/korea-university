@@ -2,7 +2,7 @@
 @section('content')
 <main class="sub_wrap inner">
 	
-	<div class="stitle tal">교육 신청 현황</div>
+	<h1 class="stitle tal">교육 신청 현황</h1>
 
 	@if(session('success'))
 	<p class="msg_success">{{ session('success') }}</p>
@@ -100,6 +100,8 @@
 			$receiptUrl = $canReceipt ? route('mypage.print.receipt', $item->id) : '';
 			$completionUrl = ($canCertificate && $certType === '수료증') ? route('mypage.print.certificate_completion', $item->id) : '';
 			$finishUrl = ($canCertificate && $certType === '이수증') ? route('mypage.print.certificate_finish', $item->id) : '';
+			$appEnd = $program->application_end ?? null;
+			$isApplicationPeriodOver = $appEnd && now()->gt($appEnd);
 		@endphp
 		<li data-application-id="{{ $item->id }}"
 			data-education-type="{{ $item->education_type_label }}"
@@ -111,7 +113,7 @@
 			data-finish-url="{{ $finishUrl }}">
 			<a href="{{ $detailUrl }}" class="link">
 				<span class="statebox"><i class="state {{ $stateClass }}">{{ $item->display_status }}</i></span>
-				<span class="tit">{{ $program ? $program->name : '' }}</span>
+				<h2 class="tit">{{ $program ? $program->name : '' }}</h2>
 				<dl>
 					<dt>교육구분</dt>
 					<dd>{{ $item->education_type_label }}</dd>
@@ -123,9 +125,16 @@
 			</a>
 			<div class="btns">
 				<button type="button" class="btn btn_wbb btn_print btn_print_list" data-target="popPrint">출력</button>
-				<a href="{{ route('mypage.application_status.edit', $item->id) }}" class="btn btn_wbb">수정</a>
-				@if($item->display_status !== '수료')
-				<button type="button" class="btn btn_cancel" onclick="openCancelPopup(this)">수강취소</button>
+				@if(!$isApplicationPeriodOver)
+					<a href="{{ route('mypage.application_status.edit', $item->id) }}" class="btn btn_wbb">수정</a>
+					@if($item->display_status !== '수료')
+					<button type="button" class="btn btn_cancel" onclick="openCancelPopup(this)">수강취소</button>
+					@endif
+				@else
+					<button type="button" class="btn btn_wbb" disabled>수정</button>
+					@if($item->display_status !== '수료')
+					<button type="button" class="btn btn_cancel" disabled>수강취소</button>
+					@endif
 				@endif
 			</div>
 		</li>

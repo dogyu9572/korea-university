@@ -139,6 +139,11 @@ class ApplicationStatusService
             ->whereNull('cancelled_at')
             ->firstOrFail();
 
+        $program = $application->program;
+        if ($program && $program->application_end && now()->gt($program->application_end)) {
+            throw new \InvalidArgumentException('신청기간이 종료된 교육은 취소할 수 없습니다.');
+        }
+
         if ($application->is_completed) {
             throw new \InvalidArgumentException('이수 완료된 신청은 취소할 수 없습니다.');
         }

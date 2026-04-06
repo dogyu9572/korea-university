@@ -54,7 +54,7 @@
 			<div class="print_btm">
 				<div class="date">{{ now()->format('Y년 m월 d일') }}</div>
 				<p>위 현황은 사실과 같음을 증명합니다.</p>
-				<div class="stemp nnmj"><span>전국대학 연구·산학협력관리자협의회(KUCra)</span></div>
+				<div class="stemp nnmj"><span>전국대학 연구·산학협력관리자협의회(KUCRA)</span></div>
 			</div>
 		</div>
 	</div>
@@ -88,7 +88,7 @@
 			<div class="print_btm">
 				<div class="date">YYYY년 MM월 DD일</div>
 				<p>위 현황은 사실과 같음을 증명합니다.</p>
-				<div class="stemp nnmj"><span>전국대학 연구·산학협력관리자협의회(KUCra)</span></div>
+				<div class="stemp nnmj"><span>전국대학 연구·산학협력관리자협의회(KUCRA)</span></div>
 			</div>
 		</div>
 	</div>
