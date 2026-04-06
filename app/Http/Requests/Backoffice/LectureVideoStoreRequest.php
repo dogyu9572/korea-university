@@ -19,7 +19,7 @@ class LectureVideoStoreRequest extends FormRequest
             'instructor_name' => 'required|string|max:255',
             'video_url' => 'nullable|url|max:500',
             'thumbnail' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
-            'attachments.*' => 'nullable|file|max:10240',
+            'attachments.*' => 'nullable|file|max:102400',
             'is_active' => 'nullable|boolean',
         ];
     }
@@ -39,7 +39,7 @@ class LectureVideoStoreRequest extends FormRequest
             'thumbnail.image' => '썸네일은 이미지 파일이어야 합니다.',
             'thumbnail.max' => '썸네일 파일 크기는 2MB를 초과할 수 없습니다.',
             'attachments.*.file' => '올바른 파일을 업로드해주세요.',
-            'attachments.*.max' => '첨부파일 크기는 10MB를 초과할 수 없습니다.',
+            'attachments.*.max' => '첨부파일 크기는 100MB를 초과할 수 없습니다.',
         ];
     }
 }

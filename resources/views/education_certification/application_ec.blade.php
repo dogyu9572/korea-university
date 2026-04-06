@@ -1,7 +1,7 @@
 @extends('layouts.app')
 @section('content')
 <main class="sub_wrap inner" id="application-ec-list">
-	<div class="stitle tal">교육 · 자격증 신청</div>
+	<h1 class="stitle tal">교육 · 자격증 신청</h1>
 
 	@if(session('error'))
 	<p class="msg_error" style="margin-bottom:1rem;" id="application-ec-error-msg">{{ session('error') }}</p>
@@ -17,7 +17,7 @@
 			<input type="hidden" name="tab" value="{{ $currentTab }}">
 			<input type="hidden" name="sort" value="{{ $currentSort }}">
 			<dl>
-				<dt>프로그램명</dt>
+				<dt><h2>프로그램명</h2></dt>
 				<dd><input type="text" name="name" class="text w100p" placeholder="프로그램명을 입력해주세요." value="{{ request('name') }}"></dd>
 			</dl>
 			<div class="filter_opcl on">
@@ -26,7 +26,7 @@
 					<div class="flex">
 						@if($currentTab === 'education' || $currentTab === 'all')
 						<dl>
-							<dt>과정구분</dt>
+							<dt><h2>과정구분</h2></dt>
 							<dd>
 								<select name="education_type" class="w100p">
 									<option value="">전체</option>
@@ -37,7 +37,7 @@
 						</dl>
 						@endif
 						<dl>
-							<dt>기간구분</dt>
+							<dt><h2>기간구분</h2></dt>
 							<dd class="dates">
 								<select name="date_type">
 									<option value="">전체</option>
@@ -62,7 +62,7 @@
 							</dd>
 						</dl>
 						<dl>
-							<dt>진행상태</dt>
+							<dt><h2>진행상태</h2></dt>
 							<dd>
 								<select name="application_status" class="w100p">
 									<option value="">전체</option>

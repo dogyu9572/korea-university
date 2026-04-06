@@ -293,6 +293,39 @@ class EducationApplicationService
     }
 
     /**
+     * 선택된 신청들의 수료 처리(이수 여부/설문조사 여부 Y)로 일괄 변경합니다.
+     */
+    public function batchGraduate(array $applicationIds): int
+    {
+        $updated = 0;
+        foreach ($applicationIds as $id) {
+            $application = EducationApplication::with(['education', 'onlineEducation', 'certification', 'seminarTraining'])->find($id);
+            if (!$application) {
+                continue;
+            }
+
+            $data = [];
+            if (!$application->is_completed) {
+                $data['is_completed'] = true;
+                $data['receipt_status'] = '수료';
+                $data['completed_at'] = now();
+                $data['certificate_number'] = $application->certificate_number
+                    ?: $this->generateCertificateNumber(now(), $application->program);
+            }
+            if (!$application->is_survey_completed) {
+                $data['is_survey_completed'] = true;
+            }
+
+            if (!empty($data)) {
+                $application->update($data);
+                $updated++;
+            }
+        }
+
+        return $updated;
+    }
+
+    /**
      * 신청별 결제상태 업데이트
      */
     public function updateApplicationPaymentStatus(EducationApplication $application, string $status): void

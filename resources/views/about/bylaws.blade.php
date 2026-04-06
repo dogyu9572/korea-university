@@ -4,7 +4,7 @@
     
 	<ul class="round_tabs slim mb80">
 		<li><a href="/about/history">연혁</a></li>
-		<li class="on"><a href="/about/bylaws">정관</a></li>
+		<li class="on"><a href="/about/bylaws"><h1>정관</h1></a></li>
 	</ul>
 	
 	<div class="bylaws_wrap">

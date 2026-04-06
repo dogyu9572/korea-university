@@ -30,6 +30,7 @@ class MemberSnsJoinRequest extends FormRequest
             'join_type' => 'required|in:naver,kakao',
             'login_id' => 'required|string|max:255|unique:members,login_id',
             'email' => 'required|email|unique:members,email',
+            'password' => 'required|string|min:8|max:10|confirmed',
             'phone_number' => 'required|string',
             'name' => 'required|string|max:8',
             'address_postcode' => 'nullable|string',
@@ -54,6 +55,10 @@ class MemberSnsJoinRequest extends FormRequest
             'email.required' => '이메일은 필수 입력 항목입니다.',
             'email.email' => '올바른 이메일 형식이 아닙니다.',
             'email.unique' => '이미 사용 중인 이메일입니다.',
+            'password.required' => '비밀번호는 필수 입력 항목입니다.',
+            'password.min' => '비밀번호는 최소 8자 이상이어야 합니다.',
+            'password.max' => '비밀번호는 최대 10자까지 입력 가능합니다.',
+            'password.confirmed' => '비밀번호와 비밀번호 확인이 일치하지 않습니다.',
             'phone_number.required' => '휴대폰번호는 필수 입력 항목입니다.',
             'phone_number.unique' => '이미 사용 중인 휴대폰번호입니다.',
             'name.required' => '이름은 필수 입력 항목입니다.',
@@ -110,8 +115,7 @@ class MemberSnsJoinRequest extends FormRequest
     public function getMemberData(): array
     {
         $data = $this->validated();
-        unset($data['terms_privacy'], $data['terms_service']);
-        $data['password'] = null;
+        unset($data['terms_privacy'], $data['terms_service'], $data['password_confirmation']);
         $data['terms_agreed_at'] = now();
         $data['is_school_representative'] = (bool) ($data['is_school_representative'] ?? false);
         $data['email_marketing_consent'] = (bool) ($data['email_marketing_consent'] ?? false);

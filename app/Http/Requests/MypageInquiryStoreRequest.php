@@ -19,7 +19,7 @@ class MypageInquiryStoreRequest extends FormRequest
             'title' => 'required|string|max:255',
             'content' => 'required|string',
             'files' => 'nullable|array|max:3',
-            'files.*' => 'file|max:10240',
+            'files.*' => 'file|max:102400',
         ];
     }
 
@@ -33,7 +33,7 @@ class MypageInquiryStoreRequest extends FormRequest
             'content.required' => '문의 내용을 입력해 주세요.',
             'files.max' => '첨부파일은 최대 3개까지 선택할 수 있습니다.',
             'files.*.file' => '올바른 파일을 선택해 주세요.',
-            'files.*.max' => '첨부파일은 1개당 10MB를 초과할 수 없습니다.',
+            'files.*.max' => '첨부파일은 1개당 100MB를 초과할 수 없습니다.',
         ];
     }
 }

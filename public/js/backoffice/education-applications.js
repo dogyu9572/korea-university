@@ -84,6 +84,45 @@ function batchComplete() {
     }
 }
 
+// 일괄 수료 (이수/설문조사 Y)
+function batchGraduate() {
+    const selected = getSelectedApplications();
+    if (selected.length === 0) {
+        alert('선택된 신청이 없습니다.');
+        return;
+    }
+
+    if (confirm('선택된 ' + selected.length + '건을 수료 처리하시겠습니까? (이수여부/설문조사여부가 Y로 변경됩니다)')) {
+        const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content');
+        const route = getApplicationsBasePath() + '/batch-graduate';
+
+        fetch(route, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRF-TOKEN': csrfToken,
+                'Accept': 'application/json'
+            },
+            body: JSON.stringify({
+                application_ids: selected
+            })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                alert(data.message);
+                location.reload();
+            } else {
+                alert('처리 중 오류가 발생했습니다.');
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('처리 중 오류가 발생했습니다.');
+        });
+    }
+}
+
 // 선택된 신청 ID 배열 반환
 function getSelectedApplications() {
     const checkboxes = document.querySelectorAll('.application-checkbox:checked');
@@ -735,6 +774,12 @@ function initShowPageHandlers() {
         if (btnComplete) {
             e.preventDefault();
             batchComplete();
+            return;
+        }
+        const btnGraduate = e.target.closest('[data-action="batch-graduate"]');
+        if (btnGraduate) {
+            e.preventDefault();
+            batchGraduate();
             return;
         }
         const btnCert = e.target.closest('[data-action="issue-certificate"]');

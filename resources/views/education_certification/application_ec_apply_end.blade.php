@@ -1,16 +1,16 @@
 @extends('layouts.app')
 @section('content')
 <main class="sub_wrap inner">
-    <div class="stitle nodot">신청 완료</div>
+    <h1 class="stitle nodot">신청 완료</h1>
 
     <div class="end_area">
-        <div class="tit">
+        <h2 class="tit">
             @if(($confirmation['type'] ?? '') === 'online')
                 온라인 교육 신청이 완료되었습니다.
             @else
                 교육 수강 신청이 완료되었습니다.
             @endif
-        </div>
+        </h2>
         <p>
             신청번호: <strong>{{ $confirmation['application_number'] ?? '-' }}</strong><br>
             프로그램명: <strong>{{ $confirmation['program_name'] ?? '-' }}</strong>

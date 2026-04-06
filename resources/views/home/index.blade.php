@@ -2,6 +2,7 @@
 
 @section('content')
 <main class="main_wrap">
+	<h1 class="hidden_title">사단법인 전국대학연구·산학협력관리자협회</h1>
     
 	<div class="mvisual_wrap">
 		<div class="inner">
@@ -34,7 +35,7 @@
 	<div class="main_quick">
 		<div class="inner">
 			<div class="flex">
-				<div class="tit"><div class="tt">자주 찾는 메뉴</div><p><strong>가장 많이 이용하는 주요 서비스</strong>를 <br class="pc_vw"/>한눈에 확인할 수 있습니다.</p></div>
+				<div class="tit"><h2 class="tt">자주 찾는 메뉴</h2><p><strong>가장 많이 이용하는 주요 서비스</strong>를 <br class="pc_vw"/>한눈에 확인할 수 있습니다.</p></div>
 				<div class="con">
 					<a href="/education_certification/education" class="i3">교육·자격증</a>
 					<a href="/seminars_training/seminar" class="i4">세미나·해외연수</a>
@@ -46,10 +47,49 @@
 			</div>
 		</div>
 	</div>
-	
+
+	{{-- 알림마당 --}}
+	<div class="mcon mc02">
+		<div class="inner flex" style="display:block;">
+			<div class="left" style="width:100%; max-width:100%; flex:1;">
+				<h2 class="mtit">알림마당</h2>
+				<p>전국대학연구산학협력 관리자협회의 <br class="mo_vw">주요 소식과 다양한 자료를 안내합니다.</p>
+				<div class="jq_tabonoff list">
+					<ul class="jq_tab">
+						<li><button type="button">공지사항</button></li>
+						<li><button type="button">자료실</button></li>
+					</ul>
+					<div class="jq_cont">
+						<div class="cont">
+							<a href="{{ route('notice.notice') }}" class="more">공지사항으로 이동</a>
+							<ul>
+								@forelse($noticePosts ?? [] as $post)
+								<li><a href="{{ $post->url }}">{{ $post->title }} <p>{{ $post->created_at ? $post->created_at->format('Y-m-d') : '' }}</p></a></li>
+								@empty
+								<li><a href="{{ route('notice.notice') }}">등록된 공지사항이 없습니다.</a></li>
+								@endforelse
+							</ul>
+						</div>
+						<div class="cont">
+							<a href="{{ route('notice.data_room') }}" class="more">자료실로 이동</a>
+							<ul>
+								@forelse($dataRoomPosts ?? [] as $post)
+								<li><a href="{{ $post->url }}">{{ $post->title }} <p>{{ $post->created_at ? $post->created_at->format('Y-m-d') : '' }}</p></a></li>
+								@empty
+								<li><a href="{{ route('notice.data_room') }}">등록된 자료가 없습니다.</a></li>
+								@endforelse
+							</ul>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+
+	{{-- 교육·자격증 슬라이드 --}}
 	<div class="mcon mc01_1">
 		<div class="inner">
-			<div class="mtit">교육<i></i>자격증 <a href="/education_certification/education" class="more">교육·자격증으로 이동</a></div>
+			<div class="mtit"><h2>교육<i></i>자격증</h2> <a href="/education_certification/education" class="more">교육·자격증으로 이동</a></div>
 			<p>산학협력단 직원의 역량 강화를 위한 <br class="mo_vw">다양한 교육 프로그램을 제공합니다.</p>
 			<div class="mc01_slide">
 				@forelse($educationSlides ?? [] as $slide)
@@ -82,10 +122,11 @@
 			</div>
 		</div>
 	</div>
-	
+
+	{{-- 세미나·해외연수 슬라이드 --}}
 	<div class="mcon mc01_2">
 		<div class="inner">
-			<div class="mtit">세미나<i></i>해외연수 <a href="/seminars_training/seminar" class="more">세미나·해외연수로 이동</a></div>
+			<div class="mtit"><h2>세미나<i></i>해외연수</h2> <a href="/seminars_training/seminar" class="more">세미나·해외연수로 이동</a></div>
 			<p>산학협력단 직원의 역량 강화를 위한 <br class="mo_vw">다양한 세미나 및 해외연수 프로그램을 제공합니다.</p>
 			<div class="mc01_slide">
 				@forelse($seminarTrainingSlides ?? [] as $slide)
@@ -118,55 +159,28 @@
 			</div>
 		</div>
 	</div>
-	
+
+	{{-- 교육자격증 안내 + 문의 (가로 정렬) --}}
 	<div class="mcon mc02">
 		<div class="inner flex">
-		
-			<div class="left">
-				<div class="mtit">알림마당</div>
-				<p>전국대학연구산학협력 관리자협회의 <br class="mo_vw">주요 소식과 다양한 자료를 안내합니다.</p>
-				<div class="jq_tabonoff list">
-					<ul class="jq_tab">
-						<li><button type="button">공지사항</button></li>
-						<li><button type="button">자료실</button></li>
-					</ul>
-					<div class="jq_cont">
-						<div class="cont">
-							<a href="{{ route('notice.notice') }}" class="more">공지사항으로 이동</a>
-							<ul>
-								@forelse($noticePosts ?? [] as $post)
-								<li><a href="{{ $post->url }}">{{ $post->title }} <p>{{ $post->created_at ? $post->created_at->format('Y-m-d') : '' }}</p></a></li>
-								@empty
-								<li><a href="{{ route('notice.notice') }}">등록된 공지사항이 없습니다.</a></li>
-								@endforelse
-							</ul>
-						</div><!-- //공지사항 -->
-						<div class="cont">
-							<a href="{{ route('notice.data_room') }}" class="more">자료실로 이동</a>
-							<ul>
-								@forelse($dataRoomPosts ?? [] as $post)
-								<li><a href="{{ $post->url }}">{{ $post->title }} <p>{{ $post->created_at ? $post->created_at->format('Y-m-d') : '' }}</p></a></li>
-								@empty
-								<li><a href="{{ route('notice.data_room') }}">등록된 자료가 없습니다.</a></li>
-								@endforelse
-							</ul>
-						</div><!-- //자료실 -->
-					</div>
-				</div>
-			</div>
-			
-			<div class="right">
-				<div class="main_education_certification">
-					<div class="tit">교육<i></i>자격증 안내</div>
+			<div class="right" id="edu-contact-wrap" style="width:100%; display:flex; gap:20px; align-items:stretch;">
+				<div class="main_education_certification" style="flex:1; box-sizing:border-box; margin-top:0;">
+					<h2 class="tit">교육<i></i>자격증 안내</h2>
 					<p>교육과정 및 대학연구행정전문가 1급·2급 <br/>자격과정을 안내합니다.</p>
 					<div class="flex">
 						<a href="/education_certification/education">교육안내</a>
 						<a href="/education_certification/certification">자격증안내</a>
 					</div>
 				</div>
-				<div class="main_contact">
-					<div class="tt">문의</div>
-					<div class="number">02-880-2040 <p>*주말 및 공휴일 제외</p></div>
+				<div class="main_contact" style="flex:1; box-sizing:border-box; margin-top:0;">
+					<h2 class="tt">문의</h2>
+					<div class="number" style="display:flex; align-items:center; gap:12px; margin-top:16px; flex-wrap:wrap;">
+						<a href="https://pf.kakao.com/_qxmaRX" target="_blank" 
+						style="display:inline-flex; align-items:center; gap:6px; padding:10px 20px; border:2px solid #fff; border-radius:50px; color:#fff; font-size:15px; font-weight:600; text-decoration:none; white-space:nowrap;">
+							카카오톡 문의하기 →
+						</a>
+						<p style="color:#fff; font-size:13px; margin:0; white-space:nowrap;">*주말 및 공휴일 제외</p>
+					</div>
 					<div class="time">
 						<dl>
 							<dt>월~금</dt>
@@ -174,15 +188,14 @@
 						</dl>
 						<dl>
 							<dt>점심시간</dt>
-							<dd>11:30~13:00 </dd>
+							<dd>11:30~13:00</dd>
 						</dl>
 					</div>
 				</div>
 			</div>
-			
 		</div>
 	</div>
-	
+
 </main>
 
 <link rel="stylesheet" href="/css/slick.css" media="all">
@@ -268,6 +281,18 @@ $(document).ready (function () {
 		$(this).addClass('on');
 		$(this).parent().next('.jq_cont').children().hide().eq(index).show();
 	});
+
+//교육자격증 안내 + 문의 반응형
+	function setEduContactLayout() {
+		var wrap = document.getElementById('edu-contact-wrap');
+		if (window.innerWidth <= 767) {
+			wrap.style.flexDirection = 'column';
+		} else {
+			wrap.style.flexDirection = 'row';
+		}
+	}
+	setEduContactLayout();
+	$(window).on('resize', setEduContactLayout);
 });
 </script>
 
@@ -277,7 +302,6 @@ $(document).ready (function () {
 @if($popups->count() > 0)
     @foreach($popups as $popup)
         @if($popup->popup_display_type === 'normal')
-            {{-- 일반팝업 (새창) - 1일 동안 보지 않음 쿠키 있으면 열지 않음 --}}
             <script>
                 document.addEventListener('DOMContentLoaded', function() {
                     var cookieName = 'popup_hide_{{ $popup->id }}';
@@ -290,7 +314,6 @@ $(document).ready (function () {
                 });
             </script>
         @else
-            {{-- 레이어팝업 (오버레이) --}}
             <div class="popup-layer popup-fixed" 
                  id="popup-{{ $popup->id }}"
                  data-popup-id="{{ $popup->id }}"

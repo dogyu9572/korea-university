@@ -1,9 +1,9 @@
 /**
- * 문의 작성 - 멀티 파일 첨부 (최대 3개, 추가 방식, 취소 시 기존 유지)
+ * 문의 작성 - 멀티 파일 첨부 (최대 3개, 파일당 100MB, 추가 방식, 취소 시 기존 유지)
  */
 (function () {
     const MAX_FILES = 3;
-    const MAX_SIZE = 10 * 1024 * 1024; // 10MB
+    const MAX_SIZE = 100 * 1024 * 1024; // 100MB
 
     var selectedFiles = [];
 
@@ -56,7 +56,7 @@
             var added = 0;
             for (var i = 0; i < files.length && list.length < MAX_FILES; i++) {
                 if (files[i].size > MAX_SIZE) {
-                    alert('"' + files[i].name + '" 파일은 10MB를 초과할 수 없습니다.');
+                    alert('"' + files[i].name + '" 파일은 100MB를 초과할 수 없습니다.');
                     continue;
                 }
                 list.push(files[i]);
@@ -65,7 +65,7 @@
             if (added < files.length && list.length >= MAX_FILES) {
                 alert('파일은 최대 3개까지 선택할 수 있습니다.');
             } else if (added < files.length) {
-                alert('일부 파일이 10MB를 초과하여 제외되었습니다.');
+                alert('일부 파일이 100MB를 초과하여 제외되었습니다.');
             }
 
             if (list.length > MAX_FILES) {

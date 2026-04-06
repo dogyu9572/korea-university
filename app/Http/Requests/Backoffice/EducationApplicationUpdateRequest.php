@@ -49,7 +49,7 @@ class EducationApplicationUpdateRequest extends FormRequest
             'refund_account_holder' => 'nullable|string|max:50',
             'refund_bank_name' => 'nullable|string|max:50',
             'refund_account_number' => 'nullable|string|max:50',
-            'attachments.*' => 'nullable|file|max:10240',
+            'attachments.*' => 'nullable|file|max:102400',
             // 온라인교육 전용
             'course_status' => 'nullable|string|in:접수,승인,만료,수강취소',
             'attendance_rate' => 'nullable|numeric|min:0|max:100',
@@ -94,7 +94,7 @@ class EducationApplicationUpdateRequest extends FormRequest
             'tax_invoice_status.in' => '올바른 세금계산서 상태를 선택해주세요.',
             'cash_receipt_status.in' => '올바른 현금영수증 상태를 선택해주세요.',
             'attachments.*.file' => '올바른 파일을 업로드해주세요.',
-            'attachments.*.max' => '첨부파일 크기는 10MB를 초과할 수 없습니다.',
+            'attachments.*.max' => '첨부파일 크기는 100MB를 초과할 수 없습니다.',
             'course_status.in' => '올바른 수강상태를 선택해주세요.',
             'attendance_rate.numeric' => '수강률은 숫자로 입력해주세요.',
             'attendance_rate.min' => '수강률은 0 이상이어야 합니다.',

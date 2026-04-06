@@ -3,7 +3,7 @@
 <main class="sub_wrap inner">
     
 	<ul class="round_tabs slim">
-		<li class="on"><a href="/about/history">연혁</a></li>
+		<li class="on"><a href="/about/history"><h1>연혁</h1></a></li>
 		<li><a href="/about/bylaws">정관</a></li>
 	</ul>
 	

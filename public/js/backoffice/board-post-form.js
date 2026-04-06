@@ -443,7 +443,7 @@ class FileManager {
         this.filePreview = document.getElementById('filePreview');
         this.fileUpload = this.fileInput?.closest('.board-file-upload');
         this.maxFiles = 5;
-        this.maxFileSize = 10 * 1024 * 1024; // 10MB
+        this.maxFileSize = 100 * 1024 * 1024; // 100MB
         
         if (this.fileInput && this.fileUpload) {
             this.init();
@@ -494,7 +494,7 @@ class FileManager {
         // 파일 크기 체크
         const oversizedFiles = files.filter(file => file.size > this.maxFileSize);
         if (oversizedFiles.length > 0) {
-            alert('10MB 이상인 파일이 있습니다. 10MB 이하의 파일만 선택해주세요.');
+            alert('100MB 이상인 파일이 있습니다. 100MB 이하의 파일만 선택해주세요.');
             this.fileInput.value = '';
             return;
         }
@@ -519,7 +519,7 @@ class FileManager {
         // 파일 크기 체크
         const oversizedFiles = files.filter(file => file.size > this.maxFileSize);
         if (oversizedFiles.length > 0) {
-            alert('10MB 이상인 파일이 있습니다. 10MB 이하의 파일만 선택해주세요.');
+            alert('100MB 이상인 파일이 있습니다. 100MB 이하의 파일만 선택해주세요.');
             return;
         }
         

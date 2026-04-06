@@ -1,76 +1,138 @@
 @extends('layouts.app')
 @section('content')
+
 <main class="sub_wrap inner">
-    
-	<div class="projects_wrap">
-	
-		<div class="box">
-			<div class="imgfit"><img src="/images/img_projects01.jpg" alt=""></div>
-			<div class="txt">
-				<div class="tit">정기 세미나</div>
-				<ul class="dots_list">
-					<li>매년 봄·가을 연 2회 정기세미나 개최</li>
-					<li>정부 및 연구비 지원기관의 최신 연구·산학협력 제도를 공유 및 관리자에게 필요한 기본 소양 및 직무교육 실시</li>
-					<li>각 대학마다 달리 운영되고 있는 연구 및 산학협력 행정 운영 사례를 교류하여 정보공유와 회원교 간 협력 및 친목을 강화</li>
-				</ul>
-			</div>
-		</div>
-	
-		<div class="box">
-			<div class="imgfit"><img src="/images/img_projects02.jpg" alt=""></div>
-			<div class="txt">
-				<div class="tit">주요 사업</div>
-				<ul class="dots_list">
-					<li>한국대학교육협의회·연구개발인력교육원 등 외부기관과 협력하여 직무교육 및 위탁교육을 운영</li>
-					<li>연구·산학협력 관리자의 역량을 강화</li>
-				</ul>
-			</div>
-		</div>
-	
-		<div class="box">
-			<div class="imgfit"><img src="/images/img_projects03.jpg" alt=""></div>
-			<div class="txt">
-				<div class="tit">해외 벤치마킹 연수</div>
-				<ul class="dots_list">
-					<li>미국·유럽 등 선진국의 대학·연구기관을 방문해 우수한 연구관리·산학협력 사례를 직접 학습하고 질의응답 진행</li>
-					<li>연수 후 연구보고서를 공유하여 선진 지식과 경험을 함께 확산</li>
-				</ul>
-			</div>
-		</div>
-	
-		<div class="box">
-			<div class="imgfit"><img src="/images/img_projects04.jpg" alt=""></div>
-			<div class="txt">
-				<div class="tit">정책연구사업</div>
-				<ul class="dots_list">
-					<li>대학 연구행정 및 산학협력 제도 개선을 위한 정책연구 수행 및 연구결과를 세미나·토론을 통해 회원교와 확산</li>
-				</ul>
-				<div class="gbox">
-					<div class="tt">정책연구 분야</div>
-					<ol>
-						<li>1. 산학협력단 인사 및 회계</li>
-						<li>2. 산학협력단 구매 및 자산</li>
-						<li>3. 연구비 관리</li>
-						<li>4. 연구기획 및 진흥</li>
-						<li>5. 산학협력(창업, 기술지주회사)</li>
-						<li>6. 기타</li>
-					</ol>
-				</div>
-			</div>
-		</div>
-	
-		<div class="box">
-			<div class="imgfit"><img src="/images/img_projects05.jpg" alt=""></div>
-			<div class="txt">
-				<div class="tit">연구비 지원기관 협력</div>
-				<ul class="dots_list">
-					<li>교육과학기술부 등 정부부처, 한국연구재단 등 전문기관, 연구개발인력교육원 등 정부출연기관 등과 유기적인 협조관계를 구축</li>
-					<li>대학 연구현장의 목소리를 정부기관등에 전달하고, 대학의 의견을 관철시키는 역할 수행</li>
-				</ul>
-			</div>
-		</div>
-		
-	</div>
-	
+	<h1 class="hidden_title">주요사업</h1>
+
+    <div class="projects_wrap">
+
+        <!-- 1 -->
+        <div class="box" style="margin-bottom:80px;">
+
+            <div class="imgfit">
+                <img src="/images/img_projects01.jpg"
+                     alt="연구·산학협력 관리자 정보교류 및 네트워크 강화"
+                     style="width:100%; height:auto;">
+            </div>
+
+            <div class="txt" style="padding-top:40px;">
+                <h2 class="tit">연구·산학협력 관리자 정보교류 및 네트워크 강화</h2>
+
+                <div class="gbox">
+                    <div class="tt">목적</div>
+                    <ul class="dots_list">
+                        <li>연구·산학협력에 관한 연수 및 세미나를 통하여 회원들의 업무 전문성 향상</li>
+                        <li>회원 간 네트워크 활동 지원 및 협력 강화</li>
+                        <li>회원교 소속 담당자의 연구·산학협력 관련 전문성 및 업무자질 향상</li>
+                    </ul>
+                </div>
+
+                <div class="gbox">
+                    <div class="tt">주요 내용</div>
+                    <ul class="dots_list">
+                        <li>정기세미나(봄·가을) 개최</li>
+                        <li>해외 연수(해외 유수 대학 및 기관 벤치마킹)</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+
+        <!-- 2 -->
+        <div class="box" style="margin-bottom:80px;">
+
+            <div class="imgfit">
+                <img src="/images/img_projects02.jpg"
+                     alt="연구·산학협력 관리자를 위한 교육 및 전문가 양성"
+                     style="width:100%; height:auto;">
+            </div>
+
+            <div class="txt" style="padding-top:40px;">
+                <h2 class="tit">연구·산학협력 관리자를 위한 교육 및 전문가 양성</h2>
+
+                <div class="gbox">
+                    <div class="tt">목적</div>
+                    <ul class="dots_list">
+                        <li>연구관리에 관한 수준별 전문교육을 통해 업무 역량 강화 도모</li>
+                        <li>대학연구행정전문가 양성을 위한 전문자격증 교육과정 운영</li>
+                    </ul>
+                </div>
+
+                <div class="gbox">
+                    <div class="tt">주요 내용</div>
+                    <ul class="dots_list">
+                        <li>산학협력단 직원 전문성 강화 교육 운영</li>
+                        <li>대학연구행정전문가 양성 과정 운영</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+
+        <!-- 3 -->
+        <div class="box" style="margin-bottom:80px;">
+
+            <div class="imgfit">
+                <img src="/images/img_projects03.jpg"
+                     alt="연구·산학협력 활성화를 위한 기획·조사·연구 및 정책 개발"
+                     style="width:100%; height:auto;">
+            </div>
+
+            <div class="txt" style="padding-top:40px;">
+                <h2 class="tit">연구·산학협력 활성화를 위한 기획·조사·연구 및 정책 개발</h2>
+
+                <div class="gbox">
+                    <div class="tt">목적</div>
+                    <ul class="dots_list">
+                        <li>연구관리 현장의 의견을 반영한 제도개선 방안 정책연구 및 발전모델 제시</li>
+                        <li>현장 중심 문제 해결 및 대학 연구행정 수월성 증대</li>
+                    </ul>
+                </div>
+
+                <div class="gbox">
+                    <div class="tt">주요 내용</div>
+                    <ul class="dots_list">
+                        <li>산학협력 정책연구사업 수행</li>
+                        <li>국내 유관기관 연계 및 지역별 연구 활성화 추진</li>
+                        <li>산학협력 조직 컨설팅</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+
+        <!-- 4 -->
+        <div class="box" style="margin-bottom:80px;">
+
+            <div class="imgfit">
+                <img src="/images/img_projects04.jpg"
+                     alt="대학연구행정전문가 민간자격증 발급 및 관리"
+                     style="width:100%; height:auto;">
+            </div>
+
+            <div class="txt" style="padding-top:40px;">
+                <h2 class="tit">대학연구행정전문가 민간자격증(1급·2급) 발급 및 관리</h2>
+
+                <div class="gbox">
+                    <div class="tt">목적</div>
+                    <ul class="dots_list">
+                        <li>대학 연구행정 전문가 양성</li>
+                        <li>대학 연구·산학협력 전문성 향상 및 자긍심 고취</li>
+                    </ul>
+                </div>
+
+                <div class="gbox">
+                    <div class="tt">주요 내용</div>
+                    <ul class="dots_list">
+                        <li>대학연구행정전문가 자격(1급·2급) 검증 시험 운영</li>
+                        <li>대학연구행정전문가 자격(1급·2급) 발급 및 관리</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
 </main>
+
 @endsection

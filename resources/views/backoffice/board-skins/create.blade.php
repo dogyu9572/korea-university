@@ -63,7 +63,7 @@
                 <div class="board-form-group">
                     <label for="skin_file" class="board-form-label">스킨 파일 <span class="required">*</span></label>
                     <input type="file" class="board-form-control" id="skin_file" name="skin_file" accept=".zip" required>
-                    <small class="board-form-text">ZIP 파일만 업로드 가능합니다. 최대 10MB</small>
+                    <small class="board-form-text">ZIP 파일만 업로드 가능합니다. 최대 100MB</small>
                     @error('skin_file')
                         <div class="board-alert board-alert-danger">{{ $message }}</div>
                     @enderror

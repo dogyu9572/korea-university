@@ -1,6 +1,7 @@
 @extends('layouts.app')
 @section('content')
 <main class="sub_wrap">
+	<h1 class="hidden_title">설립목적 및 역할</h1>
     
 	<div class="establishment_wrap">
 		<div class="inner">
@@ -18,7 +19,7 @@
 					</p>
 				</div>
 				
-				<div class="stitle tal">주요 역할 (Core Roles)</div>
+				<h2 class="stitle tal">주요 역할 (Core Roles)</h2>
 				<ul>
 					<li><div class="imgfit"><img src="/images/img_establishment01.jpg" alt=""></div>
 						<div class="txt">

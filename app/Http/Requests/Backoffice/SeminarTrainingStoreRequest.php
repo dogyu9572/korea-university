@@ -63,7 +63,7 @@ class SeminarTrainingStoreRequest extends FormRequest
             'refund_no_stay_deadline_days' => 'nullable|integer|min:1|max:30',
             'refund_same_day_fee' => 'nullable|numeric|min:0',
             'thumbnail' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
-            'attachments.*' => 'nullable|file|max:10240',
+            'attachments.*' => 'nullable|file|max:102400',
         ];
     }
 
@@ -85,7 +85,7 @@ class SeminarTrainingStoreRequest extends FormRequest
             'thumbnail.image' => '썸네일은 이미지 파일이어야 합니다.',
             'thumbnail.max' => '썸네일 파일 크기는 2MB를 초과할 수 없습니다.',
             'attachments.*.file' => '올바른 파일을 업로드해주세요.',
-            'attachments.*.max' => '첨부파일 크기는 10MB를 초과할 수 없습니다.',
+            'attachments.*.max' => '첨부파일 크기는 100MB를 초과할 수 없습니다.',
         ];
     }
 }

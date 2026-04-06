@@ -70,7 +70,7 @@
                 <div class="board-form-group">
                     <label for="skin_file" class="board-form-label">스킨 파일 업데이트</label>
                     <input type="file" class="board-form-control" id="skin_file" name="skin_file" accept=".zip">
-                    <small class="board-form-text">새 스킨 파일을 업로드하려면 ZIP 파일을 선택하세요. 최대 10MB (선택사항)</small>
+                    <small class="board-form-text">새 스킨 파일을 업로드하려면 ZIP 파일을 선택하세요. 최대 100MB (선택사항)</small>
                     @error('skin_file')
                         <div class="board-alert board-alert-danger">{{ $message }}</div>
                     @enderror

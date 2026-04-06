@@ -1,7 +1,7 @@
 @extends('layouts.app')
 @section('content')
 <main class="sub_wrap inner">
-    <div class="stitle tal bdb">교육 · 자격증 신청</div>
+    <h1 class="stitle tal bdb">교육 · 자격증 신청</h1>
 
     @if($errors->any())
         <div class="alert alert-danger" role="alert" style="margin-bottom:1rem;">
@@ -18,7 +18,7 @@
         @csrf
         <input type="hidden" name="online_education_id" value="{{ $onlineEducation->id }}">
 
-        <div class="otit">교육 신청</div>
+        <h2 class="otit">교육 신청</h2>
         <div class="glbox dl_slice">
             <dl>
                 <dt>교육명</dt>
@@ -43,7 +43,7 @@
             </dl>
         </div>
 
-        <div class="otit">신청자 정보 입력</div>
+        <h2 class="otit">신청자 정보 입력</h2>
         <div class="glbox dl_slice in_inputs">
             <dl>
                 <dt>성명</dt>
@@ -109,7 +109,7 @@
             </dl>
         </div>
 
-        <div class="otit">교육 참가비 선택</div>
+        <h2 class="otit">교육 참가비 선택</h2>
         <div class="tbl th_bg mo_reverse_tbl">
             <table>
                 <colgroup>
@@ -131,7 +131,7 @@
             </table>
         </div>
 
-        <div class="otit">결제 및 환불 안내</div>
+        <h2 class="otit">결제 및 환불 안내</h2>
         <div class="tbl th_bg">
             <table>
                 <colgroup>
@@ -162,7 +162,7 @@
         </div>
 
         @if(!($onlineEducation->is_free ?? (float)($onlineEducation->fee ?? 0) == 0))
-        <div class="otit">증빙서류 발행 여부</div>
+        <h2 class="otit">증빙서류 발행 여부</h2>
         <div class="glbox dl_slice in_inputs dt_long">
             <dl>
                 <dt>현금영수증 발행</dt>

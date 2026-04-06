@@ -1,7 +1,7 @@
 @extends('layouts.app')
 @section('content')
 <main class="sub_wrap inner">
-	<div class="stitle tal bdb">세미나 · 해외연수 신청</div>
+	<h1 class="stitle tal bdb">세미나 · 해외연수 신청</h1>
 
 	@php
 		$isEdit = isset($isEdit) && $isEdit && isset($application);
@@ -11,7 +11,7 @@
 		@csrf
 		<input type="hidden" name="seminar_training_id" value="{{ $isEdit ? ($application->seminar_training_id ?? $program->id) : $program->id }}">
 
-	<div class="otit">세미나 신청</div>
+	<h2 class="otit">세미나 신청</h2>
 	<div class="glbox dl_slice">
 		<dl>
 			<dt>세미나명</dt>
@@ -36,7 +36,7 @@
 		</dl>
 	</div>
 
-	<div class="otit">신청자 정보 입력</div>
+	<h2 class="otit">신청자 정보 입력</h2>
 	<div class="glbox dl_slice in_inputs">
 		<dl>
 			<dt>성명</dt>
@@ -102,7 +102,7 @@
 		</dl>
 	</div>
 
-	<div class="otit">교육 참가비 선택</div>
+	<h2 class="otit">교육 참가비 선택</h2>
 	<div class="tbl th_bg mo_reverse_tbl">
 		@php
 			$columnLabels = !empty($feeOptions) ? collect($feeOptions[0]['items'])->pluck('label')->values()->all() : [];
@@ -176,7 +176,7 @@
 		</div>
 	</div>
 
-	<div class="otit">결제 및 환불 안내</div>
+	<h2 class="otit">결제 및 환불 안내</h2>
 	<div class="tbl th_bg">
 		<table>
 			<colgroup>
@@ -239,7 +239,7 @@
 		<p class="ne mt0">무통장입금 시 환불은 영업일 기준 3~5일 내 처리됩니다.</p> -->
 	</div>
 
-	<div class="otit">증빙서류 발행 여부</div>
+	<h2 class="otit">증빙서류 발행 여부</h2>
 	<div class="glbox dl_slice in_inputs dt_long">
 		{{-- 현금영수증 발행: 현재 미사용. 노출 시 아래 주석 해제 --}}
 		<input type="hidden" name="has_cash_receipt" value="0">

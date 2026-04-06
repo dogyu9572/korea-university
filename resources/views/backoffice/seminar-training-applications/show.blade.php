@@ -191,7 +191,10 @@
                         <button type="button" class="btn btn-success btn-sm" data-action="batch-payment-complete">
                             <i class="fas fa-check"></i> 일괄 입금완료
                         </button>
-                        <button type="button" class="btn btn-info btn-sm" data-action="batch-complete">
+                        <button type="button" class="btn btn-info btn-sm" data-action="batch-graduate">
+                            <i class="fas fa-check-circle"></i> 일괄 수료
+                        </button>
+                        <button type="button" class="btn btn-primary btn-sm" data-action="batch-complete">
                             <i class="fas fa-check-circle"></i> 일괄 이수
                         </button>
                         <a href="{{ route('backoffice.seminar-training-applications.export.get', ['program' => $program->id]) }}" class="btn btn-secondary btn-sm" data-action="excel-download">
@@ -200,6 +203,20 @@
                         <a href="{{ route('backoffice.seminar-training-applications.create', ['program' => $program->id]) }}" class="btn btn-primary btn-sm">
                             <i class="fas fa-plus"></i> 신청 추가
                         </a>
+                        <form method="GET" action="{{ route('backoffice.seminar-training-applications.show', $program) }}" class="per-page-form" id="perPageForm">
+                            <input type="hidden" name="payment_status" value="{{ request('payment_status') }}">
+                            <input type="hidden" name="affiliation" value="{{ request('affiliation') }}">
+                            <input type="hidden" name="accommodation" value="{{ request('accommodation') }}">
+                            <input type="hidden" name="receipt_status" value="{{ request('receipt_status') }}">
+                            <input type="hidden" name="search" value="{{ request('search') }}">
+                            <label for="per_page" class="per-page-label">표시 개수:</label>
+                            <select name="per_page" id="per_page" class="per-page-select" data-action="change-per-page">
+                                <option value="10" @selected(request('per_page', 20) == 10)>10개</option>
+                                <option value="20" @selected(request('per_page', 20) == 20)>20개</option>
+                                <option value="50" @selected(request('per_page', 20) == 50)>50개</option>
+                                <option value="100" @selected(request('per_page', 20) == 100)>100개</option>
+                            </select>
+                        </form>
                     </div>
 
                     <div class="table-responsive" style="overflow-x: auto; -webkit-overflow-scrolling: touch;">
@@ -207,20 +224,23 @@
                             <colgroup>
                                 <col style="width: 3%">
                                 <col style="width: 4%">
-                                <col style="width: 8%">
-                                <col style="width: 7%">
-                                <col style="width: 6%">
-                                <col style="width: 8%">
-                                <col style="width: 8%">
-                                <col style="width: 6%">
-                                <col style="width: 6%">
+                                <col style="">
+                                <col style="width: 8%;">
+                                <col style="width: 4%;">
+                                <col style="width: 8%;">
+                                <col style="width: 6%;">
+                                <col style="width: 4%;">
+                                <col style="width: 4%;">
                                 <col style="width: 8%">
                                 <col style="width: 5%">
                                 <col style="width: 6%">
-                                <col style="width: 6%">
-                                <col style="width: 6%">
-                                <col style="width: 9%">
-                            </colgroup>
+                                <col style="width: 4%;">
+                                <col style="width: 7%;">
+                                <col style="width: 5%;">
+								<col style="width: 5%">
+								<col style="width: 5%;">
+								<col style="width: 8%;">
+							</colgroup>
                             <thead>
                                 <tr>
                                     <th><input type="checkbox" id="selectAll"></th>

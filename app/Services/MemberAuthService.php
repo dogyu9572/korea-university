@@ -19,8 +19,21 @@ class MemberAuthService
      */
     public function findMemberFromSocial(string $provider, ProviderUser $providerUser): ?Member
     {
-        $loginId = $provider . '_' . $providerUser->getId();
         $email = $providerUser->getEmail();
+
+        // 1단계: 이메일로 기존 회원(가입구분 무관) 우선 매칭
+        if ($email !== null && $email !== '') {
+            $memberByEmail = Member::active()
+                ->where('email', $email)
+                ->first();
+
+            if ($memberByEmail) {
+                return $memberByEmail;
+            }
+        }
+
+        // 2단계: 기존 SNS 회원 (join_type = provider) 조회 (기존 로직 유지)
+        $loginId = $provider . '_' . $providerUser->getId();
 
         return Member::active()
             ->where('join_type', $provider)
@@ -38,8 +51,9 @@ class MemberAuthService
      */
     public function getSnsJoinData(string $provider, ProviderUser $providerUser): array
     {
-        $loginId = $provider . '_' . $providerUser->getId();
         $email = $providerUser->getEmail();
+        // 이메일이 있으면 로그인 ID도 이메일로 사용해, 이후 일반 로그인(ID=이메일)과 공용 사용
+        $loginId = $email ?: ($provider . '_' . $providerUser->getId());
         $name = $this->resolveSocialName($provider, $providerUser);
         $phoneNumber = $this->resolveSocialPhoneNumber($provider, $providerUser);
 

@@ -5,7 +5,7 @@
 	<div class="board_view">
 		<div class="tit gbox">
 			<div class="types"><span class="type {{ $inquiry->status === '답변완료' ? 'end' : 'ing' }}">{{ $inquiry->status === '답변완료' ? '답변완료' : '미답변' }}</span></div>
-			<strong>{{ $inquiry->title }}</strong>
+			<h1>{{ $inquiry->title }}</h1>
 			<div class="flex">
 				<dl class="typebox"><dt>분류</dt><dd>{{ $inquiry->category }}</dd></dl>
 				<dl class="date"><dt>등록일</dt><dd>{{ $inquiry->created_at->format('Y.m.d') }}</dd></dl>

@@ -1,6 +1,7 @@
 @extends('layouts.app')
 @section('content')
 <main class="sub_wrap inner">
+	<h1 class="hidden_title">나의 문의</h1>
 	@php
 		$categoryLabels = ['전체' => '전체'] + array_combine($categories, $categories);
 		$currentCategory = $filters['category'] ?? '전체';
@@ -47,7 +48,7 @@
 				<tr>
 					<td class="num">{{ $inquiries->total() - ($inquiries->currentPage() - 1) * $inquiries->perPage() - $index }}</td>
 					<td class="type">{{ $inquiry->category }}</td>
-					<td class="tit tal"><a href="{{ route('mypage.my_inquiries_view', $inquiry->id) }}">{{ $inquiry->title }}</a></td>
+					<td class="tit tal"><a href="{{ route('mypage.my_inquiries_view', $inquiry->id) }}"><h2>{{ $inquiry->title }}</h2></a></td>
 					<td class="date">{{ $inquiry->created_at->format('Y.m.d') }}</td>
 					<td class="state">@if($inquiry->status === '답변완료')<i class="answer_end">답변완료</i>@else<i class="answer_ing">미답변</i>@endif</td>
 				</tr>

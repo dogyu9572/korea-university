@@ -53,7 +53,7 @@ class InquiryReplyRequest extends FormRequest
             'status' => ['required', 'in:답변대기,답변완료'],
             'reply_date' => ['nullable', 'date'],
             'content' => ['required', 'string'],
-            'attachments.*' => ['nullable', 'file', 'max:10240'], // 10MB
+            'attachments.*' => ['nullable', 'file', 'max:102400'], // 100MB
         ];
     }
 
@@ -90,7 +90,7 @@ class InquiryReplyRequest extends FormRequest
             'reply_date.date' => '등록일은 올바른 날짜 형식이어야 합니다.',
             'content.required' => '답변 내용은 필수 입력 항목입니다.',
             'files.*.file' => '올바른 파일을 업로드해주세요.',
-            'files.*.max' => '파일 크기는 10MB를 초과할 수 없습니다.',
+            'files.*.max' => '파일 크기는 100MB를 초과할 수 없습니다.',
         ];
     }
 }

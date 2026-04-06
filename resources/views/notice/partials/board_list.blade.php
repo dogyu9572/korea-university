@@ -39,7 +39,7 @@
 			<tr class="{{ !empty($item->is_notice) ? 'notice' : '' }}">
 				<td class="num">{{ $item->id }}</td>
 				<td class="tit tal">
-					<a href="{{ route('notice.' . $detailRoute, $item->id) }}">{{ $item->title ?? '' }}</a>
+					<a href="{{ route('notice.' . $detailRoute, $item->id) }}"><h2>{{ $item->title ?? '' }}</h2></a>
 				</td>
 				<td class="down">
 					@php

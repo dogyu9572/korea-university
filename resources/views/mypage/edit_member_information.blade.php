@@ -2,13 +2,13 @@
 @section('content')
 <main class="sub_wrap inner" @if($errors->has('secession_agreed')) data-secession-errors="1" @endif @if($errors->any()) data-join-errors="1" @endif @if(session('success')) data-success-message="{{ e(session('success')) }}" @endif>
 
-	<div class="stitle tal bdb">회원정보 수정</div>
+	<h1 class="stitle tal bdb">회원정보 수정</h1>
 
 	<form action="{{ route('mypage.edit_member_information.update') }}" method="POST" id="mypageMemberForm" novalidate>
 		@csrf
 		@method('PUT')
 
-		<div class="otit">기본정보 수정</div>
+		<h2 class="otit">기본정보 수정</h2>
 		<div class="glbox dl_slice in_inputs">
 			<dl>
 				<dt>이메일</dt>
@@ -74,7 +74,7 @@
 			</dl>
 		</div>
 
-		<div class="otit">소속정보 수정</div>
+		<h2 class="otit">소속정보 수정</h2>
 		<div class="glbox dl_slice in_inputs">
 			<dl>
 				<dt>소속기관</dt>

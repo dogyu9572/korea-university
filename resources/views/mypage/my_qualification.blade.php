@@ -2,7 +2,7 @@
 @section('content')
 <main class="sub_wrap inner">
 
-	<div class="stitle tal">나의 자격 현황</div>
+	<h1 class="stitle tal">나의 자격 현황</h1>
 
 	<div class="board_top">
 		<div class="left">
@@ -32,7 +32,7 @@
 			data-qualification-certificate-url="{{ $qualCertUrl }}">
 			<a href="{{ route('mypage.my_qualification_view', $item->id) }}" class="link">
 				<span class="statebox"><i class="state {{ $stateClass }}">{{ $item->qualification_display_status }}</i></span>
-				<span class="tit">{{ $cert ? $cert->name : '' }}</span>
+				<h2 class="tit">{{ $cert ? $cert->name : '' }}</h2>
 				<dl>
 					<dt>시험일자</dt>
 					<dd>{{ $examDateStr }}</dd>

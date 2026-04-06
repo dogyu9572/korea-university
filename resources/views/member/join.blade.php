@@ -27,7 +27,6 @@
 						@error('email')<dd class="join_field_error" style="color:#c00;font-size:1rem;margin-top:0.25rem;">{{ $message }}</dd>@enderror
 						@error('email_verified')<dd class="join_field_error" style="color:#c00;font-size:1rem;margin-top:0.25rem;">{{ $message }}</dd>@enderror
 					</dl>
-					@if(!($snsJoinData ?? null))
 					<dl>
 						<dt>비밀번호<span class="c_blue_light">*</span></dt>
 						<dd><input type="password" name="password" class="w100p" placeholder="영문/숫자/특수문자 조합 두가지 이상(8~10자 이내 입력)" value="{{ old('password') }}" required></dd>
@@ -40,6 +39,10 @@
 						<dd id="passwordConfirmCheckMsg" class="join_field_error" style="color:#c00;font-size:1rem;margin-top:0.25rem;display:none;"></dd>
 						@error('password_confirmation')<dd class="join_field_error" style="color:#c00;font-size:1rem;margin-top:0.25rem;">{{ $message }}</dd>@enderror
 					</dl>
+					@if($snsJoinData ?? null)
+					<p class="ne" >
+						설정된 이메일(ID)과 비밀번호로 일반 회원 로그인이 가능합니다.
+					</p>
 					@endif
 					<dl>
 						<dt>휴대폰번호<span class="c_blue_light">*</span></dt>

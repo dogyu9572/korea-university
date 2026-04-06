@@ -1,6 +1,7 @@
 @extends('layouts.app')
 @section('content')
 <main class="sub_wrap inner">
+	<h1 class="hidden_title">FAQ</h1>
 
 	<div class="board_search">
 		<form method="GET" action="{{ route('notice.faq') }}" class="search-form">

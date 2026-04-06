@@ -1,6 +1,7 @@
 @extends('layouts.app')
 @section('content')
 <main class="sub_wrap pb0">
+	<h1 class="hidden_title">조직도</h1>
     
 	<div class="inner">
 		<div class="organizational_chart">
@@ -14,7 +15,7 @@
 				@if($membersByCategory && $membersByCategory->count() > 0)
 					@foreach(['회장', '부회장', '사무국', '지회', '감사', '고문'] as $category)
 						@if($membersByCategory->has($category) && $membersByCategory[$category]->count() > 0)
-							<div class="btit">{{ $category }}</div>
+							<h2 class="btit">{{ $category }}</h2>
 							<ul>
 								@foreach($membersByCategory[$category] as $member)
 									<li>

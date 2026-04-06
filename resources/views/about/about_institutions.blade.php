@@ -1,6 +1,7 @@
 @extends('layouts.app')
 @section('content')
 <main class="sub_wrap inner">
+	<h1 class="hidden_title">회원기관 소개</h1>
 
 	<div class="search_wrap">
 		<form method="GET" action="{{ route('about.about_institutions') }}" id="institutionsSearchForm">

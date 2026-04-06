@@ -5,7 +5,7 @@
 	<div class="board_view">
 		<div class="tit">
 			<div class="types"><span class="type c4">온라인교육</span></div>
-			<strong>{{ $viewData['name'] }}</strong>
+			<h1>{{ $viewData['name'] }}</h1>
 		</div>
 	</div>
 
@@ -14,7 +14,7 @@
 		<div class="point" id="end"></div>
 		<div class="imgfit"><img src="{{ $viewData['thumb'] }}" alt=""></div>
 		<div class="abso_info">
-			<div class="tit">{{ $viewData['name'] }}</div>
+			<h2 class="tit">{{ $viewData['name'] }}</h2>
 			<div class="con">
 				<dl>
 					<dt>구분</dt>
@@ -55,7 +55,7 @@
 		</div>
 
 		@if($onlineEducation->attachments->count() > 0)
-		<div class="otit mt0">첨부파일</div>
+		<h2 class="otit mt0">첨부파일</h2>
 		<div class="download_area">
 			@foreach($onlineEducation->attachments as $att)
 			<a href="{{ $att->path }}" download>{{ $att->name }}</a>
@@ -64,7 +64,7 @@
 		@endif
 
 		@if($onlineEducation->lectures->count() > 0)
-		<div class="otit mt0">강의영상</div>
+		<h2 class="otit mt0">강의영상</h2>
 		<ul class="glbox dl_slice">
 			@foreach($onlineEducation->lectures as $lec)
 			<li>
@@ -87,7 +87,7 @@
 			</ul>
 			<div class="view_cont">
 				<div class="cont">
-					<div class="otit">교육개요</div>
+					<h2 class="otit">교육개요</h2>
 					@if($onlineEducation->education_overview)
 					<div class="gbox">{!! $onlineEducation->education_overview !!}</div>
 					@else
@@ -95,7 +95,7 @@
 					@endif
 				</div>
 				<div class="cont">
-					<div class="otit">교육일정</div>
+					<h2 class="otit">교육일정</h2>
 					@if($onlineEducation->education_schedule)
 					<div class="gbox">{!! $onlineEducation->education_schedule !!}</div>
 					@else
@@ -103,7 +103,7 @@
 					@endif
 				</div>
 				<div class="cont">
-					<div class="otit">참가비 및 납부 안내</div>
+					<h2 class="otit">참가비 및 납부 안내</h2>
 					@if($onlineEducation->fee_info)
 					<div class="gbox">{!! $onlineEducation->fee_info !!}</div>
 					@else
@@ -111,7 +111,7 @@
 					@endif
 				</div>
 				<div class="cont">
-					<div class="otit">취소 및 환불 규정</div>
+					<h2 class="otit">취소 및 환불 규정</h2>
 					@if($onlineEducation->refund_policy)
 					<div class="gbox">{!! $onlineEducation->refund_policy !!}</div>
 					@else
@@ -119,7 +119,7 @@
 					@endif
 				</div>
 				<div class="cont">
-					<div class="otit">교과내용</div>
+					<h2 class="otit">교과내용</h2>
 					@if($onlineEducation->curriculum)
 					<div class="gbox">{!! $onlineEducation->curriculum !!}</div>
 					@else
@@ -127,7 +127,7 @@
 					@endif
 				</div>
 				<div class="cont">
-					<div class="otit">교육안내</div>
+					<h2 class="otit">교육안내</h2>
 					@if($onlineEducation->education_notice)
 					<div class="gbox">{!! $onlineEducation->education_notice !!}</div>
 					@else

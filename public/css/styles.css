@@ -6,6 +6,7 @@
 
 /** 공통 **/
 	.mo_vw {display:none;}
+	.hidden_title {position:absolute; width:1px; height:1px; padding:0; margin:-1px; overflow:hidden; clip:rect(0, 0, 0, 0); white-space:nowrap; border-width:0;}
 /* color */
 	body{
 		--c_iden:#034DA2;
@@ -144,6 +145,7 @@
 	.main_quick .con .i6:before {background-image:url('/images/icon_mquick06.svg');}
 	.mcon {margin-top:120px;}
 	.mtit {position:relative; font-size:38px; font-weight:700; line-height:1.2; margin-bottom:12px; display:flex; align-items:center;}
+	.mtit h2 {display:flex; align-items:center;}
 	.mtit i {width:6px; height:6px; background:#1E2124; border-radius:50%; margin:0 8px;}
 	.mtit:after {content:""; display:block; width:8px; aspect-ratio:1/1; background:#034DA2; border-radius:8px; margin-bottom:auto;}
 	.mcon .more {position:absolute; top:0; right:0; width:46px; height:46px; border:#CDD1D5 1px solid; border-radius:50%; font-size:0;}
@@ -240,6 +242,7 @@
 	.stitle.bdb {border-bottom:#1E2124 2px solid; padding-bottom:16px;}
 	.stitle .btns_abso {position:absolute; bottom:16px; right:0; display:flex; gap:4px;}
 	.stitle .btns_abso .btn {font-size:15px; color:#0A195B; font-weight:500; line-height:32px; height:34px; padding:0 14px; border:#0A195B 1px solid; border-radius:4px;}
+	.stitle h1 {font-weight:inherit;}
 	.btit {font-size:28px; font-weight:700; line-height:1.42; margin:80px 0 16px;}
 	.otit {position:relative; font-size:24px; font-weight:600; line-height:1.4; padding-left:18px; margin:80px 0 16px;}
 	.otit:before {content:""; position:absolute; top:50%; left:0; width:10px; height:10px; background:#fff; border:#0A195B 3px solid; border-radius:50%; transform:translateY(-50%);}
@@ -325,6 +328,7 @@
 	.search_wrap dl {display:flex;}
 	.search_wrap dt {position:relative; width:168px; font-size:18px; font-weight:500; line-height:50px; padding-left:12px;}
 	.search_wrap dt:before {content:""; position:absolute; top:23px; left:0; width:4px; height:4px; background:#6D7882; border-radius:50%;}
+	.search_wrap dt h2 {font-weight:inherit;}
 	.search_wrap dd {width:calc(100% - 168px); font-size:16px;}
 	.search_wrap.dt_slim dt {width:100px;}
 	.search_wrap.dt_slim dd {width:calc(100% - 100px);}
@@ -412,6 +416,7 @@
 /* 게시판 상세 */
 	.board_view .tit {border-bottom:#1E2124 2px solid; padding-bottom:16px; margin-bottom:40px;}
 	.board_view .types {display:flex; margin-bottom:12px;}
+	.board_view .tit h1,
 	.board_view .tit strong {display:block; font-size:28px; line-height:1.35;}
 	.board_view .tit.gbox {padding:32px 40px; border:0; background:#F8F9FB;}
 	.board_view dl {display:flex; align-items:center; gap:10px; margin-top:24px; font-size:17px;}
@@ -619,6 +624,7 @@
 	.application_view .abso_info .con dl {display:flex; font-size:16px; line-height:1.65; letter-spacing:-0.384px;}
 	.application_view .abso_info .con dl + dl {margin-top:4px;}
 	.application_view .abso_info .con dt {width:90px; font-weight:500;}
+	.application_view .abso_info .con dt h2 {font-weight:inherit;}
 	.application_view .abso_info .con dd {width:calc(100% - 90px); color:#464C53;}
 	.application_view .abso_info .btns {position:relative; overflow:hidden; margin-top:48px;}
 	.application_view .abso_info .btn {display:flex; justify-content:center; align-items:center; gap:8px; font-size:17px; font-weight:500; line-height:56px; height:56px; width:100%; border-radius:8px; text-align:center;}
@@ -725,9 +731,10 @@
 	.establishment_con strong {display:block; font-size:24px; font-weight:600; line-height:1.4;}
 	.establishment_con p {font-size:20px; color:#464C53; line-height:1.6; margin-top:12px;}
 /* 주요사업 */
-	.projects_wrap .box {border:#CDD1D5 1px solid; border-radius:40px 4px; overflow:hidden; display:flex; align-items:center;}
+	.projects_wrap .box {border:#CDD1D5 1px solid; border-radius:40px 4px; overflow:hidden; display:flex; /* align-items:center; */}
 	.projects_wrap .box + .box {margin-top:80px;}
 	.projects_wrap .imgfit {width:41.6667%;}
+	.projects_wrap .imgfit img {height:100% !important;}
 	.projects_wrap .txt {width:58.3333%; padding:48px;}
 	.projects_wrap .tit {font-size:28px; font-weight:700; line-height:1.42; margin-bottom:16px;}
 	.projects_wrap ul.dots_list li {font-size:20px; line-height:32px;}

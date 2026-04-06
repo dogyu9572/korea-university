@@ -2,7 +2,7 @@
 @section('content')
 <main class="sub_wrap inner">
     
-	<div class="otit mt0">문의내용 작성 <p class="abso"><strong class="c_blue_light">*</strong>는 필수입력 항목 입니다.</p></div>
+	<div class="otit mt0"><h1>문의내용 작성</h1> <p class="abso"><strong class="c_blue_light">*</strong>는 필수입력 항목 입니다.</p></div>
 
 	<form action="{{ route('mypage.my_inquiries.store') }}" method="POST" enctype="multipart/form-data" id="inquiryWriteForm">
 		@csrf
@@ -30,7 +30,7 @@
 				<dt>파일첨부</dt>
 				<dd class="file_inputs">
 					<label class="file"><input type="file" name="files[]" multiple><span>파일선택</span></label>
-					<p class="ne mt0">파일은 최대 3개까지 가능하고, 1개당 최대 10MB를 초과할 수 없습니다.</p>
+					<p class="ne mt0">파일은 최대 3개까지 가능하고, 1개당 최대 100MB를 초과할 수 없습니다.</p>
 					<div class="file_input w100p flex colm">선택된 파일 없음</div>
 				</dd>
 			</dl>

@@ -281,6 +281,8 @@ Route::prefix('backoffice')->middleware(['backoffice'])->group(function () {
         ->name('backoffice.education-applications.store');
     Route::post('education-applications/batch-payment-complete', [EducationApplicationController::class, 'batchPaymentComplete'])
         ->name('backoffice.education-applications.batch-payment-complete');
+    Route::post('education-applications/batch-graduate', [EducationApplicationController::class, 'batchGraduate'])
+        ->name('backoffice.education-applications.batch-graduate');
     Route::post('education-applications/batch-complete', [EducationApplicationController::class, 'batchComplete'])
         ->name('backoffice.education-applications.batch-complete');
     // 구체적인 라우트를 먼저 정의 (순서 중요!)
@@ -309,6 +311,8 @@ Route::prefix('backoffice')->middleware(['backoffice'])->group(function () {
         ->name('backoffice.online-education-applications.store');
     Route::post('online-education-applications/batch-payment-complete', [EducationApplicationController::class, 'batchPaymentComplete'])
         ->name('backoffice.online-education-applications.batch-payment-complete');
+    Route::post('online-education-applications/batch-graduate', [EducationApplicationController::class, 'batchGraduate'])
+        ->name('backoffice.online-education-applications.batch-graduate');
     Route::post('online-education-applications/batch-complete', [EducationApplicationController::class, 'batchComplete'])
         ->name('backoffice.online-education-applications.batch-complete');
     Route::get('online-education-applications/{education_application}/edit', [EducationApplicationController::class, 'edit'])
@@ -361,6 +365,8 @@ Route::prefix('backoffice')->middleware(['backoffice'])->group(function () {
         ->name('backoffice.seminar-training-applications.store');
     Route::post('seminar-training-applications/batch-payment-complete', [EducationApplicationController::class, 'batchPaymentComplete'])
         ->name('backoffice.seminar-training-applications.batch-payment-complete');
+    Route::post('seminar-training-applications/batch-graduate', [EducationApplicationController::class, 'batchGraduate'])
+        ->name('backoffice.seminar-training-applications.batch-graduate');
     Route::post('seminar-training-applications/batch-complete', [EducationApplicationController::class, 'batchComplete'])
         ->name('backoffice.seminar-training-applications.batch-complete');
     Route::get('seminar-training-applications/{education_application}/edit', [EducationApplicationController::class, 'edit'])

@@ -7,7 +7,7 @@
 			<span class="type type_notice">공지</span>
 			@endif
 		</div>
-		<strong>{{ $post->title ?? '' }}</strong>
+		<h1>{{ $post->title ?? '' }}</h1>
 		<dl class="date">
 			<dt>등록일</dt>
 			<dd>{{ isset($post->created_at) ? $post->created_at->format('Y.m.d') : '' }}</dd>

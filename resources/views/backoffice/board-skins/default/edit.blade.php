@@ -276,7 +276,7 @@
                             <div class="board-file-input-content">
                                 <i class="fas fa-cloud-upload-alt"></i>
                                 <span class="board-file-input-text">파일을 선택하거나 여기로 드래그하세요</span>
-                                <span class="board-file-input-subtext">최대 5개, 각 파일 10MB 이하</span>
+                                <span class="board-file-input-subtext">최대 5개, 각 파일 100MB 이하</span>
                             </div>
                         </div>
                         
@@ -340,5 +340,5 @@
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.0/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/summernote@0.8.18/dist/summernote-bs4.min.js"></script>
-    <script src="{{ asset('js/backoffice/board-post-form.js') }}"></script>
+    <script src="{{ asset('js/backoffice/board-post-form.js') }}?v={{ filemtime(public_path('js/backoffice/board-post-form.js')) }}"></script>
 @endsection

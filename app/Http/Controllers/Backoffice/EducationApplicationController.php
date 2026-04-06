@@ -360,6 +360,24 @@ class EducationApplicationController extends BaseController
     }
 
     /**
+     * 일괄 수료 처리 (이수 여부/설문조사 여부 Y)
+     */
+    public function batchGraduate(Request $request)
+    {
+        $request->validate([
+            'application_ids' => 'required|array',
+            'application_ids.*' => 'exists:education_applications,id',
+        ]);
+
+        $count = $this->educationApplicationService->batchGraduate($request->application_ids);
+
+        return response()->json([
+            'success' => true,
+            'message' => $count . '건이 수료 처리되었습니다.',
+        ]);
+    }
+
+    /**
      * 신청별 결제상태 즉시 업데이트
      */
     public function updatePaymentStatus(EducationApplication $education_application, Request $request)

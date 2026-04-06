@@ -5,7 +5,7 @@
 	<div class="board_view">
 		<div class="tit">
 			<div class="types"><span class="type c3">자격증</span></div>
-			<strong>{{ $viewData['name'] }}</strong>
+			<h1>{{ $viewData['name'] }}</h1>
 		</div>
 	</div>
 
@@ -14,7 +14,7 @@
 		<div class="point" id="end"></div>
 		<div class="imgfit"><img src="{{ $viewData['thumb'] }}" alt=""></div>
 		<div class="abso_info">
-			<div class="tit">{{ $viewData['name'] }}</div>
+			<h2 class="tit">{{ $viewData['name'] }}</h2>
 			<div class="con">
 				<dl>
 					<dt>구분</dt>
@@ -45,7 +45,7 @@
 		</div>
 
 		@if($certification->attachments->count() > 0)
-		<div class="otit mt0">첨부파일</div>
+		<h2 class="otit mt0">첨부파일</h2>
 		<div class="download_area">
 			@foreach($certification->attachments as $att)
 			<a href="{{ $att->path }}" download>{{ $att->name }}</a>
@@ -61,7 +61,7 @@
 			</ul>
 			<div class="view_cont">
 				<div class="cont">
-					<div class="otit">시험개요</div>
+					<h2 class="otit">시험개요</h2>
 					@if($certification->exam_overview)
 					<div class="gbox">{!! $certification->exam_overview !!}</div>
 					@else
@@ -69,7 +69,7 @@
 					@endif
 				</div>
 				<div class="cont">
-					<div class="otit">출제경향</div>
+					<h2 class="otit">출제경향</h2>
 					@if($certification->exam_trend)
 					<div class="gbox">{!! $certification->exam_trend !!}</div>
 					@else
@@ -77,7 +77,7 @@
 					@endif
 				</div>
 				<div class="cont">
-					<div class="otit">시험장 정보</div>
+					<h2 class="otit">시험장 정보</h2>
 					@if($certification->exam_venue)
 					<div class="gbox">{!! $certification->exam_venue !!}</div>
 					@else

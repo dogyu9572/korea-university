@@ -158,7 +158,7 @@
                             <div class="member-form-field">
                                 <input type="file" class="board-form-control" id="attachments" name="attachments[]" multiple accept=".jpg,.jpeg,.png,.gif,.pdf,.doc,.docx,.xls,.xlsx,.txt,.zip,.rar"
                                        style="max-width: none !important;">
-                                <small class="board-form-text">파일은 최대 3개까지 가능하고, 1개당 최대 10MB를 초과할 수 없습니다.</small>
+                                <small class="board-form-text">파일은 최대 3개까지 가능하고, 1개당 최대 100MB를 초과할 수 없습니다.</small>
                                 
                                 @if($reply && $reply->files && $reply->files->count() > 0)
                                 <div class="mt-3">
@@ -210,7 +210,7 @@
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.0/dist/js/bootstrap.bundle.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/summernote@0.8.18/dist/summernote-bs4.min.js"></script>
-<script src="{{ asset('js/backoffice/board-post-form.js') }}"></script>
+<script src="{{ asset('js/backoffice/board-post-form.js') }}?v={{ filemtime(public_path('js/backoffice/board-post-form.js')) }}"></script>
 <script>
 document.addEventListener('DOMContentLoaded', function() {
     const replyForm = document.getElementById('replyForm');

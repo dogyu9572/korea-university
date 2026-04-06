@@ -100,7 +100,19 @@
 .education-applications .action-buttons-right,
 .action-buttons-right {
     margin-bottom: 20px;
-    text-align: right;
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    gap: 0.5rem;
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    white-space: nowrap;
+}
+
+.education-applications .action-buttons-right .per-page-form,
+.action-buttons-right .per-page-form {
+    margin: 0;
+    flex-shrink: 0;
 }
 
 /* 테이블 내 셀렉트 박스 (show 페이지) */

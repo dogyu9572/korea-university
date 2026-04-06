@@ -5,17 +5,20 @@
     <meta name="csrf-token" content="{{ csrf_token() }}">
 	<meta name="robots" content="follow">
 	<meta http-equiv="X-UA-Compatible" content="IE=edge">
-	<meta name="subject" content="사단법인 전국대학연구·산학협력관리자협회" />
-	<meta name="title" content="사단법인 전국대학연구·산학협력관리자협회" />
-	<meta name="description" content="사단법인 전국대학연구·산학협력관리자협회" />
-	<meta name="keywords" content="사단법인 전국대학연구·산학협력관리자협회" />
-	<meta name="copyright" content="사단법인 전국대학연구·산학협력관리자협회" />
+	<meta name="subject" content="전국대학 연구·산학협력 관리자 네트워크 협회" />
+	<meta name="title" content="사단법인 전국대학연구·산학협력관리자협회 | 연구행정·산학협력 전문 네트워크" />
+	<meta name="description" content="전국 대학 연구·산학협력 관리자의 정보교류, 연수, 세미나, 자격과정 운영 및 네트워크 강화를 위한 사단법인 협회입니다." />
+	<meta name="keywords" content="전국대학연구산학협력관리자협회, 연구행정, 산학협력, 대학연구관리, 연구지원, 연구행정전문가, 산학협력세미나, 연구관리자 네트워크" />
+	<meta name="copyright" content="© 사단법인 전국대학연구·산학협력관리자협회. All rights reserved." />
+
+	<meta property="og:type" content="website" />
 	<meta property="og:title" content="사단법인 전국대학연구·산학협력관리자협회" />
-	<meta property="og:subject" content="사단법인 전국대학연구·산학협력관리자협회" />
-	<meta property="og:description" content="사단법인 전국대학연구·산학협력관리자협회" />
+	<meta property="og:description" content="전국 대학 연구·산학협력 관리자를 위한 정보교류 및 전문성 강화를 지원하는 협회입니다." />
 	<meta property="og:image" content="/images/og_image.jpg" />
-	<meta name="author" content="http://">
-	<link rel="canonical" href="http://" />
+	<meta property="og:url" content="https://kucra.or.kr/" />
+
+	<meta name="author" content="사단법인 전국대학연구·산학협력관리자협회" />
+	<link rel="canonical" href="https://kucra.or.kr/" />
 	<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes, viewport-fit=cover">
     <title>@yield('title', '사단법인 전국대학연구·산학협력관리자협회')</title>
 
@@ -40,7 +43,7 @@
 	@if(isset($gNum) && $gNum !== '99')
     <header class="header @if(isset($gNum) && $gNum == 'main') main @endif">
 		<div class="inner">
-			<a href="/" class="logo"><img src="/images/logo.svg" alt="logo"><h1>사단법인 전국대학연구·산학협력관리자협회</h1></a>
+			<a href="/" class="logo"><img src="/images/logo.svg" alt="logo"></a>
 			<div class="gnb">
 				<div class="menu {{ $gNum == '01' ? 'on' : '' }}"><a href="/education_certification/education">교육 · 자격증</a>
 					<div class="snb">

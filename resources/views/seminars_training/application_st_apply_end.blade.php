@@ -1,10 +1,10 @@
 @extends('layouts.app')
 @section('content')
 <main class="sub_wrap inner">
-    <div class="stitle nodot">신청 완료</div>
+    <h1 class="stitle nodot">신청 완료</h1>
 
     <div class="end_area">
-        <div class="tit">세미나·해외연수 신청이 완료되었습니다.</div>
+        <h2 class="tit">세미나·해외연수 신청이 완료되었습니다.</h2>
         <p>
             신청번호: <strong>{{ $confirmation['application_number'] ?? '-' }}</strong><br>
             프로그램명: <strong>{{ $confirmation['program_name'] ?? '-' }}</strong>

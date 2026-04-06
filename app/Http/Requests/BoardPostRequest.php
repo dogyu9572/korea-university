@@ -37,7 +37,7 @@ class BoardPostRequest extends FormRequest
             'password' => 'nullable|string|max:255',
             'thumbnail' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:5120', // 5MB
             'attachments' => 'nullable|array',
-            'attachments.*' => 'nullable|file|max:10240', // 10MB
+            'attachments.*' => 'nullable|file|max:102400', // 100MB
             'sort_order' => 'nullable|integer|min:0'
         ];
 
@@ -144,7 +144,7 @@ class BoardPostRequest extends FormRequest
             'thumbnail.mimes' => '썸네일은 jpeg, png, jpg, gif 형식만 지원합니다.',
             'thumbnail.max' => '썸네일은 최대 5MB까지 업로드 가능합니다.',
             'attachments.*.file' => '첨부파일은 파일이어야 합니다.',
-            'attachments.*.max' => '첨부파일은 최대 10MB까지 업로드 가능합니다.'
+            'attachments.*.max' => '첨부파일은 최대 100MB까지 업로드 가능합니다.'
         ];
 
         // 커스텀 필드 에러 메시지 추가

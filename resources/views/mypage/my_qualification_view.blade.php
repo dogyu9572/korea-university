@@ -2,7 +2,7 @@
 @section('content')
 <main class="sub_wrap inner">
 
-	<div class="stitle tal bdb">나의 자격 현황
+	<div class="stitle tal bdb"><h1>나의 자격 현황</h1>
 		<div class="btns_abso pc_vw">
 			<a href="{{ route('mypage.print.admission_ticket', $application->id) }}" target="_blank" class="btn btn_wbb">수험표 출력</a>
 			@if($application->payment_status === '입금완료')
@@ -23,7 +23,7 @@
 		$examDateStr = $cert && $cert->exam_date ? $cert->exam_date->format('Y-m-d H:i') : '';
 		$venueName = $application->examVenue ? $application->examVenue->name : ($cert && $cert->exam_venue ? $cert->exam_venue : '');
 	@endphp
-	<div class="otit">응시 및 자격 정보</div>
+	<h2 class="otit">응시 및 자격 정보</h2>
 	<div class="glbox dl_tbl">
 		<dl>
 			<dt>시험명</dt>
@@ -59,7 +59,7 @@
 		</dl>
 	</div>
 
-	<div class="otit">결제/입금 정보</div>
+	<h2 class="otit">결제/입금 정보</h2>
 	<div class="glbox dl_tbl">
 		<dl>
 			<dt>결제상태</dt>
@@ -85,7 +85,7 @@
 		</dl>
 	</div>
 
-	<div class="otit">시험 응시 유의사항</div>
+	<h2 class="otit">시험 응시 유의사항</h2>
 	<ul class="gbox dots_list">
 		<li>시험 당일 수험표와 신분증을 반드시 지참해야 합니다.</li>
 		<li>시험 시작 20분 전까지 입실해야 합니다.</li>

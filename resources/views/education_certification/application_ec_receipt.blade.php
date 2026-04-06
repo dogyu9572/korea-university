@@ -1,13 +1,13 @@
 @extends('layouts.app')
 @section('content')
 <main class="sub_wrap inner">
-    <div class="stitle tal bdb">교육 · 자격증 신청</div>
+    <h1 class="stitle tal bdb">교육 · 자격증 신청</h1>
 
     <form method="POST" action="{{ route('education_certification.application_ec_receipt.store') }}" enctype="multipart/form-data" class="application_form">
         @csrf
         <input type="hidden" name="certification_id" value="{{ $certification->id }}">
 
-        <div class="otit">시험 정보</div>
+        <h2 class="otit">시험 정보</h2>
         <div class="glbox dl_slice">
             <dl>
                 <dt>시험명</dt>
@@ -37,7 +37,7 @@
             </dl>
         </div>
 
-        <div class="otit">신청자 정보 입력</div>
+        <h2 class="otit">신청자 정보 입력</h2>
         <div class="glbox dl_slice in_inputs">
             <dl>
                 <dt>성명</dt>
@@ -120,7 +120,7 @@
             </dl>
         </div>
 
-        <div class="otit">결제 및 환불 안내</div>
+        <h2 class="otit">결제 및 환불 안내</h2>
         <div class="tbl th_bg">
             <table>
                 <colgroup>
@@ -155,7 +155,7 @@
             </table>
         </div>
 
-        <div class="otit">증빙서류 발행 여부</div>
+        <h2 class="otit">증빙서류 발행 여부</h2>
         <div class="glbox dl_slice in_inputs dt_long">
             <dl>
                 <dt>현금영수증 발행</dt>
