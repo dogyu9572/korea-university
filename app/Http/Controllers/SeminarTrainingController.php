@@ -80,6 +80,7 @@ class SeminarTrainingController extends Controller
             'member' => $member,
             'feeOptions' => $this->applicationService->buildSeminarTrainingFeeOptions($program),
             'refundPolicies' => $this->applicationService->buildSeminarTrainingRefundPolicies($program),
+            'tempFilePassportCopy' => $stApplyDisplay['passport_copy'] ?? '',
             'tempFileBusinessRegistration' => $stApplyDisplay['business_registration'] ?? '',
         ]);
 

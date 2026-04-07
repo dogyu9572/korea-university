@@ -535,6 +535,8 @@ class EducationApplicationService
                 'seminar_training_id',
                 'member_id',
                 'applicant_name',
+                'english_last_name',
+                'english_first_name',
                 'affiliation',
                 'phone_number',
                 'email',
@@ -654,6 +656,18 @@ class EducationApplicationService
                 $application->update(['id_photo_path' => $path]);
             }
 
+            // 여권사본 첨부 저장 (세미나/해외연수)
+            if ($request->hasFile('passport_copy')) {
+                $path = $request->file('passport_copy')->store('education_applications/passport_copy', 'public');
+                EducationApplicationAttachment::create([
+                    'education_application_id' => $application->id,
+                    'path' => Storage::url($path),
+                    'name' => $request->file('passport_copy')->getClientOriginalName(),
+                    'type' => 'passport_copy',
+                    'order' => 0,
+                ]);
+            }
+
             // 첨부파일 저장
             if ($request->hasFile('attachments')) {
                 $order = 0;
@@ -686,6 +700,8 @@ class EducationApplicationService
         try {
             $data = $request->only([
                 'applicant_name',
+                'english_last_name',
+                'english_first_name',
                 'affiliation',
                 'phone_number',
                 'email',
@@ -828,6 +844,22 @@ class EducationApplicationService
                     Storage::disk('public')->delete($oldPath);
                 }
                 $data['id_photo_path'] = null;
+            }
+
+            // 여권사본 첨부 수정/삭제 처리
+            if ($request->filled('remove_passport_copy')) {
+                $application->attachments()->where('type', 'passport_copy')->delete();
+            }
+            if ($request->hasFile('passport_copy')) {
+                $application->attachments()->where('type', 'passport_copy')->delete();
+                $path = $request->file('passport_copy')->store('education_applications/passport_copy', 'public');
+                EducationApplicationAttachment::create([
+                    'education_application_id' => $application->id,
+                    'path' => Storage::url($path),
+                    'name' => $request->file('passport_copy')->getClientOriginalName(),
+                    'type' => 'passport_copy',
+                    'order' => 0,
+                ]);
             }
 
             // 교육 신청 수정

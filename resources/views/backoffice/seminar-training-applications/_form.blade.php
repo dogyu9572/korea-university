@@ -89,6 +89,28 @@
             </div>
             <div class="member-form-row member-form-row-inline">
                 <div class="member-form-inline-item">
+                    <label class="member-form-label">영문 성</label>
+                    <div class="member-form-field">
+                        <input type="text" class="board-form-control @error('english_last_name') is-invalid @enderror"
+                               id="english_last_name" name="english_last_name" value="{{ old('english_last_name', $app?->english_last_name ?? '') }}" maxlength="100" placeholder="Last Name">
+                        @error('english_last_name')
+                            <div class="invalid-feedback">{{ $message }}</div>
+                        @enderror
+                    </div>
+                </div>
+                <div class="member-form-inline-item">
+                    <label class="member-form-label">영문 이름</label>
+                    <div class="member-form-field">
+                        <input type="text" class="board-form-control @error('english_first_name') is-invalid @enderror"
+                               id="english_first_name" name="english_first_name" value="{{ old('english_first_name', $app?->english_first_name ?? '') }}" maxlength="100" placeholder="First Name">
+                        @error('english_first_name')
+                            <div class="invalid-feedback">{{ $message }}</div>
+                        @enderror
+                    </div>
+                </div>
+            </div>
+            <div class="member-form-row member-form-row-inline">
+                <div class="member-form-inline-item">
                     <label class="member-form-label">휴대폰 번호 <span class="required">*</span></label>
                     <div class="member-form-field">
                         <input type="text" class="board-form-control @error('phone_number') is-invalid @enderror"
@@ -235,6 +257,11 @@
             <div class="member-form-row">
                 <label class="member-form-label">환불계좌정보</label>
                 <div class="member-form-field">
+                    @php
+                        $bankOptions = ['KB국민은행','신한은행','우리은행','하나은행','NH농협은행','IBK기업은행','카카오뱅크','토스뱅크','SC제일은행','한국씨티은행','케이뱅크','새마을금고','신협','우체국','수협은행','KDB산업은행','한국수출입은행','저축은행','부산은행','경남은행','대구은행','광주은행','전북은행','제주은행'];
+                        $savedBankName = old('refund_bank_name', $app?->refund_bank_name ?? '');
+                        $isCustomBank = $savedBankName !== '' && !in_array($savedBankName, $bankOptions, true);
+                    @endphp
                     <div class="refund-account-row">
                         <div class="form-field-flex">
                             <label class="sub-label">예금주명</label>
@@ -246,12 +273,15 @@
                         </div>
                         <div class="form-field-flex">
                             <label class="sub-label">은행선택</label>
-                            <select name="refund_bank_name" class="board-form-control @error('refund_bank_name') is-invalid @enderror">
+                            <select name="refund_bank_name_select" id="refund_bank_name_select" class="board-form-control @error('refund_bank_name') is-invalid @enderror">
                                 <option value="">선택해주세요</option>
-                                @foreach(['KB국민은행','신한은행','우리은행','하나은행','NH농협은행','IBK기업은행','카카오뱅크','토스뱅크','SC제일은행','한국씨티은행','케이뱅크','새마을금고','신협','우체국'] as $bank)
-                                    <option value="{{ $bank }}" @selected(old('refund_bank_name', $app?->refund_bank_name ?? '') == $bank)>{{ $bank }}</option>
+                                @foreach($bankOptions as $bank)
+                                    <option value="{{ $bank }}" @selected($savedBankName == $bank)>{{ $bank }}</option>
                                 @endforeach
+                                <option value="기타" @selected($isCustomBank)>기타</option>
                             </select>
+                            <input type="hidden" name="refund_bank_name" id="refund_bank_name" value="{{ $savedBankName }}">
+                            <input type="text" id="refund_bank_name_other" class="board-form-control mt-2" placeholder="기타 은행명을 입력해주세요." value="{{ $isCustomBank ? $savedBankName : '' }}" @if(!$isCustomBank) style="display:none;" @endif>
                             @error('refund_bank_name')
                                 <div class="invalid-feedback">{{ $message }}</div>
                             @enderror
@@ -265,6 +295,32 @@
                             @enderror
                         </div>
                     </div>
+                </div>
+            </div>
+            <div class="member-form-row">
+                <label class="member-form-label">여권사본 첨부</label>
+                <div class="member-form-field">
+                    @php
+                        $passportAttachment = $app?->attachments?->firstWhere('type', 'passport_copy');
+                    @endphp
+                    <div class="form-row-inline mb-1">
+                        <input type="file" class="board-form-control form-field-flex-300 @error('passport_copy') is-invalid @enderror" name="passport_copy" accept=".pdf,.jpg,.jpeg,.png">
+                    </div>
+                    @if($passportAttachment)
+                        <div class="mt-2" style="display:flex;align-items:center;gap:8px;flex-wrap:nowrap;">
+                            <span class="sub-label" style="margin-bottom:0;">등록된 파일:</span>
+                            <span class="attachment-item-inline" id="passport_copy_attachment_item">
+                                <a href="{{ $passportAttachment->path }}" target="_blank">{{ $passportAttachment->name }}</a>
+                                <button type="button" class="btn btn-outline-danger btn-sm delete-attachment-btn ms-1" data-action="remove-passport-copy">
+                                    삭제
+                                </button>
+                            </span>
+                            <input type="hidden" name="remove_passport_copy" id="remove_passport_copy" value="">
+                        </div>
+                    @endif
+                    @error('passport_copy')
+                        <div class="invalid-feedback d-block">{{ $message }}</div>
+                    @enderror
                 </div>
             </div>
         </div>
@@ -527,7 +583,7 @@
                             <button type="button" class="btn btn-outline-danger btn-sm ml-1" data-action="clear-attachment-files">삭제</button>
                         </div>
                         @if($isEdit && $app?->attachments->count() > 0)
-                            <div class="mt-2">
+                            <div class="mt-2" style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
                                 <span class="sub-label" style="margin-bottom:0;">등록된 파일:</span>
                                 @foreach($app?->attachments as $index => $attachment)
                                     <span class="attachment-item-inline">

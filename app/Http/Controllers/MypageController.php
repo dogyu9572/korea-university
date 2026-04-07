@@ -142,6 +142,8 @@ class MypageController extends Controller
             $member = $application->member;
             $existingBiz = $application->attachments()->where('type', 'business_registration')->first();
             $existingBusinessRegistration = $existingBiz ? $existingBiz->name : '';
+            $existingPassport = $application->attachments()->where('type', 'passport_copy')->first();
+            $existingPassportCopy = $existingPassport ? $existingPassport->name : '';
             $viewData = array_merge($meta, [
                 'isEdit' => true,
                 'application' => $application,
@@ -149,6 +151,8 @@ class MypageController extends Controller
                 'member' => $member,
                 'feeOptions' => $seminarService->buildSeminarTrainingFeeOptions($program),
                 'refundPolicies' => $seminarService->buildSeminarTrainingRefundPolicies($program),
+                'tempFilePassportCopy' => '',
+                'existingPassportCopy' => $existingPassportCopy,
                 'tempFileBusinessRegistration' => '',
                 'existingBusinessRegistration' => $existingBusinessRegistration,
             ]);

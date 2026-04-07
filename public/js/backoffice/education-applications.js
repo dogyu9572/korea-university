@@ -561,6 +561,35 @@ function initMemberSearchForm() {
 
 // create/edit 페이지: 회원 검색 버튼 바인딩
 function initCreateEditPageHandlers() {
+    const bankSelectEl = document.getElementById('refund_bank_name_select');
+    const bankHiddenEl = document.getElementById('refund_bank_name');
+    const bankOtherEl = document.getElementById('refund_bank_name_other');
+    if (bankSelectEl && bankHiddenEl && bankOtherEl) {
+        const syncBank = function () {
+            if (bankSelectEl.value === '기타') {
+                bankOtherEl.style.display = '';
+                bankHiddenEl.value = (bankOtherEl.value || '').trim();
+            } else {
+                bankOtherEl.style.display = 'none';
+                bankHiddenEl.value = bankSelectEl.value || '';
+            }
+        };
+        bankSelectEl.addEventListener('change', syncBank);
+        bankOtherEl.addEventListener('input', syncBank);
+        syncBank();
+    }
+
+    const removePassportBtn = document.querySelector('[data-action="remove-passport-copy"]');
+    if (removePassportBtn) {
+        removePassportBtn.addEventListener('click', function () {
+            if (!confirm('여권사본 파일을 삭제하시겠습니까?')) return;
+            const hidden = document.getElementById('remove_passport_copy');
+            const item = document.getElementById('passport_copy_attachment_item');
+            if (hidden) hidden.value = '1';
+            if (item) item.style.display = 'none';
+        });
+    }
+
     const clearAttachmentBtn = document.querySelector('[data-action="clear-attachment-files"]');
     if (clearAttachmentBtn) {
         clearAttachmentBtn.addEventListener('click', function () {

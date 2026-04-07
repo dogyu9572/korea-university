@@ -18,6 +18,8 @@ class EducationApplication extends Model
         'seminar_training_id',
         'member_id',
         'applicant_name',
+        'english_last_name',
+        'english_first_name',
         'affiliation',
         'phone_number',
         'email',

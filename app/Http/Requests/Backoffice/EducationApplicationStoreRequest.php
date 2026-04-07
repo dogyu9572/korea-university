@@ -26,6 +26,8 @@ class EducationApplicationStoreRequest extends FormRequest
             'seminar_training_id' => 'required_without_all:education_id,online_education_id,certification_id|nullable|exists:seminar_trainings,id',
             'member_id' => 'nullable|exists:members,id',
             'applicant_name' => 'required|string|max:50',
+            'english_last_name' => 'nullable|string|max:100',
+            'english_first_name' => 'nullable|string|max:100',
             'affiliation' => 'nullable|string|max:100',
             'phone_number' => 'required|string|max:20',
             'email' => 'nullable|email|max:100',
@@ -51,6 +53,7 @@ class EducationApplicationStoreRequest extends FormRequest
             'refund_account_holder' => 'nullable|string|max:50',
             'refund_bank_name' => 'nullable|string|max:50',
             'refund_account_number' => 'nullable|string|max:50',
+            'passport_copy' => 'nullable|file|mimes:pdf,jpg,jpeg,png|max:10240',
             'attachments.*' => 'nullable|file|max:102400',
             // 온라인교육 전용
             'course_status' => 'nullable|string|in:접수,승인,만료,수강취소',

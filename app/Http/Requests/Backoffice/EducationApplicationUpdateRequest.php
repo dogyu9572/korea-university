@@ -25,6 +25,8 @@ class EducationApplicationUpdateRequest extends FormRequest
             'phone_number' => 'required|string|max:20',
             'email' => 'nullable|email|max:100',
             'gender' => 'nullable|string|in:남,여',
+            'english_last_name' => 'nullable|string|max:100',
+            'english_first_name' => 'nullable|string|max:100',
             'application_date' => 'required|date',
             'is_completed' => 'nullable|boolean',
             'is_survey_completed' => 'nullable|boolean',
@@ -49,6 +51,8 @@ class EducationApplicationUpdateRequest extends FormRequest
             'refund_account_holder' => 'nullable|string|max:50',
             'refund_bank_name' => 'nullable|string|max:50',
             'refund_account_number' => 'nullable|string|max:50',
+            'passport_copy' => 'nullable|file|mimes:pdf,jpg,jpeg,png|max:10240',
+            'remove_passport_copy' => 'nullable|boolean',
             'attachments.*' => 'nullable|file|max:102400',
             // 온라인교육 전용
             'course_status' => 'nullable|string|in:접수,승인,만료,수강취소',

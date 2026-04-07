@@ -27,7 +27,7 @@ class SeminarTrainingApplicationRequest extends FormRequest
     protected function failedValidation(Validator $validator): void
     {
         try {
-            TempUploadSessionHelper::saveToSession($this, ['business_registration'], 'seminar_training_apply_temp_files');
+            TempUploadSessionHelper::saveToSession($this, ['passport_copy', 'business_registration'], 'seminar_training_apply_temp_files');
         } catch (\Throwable $e) {
             report($e);
         }
@@ -95,6 +95,8 @@ class SeminarTrainingApplicationRequest extends FormRequest
             'seminar_training_id' => ['required', 'integer', 'exists:seminar_trainings,id'],
             'fee_type' => ['required', 'string', 'max:50'],
             'applicant_name' => ['nullable', 'string', 'max:50'],
+            'english_last_name' => ['required', 'string', 'max:100'],
+            'english_first_name' => ['required', 'string', 'max:100'],
             'affiliation' => ['nullable', 'string', 'max:100'],
             'phone_number' => ['nullable', 'string', 'max:20'],
             'email' => ['nullable', 'email', 'max:100'],
@@ -111,6 +113,7 @@ class SeminarTrainingApplicationRequest extends FormRequest
             'contact_person_name' => ['required_if:has_tax_invoice,1', 'nullable', 'string', 'max:50'],
             'contact_person_email' => ['required_if:has_tax_invoice,1', 'nullable', 'email', 'max:100'],
             'contact_person_phone' => ['required_if:has_tax_invoice,1', 'nullable', 'string', 'max:20'],
+            'passport_copy' => ['nullable', 'file', 'mimes:pdf,jpg,jpeg,png', 'max:2048'],
             'business_registration' => ['nullable', 'file', 'mimes:pdf,jpg,jpeg,png', 'max:2048'],
             'attachments.*' => ['nullable', 'file', 'mimes:pdf,jpg,jpeg,png', 'max:2048'],
             'roommate_member_id' => ['nullable', 'integer', 'exists:members,id'],
@@ -130,6 +133,8 @@ class SeminarTrainingApplicationRequest extends FormRequest
             'seminar_training_id' => '세미나·해외연수 프로그램',
             'fee_type' => '참가비 유형',
             'gender' => '성별',
+            'english_last_name' => '영문 성',
+            'english_first_name' => '영문 이름',
             'refund_account_holder' => '환불 계좌 예금주명',
             'refund_bank_name' => '환불 계좌 은행명',
             'refund_account_number' => '환불 계좌번호',
@@ -140,6 +145,7 @@ class SeminarTrainingApplicationRequest extends FormRequest
             'contact_person_name' => '담당자명',
             'contact_person_email' => '담당자 이메일',
             'contact_person_phone' => '담당자 연락처',
+            'passport_copy' => '여권 사본',
             'business_registration' => '사업자등록증',
             'roommate_member_id' => '룸메이트 회원',
             'roommate_name' => '룸메이트 이름',

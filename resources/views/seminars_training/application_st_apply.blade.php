@@ -6,15 +6,16 @@
 	@php
 		$isEdit = isset($isEdit) && $isEdit && isset($application);
 		$formAction = $isEdit ? route('mypage.application_status.update', $application->id) : route('seminars_training.application_st_apply.store');
+		$programTypeLabel = $program->type ?? '세미나';
 	@endphp
 	<form method="POST" action="{{ $formAction }}" enctype="multipart/form-data" class="application_form" data-roommate-check-url="{{ route('seminars_training.roommate_check') }}" @if($errors->any()) data-join-errors="1" @endif>
 		@csrf
 		<input type="hidden" name="seminar_training_id" value="{{ $isEdit ? ($application->seminar_training_id ?? $program->id) : $program->id }}">
 
-	<h2 class="otit">세미나 신청</h2>
+	<h2 class="otit">{{ $programTypeLabel }} 신청</h2>
 	<div class="glbox dl_slice">
 		<dl>
-			<dt>세미나명</dt>
+			<dt>{{ $programTypeLabel }}명</dt>
 			<dd>{{ $program->name }}</dd>
 		</dl>
 		<dl>
@@ -42,6 +43,19 @@
 			<dt>성명</dt>
 			<dd>
 				<input type="text" name="applicant_name" class="text w1" value="{{ old('applicant_name', $member->name ?? '') }}" readonly>
+			</dd>
+		</dl>
+		<dl>
+			<dt>영문명</dt>
+			<dd class="colm">
+				<input type="text" name="english_last_name" class="text w1 @error('english_last_name') is-invalid @enderror" placeholder="성(Last Name)" value="{{ old('english_last_name', isset($application) ? ($application->english_last_name ?? '') : '') }}">
+				<input type="text" name="english_first_name" class="text w1 @error('english_first_name') is-invalid @enderror" placeholder="이름(First Name)" value="{{ old('english_first_name', isset($application) ? ($application->english_first_name ?? '') : '') }}">
+				@error('english_last_name')
+					<p class="join_field_error" style="color:#c00;font-size:0.875rem;margin-top:0.25rem;">{{ $message }}</p>
+				@enderror
+				@error('english_first_name')
+					<p class="join_field_error" style="color:#c00;font-size:0.875rem;margin-top:0.25rem;">{{ $message }}</p>
+				@enderror
 			</dd>
 		</dl>
 		<dl>
@@ -85,17 +99,45 @@
 				@error('refund_account_holder')
 					<p class="join_field_error" style="color:#c00;font-size:0.875rem;margin-top:0.25rem;">{{ $message }}</p>
 				@enderror
-				<select name="refund_bank_name" class="text w1 @error('refund_bank_name') is-invalid @enderror">
+				@php
+					$bankOptions = ['KB국민은행','신한은행','우리은행','하나은행','NH농협은행','IBK기업은행','카카오뱅크','토스뱅크','새마을금고','SC제일은행','씨티은행','수협은행','KDB산업은행','한국수출입은행','신협','우체국','산림조합','저축은행','부산은행','경남은행','대구은행','광주은행','전북은행','제주은행'];
+					$savedBankName = old('refund_bank_name', isset($application) ? ($application->refund_bank_name ?? '') : '');
+					$isCustomBank = $savedBankName !== '' && !in_array($savedBankName, $bankOptions, true);
+				@endphp
+				<select name="refund_bank_name_select" id="refund_bank_name_select" class="text w1 @error('refund_bank_name') is-invalid @enderror">
 					<option value="">은행을 선택해주세요.</option>
-					@foreach (['KB국민은행','신한은행','우리은행','하나은행','NH농협은행','IBK기업은행','카카오뱅크','토스뱅크','새마을금고','SC제일은행'] as $bank)
-						<option value="{{ $bank }}" @selected(old('refund_bank_name', isset($application) ? ($application->refund_bank_name ?? '') : '') === $bank)>{{ $bank }}</option>
+					@foreach ($bankOptions as $bank)
+						<option value="{{ $bank }}" @selected($savedBankName === $bank)>{{ $bank }}</option>
 					@endforeach
+					<option value="기타" @selected($isCustomBank)>기타</option>
 				</select>
+				<input type="hidden" name="refund_bank_name" id="refund_bank_name" value="{{ $savedBankName }}">
+				<input type="text" id="refund_bank_name_other" class="text w1" placeholder="은행명을 입력해주세요." value="{{ $isCustomBank ? $savedBankName : '' }}" @if(!$isCustomBank) style="display:none;" @endif>
 				@error('refund_bank_name')
 					<p class="join_field_error" style="color:#c00;font-size:0.875rem;margin-top:0.25rem;">{{ $message }}</p>
 				@enderror
 				<input type="text" name="refund_account_number" class="text w1 @error('refund_account_number') is-invalid @enderror" placeholder="계좌번호를 입력해주세요." value="{{ old('refund_account_number', isset($application) ? ($application->refund_account_number ?? '') : '') }}">
 				@error('refund_account_number')
+					<p class="join_field_error" style="color:#c00;font-size:0.875rem;margin-top:0.25rem;">{{ $message }}</p>
+				@enderror
+			</dd>
+		</dl>
+		<dl>
+			<dt>여권 사본 첨부</dt>
+			<dd class="file_inputs" @if(!empty($tempFilePassportCopy ?? null)) data-temp-file="passport_copy" @endif @if(!empty($existingPassportCopy ?? null)) data-existing-file="passport_copy" @endif>
+				<label class="file">
+					<input type="file" name="passport_copy" accept=".pdf,.jpg,.jpeg,.png">
+					<span>파일선택</span>
+				</label>
+				@if(!empty($tempFilePassportCopy ?? null))
+					<div class="file_input w100p"><button type="button">{{ $tempFilePassportCopy }}</button></div>
+				@elseif(!empty($existingPassportCopy ?? null))
+					<div class="file_input w100p"><button type="button">{{ $existingPassportCopy }}</button></div>
+					<p class="ne mt0 existing_file_msg" style="font-size:0.875rem;">기존 첨부 파일입니다. 변경하려면 새 파일을 선택하세요.</p>
+				@else
+					<div class="file_input">선택된 파일 없음</div>
+				@endif
+				@error('passport_copy')
 					<p class="join_field_error" style="color:#c00;font-size:0.875rem;margin-top:0.25rem;">{{ $message }}</p>
 				@enderror
 			</dd>

@@ -239,6 +239,7 @@ class SeminarTrainingApplicationService
 
             $application = EducationApplication::create($data);
 
+            $this->storePassportCopy($application, $request->file('passport_copy'));
             $this->storeBusinessRegistration($application, $request->file('business_registration'));
             $this->storeAdditionalAttachments($application, $request->file('attachments', []));
 
@@ -263,12 +264,21 @@ class SeminarTrainingApplicationService
             'participation_fee' => $participationFee,
             'fee_type' => $feeType,
             'gender' => $request->input('gender'),
+            'english_last_name' => trim((string) $request->input('english_last_name')),
+            'english_first_name' => trim((string) $request->input('english_first_name')),
             'roommate_member_id' => $request->filled('roommate_member_id') ? (int) $request->input('roommate_member_id') : null,
             'roommate_name' => $request->filled('roommate_name') ? trim((string) $request->input('roommate_name')) : null,
             'roommate_phone' => $request->filled('roommate_phone') ? trim((string) $request->input('roommate_phone')) : null,
             'request_notes' => $request->filled('request_notes') ? trim((string) $request->input('request_notes')) : null,
         ]));
 
+        if ($request->filled('remove_passport_copy')) {
+            $application->attachments()->where('type', 'passport_copy')->delete();
+        }
+        if ($request->hasFile('passport_copy')) {
+            $application->attachments()->where('type', 'passport_copy')->delete();
+            $this->storePassportCopy($application, $request->file('passport_copy'));
+        }
         if ($request->filled('remove_business_registration')) {
             $application->attachments()->where('type', 'business_registration')->delete();
         }
@@ -491,6 +501,8 @@ class SeminarTrainingApplicationService
             'application_number' => $this->generateApplicationNumber($now),
             'member_id' => $member->id,
             'applicant_name' => $name,
+            'english_last_name' => trim((string) $request->input('english_last_name')),
+            'english_first_name' => trim((string) $request->input('english_first_name')),
             'affiliation' => $affiliation,
             'phone_number' => $phone,
             'email' => $email,
@@ -590,6 +602,15 @@ class SeminarTrainingApplicationService
         }
 
         $this->storeAttachment($application, $file, 'business_registration', 0);
+    }
+
+    private function storePassportCopy(EducationApplication $application, $file): void
+    {
+        if (!$file) {
+            return;
+        }
+
+        $this->storeAttachment($application, $file, 'passport_copy', 0);
     }
 
     private function storeAdditionalAttachments(EducationApplication $application, array $files): void

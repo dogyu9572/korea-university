@@ -246,6 +246,30 @@ function setupPhoneFormat() {
     });
 }
 
+function setupRefundBankSelect() {
+    var selectEl = document.getElementById('refund_bank_name_select');
+    var hiddenEl = document.getElementById('refund_bank_name');
+    var otherEl = document.getElementById('refund_bank_name_other');
+    if (!selectEl || !hiddenEl || !otherEl) {
+        return;
+    }
+
+    function syncValue() {
+        if (selectEl.value === '기타') {
+            otherEl.style.display = '';
+            hiddenEl.value = (otherEl.value || '').trim();
+            return;
+        }
+
+        otherEl.style.display = 'none';
+        hiddenEl.value = selectEl.value || '';
+    }
+
+    selectEl.addEventListener('change', syncValue);
+    otherEl.addEventListener('input', syncValue);
+    syncValue();
+}
+
 function layerShow(id) {
     const el = document.getElementById(id);
     if (el) {
@@ -332,6 +356,7 @@ document.addEventListener('DOMContentLoaded', function () {
     setupFormSubmit();
     setupReceiptToggles();
     setupPhoneFormat();
+    setupRefundBankSelect();
     setupRoommateSectionToggle();
     setupRoommateSearch();
 
