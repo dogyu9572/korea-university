@@ -37,16 +37,16 @@
 			</colgroup>
 			<thead>
 				<tr>
-					<th>지회</th>
 					<th>회원학교</th>
+					<th>지회</th>
 					<th>공식 웹사이트</th>
 				</tr>
 			</thead>
 			<tbody>
 				@forelse($schools as $school)
 				<tr>
-					<td class="branch">{{ $school->branch ?? '' }}</td>
 					<td class="school">{{ $school->school_name ?? '' }}</td>
+					<td class="branch">{{ $school->branch ?? '' }}</td>
 					<td class="link">
 						@if(!empty($school->url))
 						<a href="{{ $school->url }}" target="_blank" rel="noopener noreferrer" class="btn_outlink">링크</a>

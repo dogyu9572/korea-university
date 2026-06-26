@@ -3,7 +3,7 @@
 namespace App\Http\Controllers\Backoffice;
 
 use App\Http\Controllers\Controller;
-use App\Models\VisitorLog;
+use App\Models\UserAccessLog;
 use App\Models\AdminAccessLog;
 use Illuminate\Http\Request;
 
@@ -48,10 +48,9 @@ class LogController extends Controller
      */
     public function userAccessLogs(Request $request)
     {
-        $logs = VisitorLog::with('user')
-            ->users()
+        $logs = UserAccessLog::query()
             ->search($request)
-            ->orderBy('created_at', 'desc')
+            ->orderBy('login_at', 'desc')
             ->paginate($request->get('per_page', 20));
 
         return view('backoffice.logs.user-access', compact('logs'));

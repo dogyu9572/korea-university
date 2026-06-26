@@ -192,7 +192,38 @@
 /* 반응형 스타일은 boards.css에서 처리 */
 /* 추가 반응형 스타일만 여기에 정의 */
 
-/* 학교 검색 팝업 기본 숨김 */
-.popup#searchSchool {
-    display: none !important;
+/* 회원교 검색 모달: 화면 높이를 활용하고 목록 영역만 스크롤 */
+#schoolSearchModal .modal-dialog {
+    max-height: calc(100vh - 2rem);
+    margin: 1rem auto;
+}
+#schoolSearchModal .modal-content {
+    max-height: calc(100vh - 2rem);
+    display: flex;
+    flex-direction: column;
+}
+#schoolSearchModal .modal-header {
+    flex-shrink: 0;
+}
+#schoolSearchModal .modal-body {
+    flex: 1 1 auto;
+    min-height: 0;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+}
+#schoolSearchModal .member-search-modal-filter {
+    margin-bottom: 20px;
+    flex-shrink: 0;
+}
+#schoolSearchModal .school-search-table-wrap {
+    flex: 1 1 auto;
+    min-height: 360px;
+    overflow-y: auto;
+}
+#schoolSearchModal .board-table th:last-child,
+#schoolSearchModal .board-table td:last-child {
+    text-align: center;
+    white-space: nowrap;
+    width: 88px;
 }

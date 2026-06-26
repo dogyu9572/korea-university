@@ -8,8 +8,9 @@
 
 @section('scripts')
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.0/dist/js/bootstrap.bundle.min.js"></script>
 <script src="https://t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js"></script>
-<script src="{{ asset('js/backoffice/members.js') }}"></script>
+<script src="{{ asset('js/backoffice/members.js') }}?v=20260416c"></script>
 <script>
 // 가입 구분에 따라 비밀번호 필드 표시/숨김
 document.addEventListener('DOMContentLoaded', function() {
@@ -286,5 +287,5 @@ document.addEventListener('DOMContentLoaded', function() {
     </div>
 </div>
 
-@include('member.pop_search_school')
+@include('backoffice.members._school_search_modal')
 @endsection

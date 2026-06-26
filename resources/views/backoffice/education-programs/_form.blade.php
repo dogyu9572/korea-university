@@ -384,9 +384,9 @@
                             </tr>
                             <tr>
                                 <th>비회원교</th>
-                                <td><input type="number" class="board-form-control form-control-sm" name="fee_guest_twin" value="{{ old('fee_guest_twin', $program->fee_guest_twin ? (int)$program->fee_guest_twin : '') }}" min="0" step="1"></td>
-                                <td><input type="number" class="board-form-control form-control-sm" name="fee_guest_single" value="{{ old('fee_guest_single', $program->fee_guest_single ? (int)$program->fee_guest_single : '') }}" min="0" step="1"></td>
-                                <td><input type="number" class="board-form-control form-control-sm" name="fee_guest_no_stay" value="{{ old('fee_guest_no_stay', $program->fee_guest_no_stay ? (int)$program->fee_guest_no_stay : '') }}" min="0" step="1"></td>
+                                <td><input type="number" class="board-form-control form-control-sm" name="fee_guest_twin" value="{{ old('fee_guest_twin', $program->fee_guest_twin !== null && $program->fee_guest_twin !== '' ? (int)$program->fee_guest_twin : '') }}" min="0" step="1"></td>
+                                <td><input type="number" class="board-form-control form-control-sm" name="fee_guest_single" value="{{ old('fee_guest_single', $program->fee_guest_single !== null && $program->fee_guest_single !== '' ? (int)$program->fee_guest_single : '') }}" min="0" step="1"></td>
+                                <td><input type="number" class="board-form-control form-control-sm" name="fee_guest_no_stay" value="{{ old('fee_guest_no_stay', $program->fee_guest_no_stay !== null && $program->fee_guest_no_stay !== '' ? (int)$program->fee_guest_no_stay : '') }}" min="0" step="1"></td>
                             </tr>
                         </tbody>
                     </table>

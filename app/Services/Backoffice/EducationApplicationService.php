@@ -326,6 +326,18 @@ class EducationApplicationService
     }
 
     /**
+     * 선택된 신청들의 설문조사 여부를 일괄 Y로 변경합니다.
+     */
+    public function batchSurveyComplete(array $applicationIds): int
+    {
+        return EducationApplication::whereIn('id', $applicationIds)
+            ->where('is_survey_completed', false)
+            ->update([
+                'is_survey_completed' => true,
+            ]);
+    }
+
+    /**
      * 신청별 결제상태 업데이트
      */
     public function updateApplicationPaymentStatus(EducationApplication $application, string $status): void

@@ -50,9 +50,15 @@ class SchoolService
             $query->searchByName($filters['school_name']);
         }
 
-        // 정렬 (연도 내림차순, 생성일 내림차순)
-        $query->orderBy('year', 'desc')
-              ->orderBy('created_at', 'desc');
+        // 정렬: 공개 회원기관 등에서 학교명 가나다순 요청 시
+        if (!empty($filters['order_by_school_name'])) {
+            $query->orderBy('school_name', 'asc')
+                ->orderBy('branch', 'asc');
+        } else {
+            // 기본 (백오피스 등): 연도 내림차순, 생성일 내림차순
+            $query->orderBy('year', 'desc')
+                ->orderBy('created_at', 'desc');
+        }
 
         // 페이지네이션
         return $query->paginate($perPage)->withQueryString();

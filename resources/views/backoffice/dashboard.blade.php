@@ -130,11 +130,11 @@
                 <div class="visitor-summary">
                     <div class="visitor-stat">
                         <span class="visitor-label">오늘 방문객</span>
-                        <span class="visitor-number">{{ $visitorStats['today_visitors'] ?? 0 }}</span>
+                        <span class="visitor-number">{{ number_format($visitorStats['today'] ?? 0) }}</span>
                     </div>
                     <div class="visitor-stat">
                         <span class="visitor-label">총 방문객</span>
-                        <span class="visitor-number">{{ number_format($visitorStats['total_visitors'] ?? 0) }}</span>
+                        <span class="visitor-number">{{ number_format($visitorStats['total'] ?? 0) }}</span>
                     </div>
                 </div>
                 <div class="chart-container">

@@ -19,10 +19,7 @@ class TrackVisitor
     public function handle(Request $request, Closure $next): Response
     {
         $response = $next($request);
-        
-        // 퍼블리싱 모드: 방문자 추적 비활성화
-        // DB 연결 없이도 정상 작동하도록 수정
-        /*
+
         // 백오피스, API 경로는 제외
         if (!$request->is('backoffice*') && !$request->is('api/*')) {
             try {
@@ -32,7 +29,6 @@ class TrackVisitor
                 Log::error('방문자 로그 기록 실패: ' . $e->getMessage());
             }
         }
-        */
 
         return $response;
     }
@@ -56,6 +52,8 @@ class TrackVisitor
 
         // 방문 로그 기록
         VisitorLog::create([
+            // visitor_logs.user_id 는 users FK이므로, member 로그인 상태에서는 저장하지 않음
+            'user_id' => null,
             'ip_address' => $ipAddress,
             'user_agent' => $request->userAgent(),
             'page_url' => $request->fullUrl(),

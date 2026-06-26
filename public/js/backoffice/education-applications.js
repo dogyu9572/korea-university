@@ -123,6 +123,45 @@ function batchGraduate() {
     }
 }
 
+// 일괄 설문완료 (설문조사 여부 Y)
+function batchSurveyComplete() {
+    const selected = getSelectedApplications();
+    if (selected.length === 0) {
+        alert('선택된 신청이 없습니다.');
+        return;
+    }
+
+    if (confirm('선택된 ' + selected.length + '건의 설문조사 여부를 Y로 변경하시겠습니까?')) {
+        const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content');
+        const route = getApplicationsBasePath() + '/batch-survey-complete';
+
+        fetch(route, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRF-TOKEN': csrfToken,
+                'Accept': 'application/json'
+            },
+            body: JSON.stringify({
+                application_ids: selected
+            })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                alert(data.message);
+                location.reload();
+            } else {
+                alert('처리 중 오류가 발생했습니다.');
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('처리 중 오류가 발생했습니다.');
+        });
+    }
+}
+
 // 선택된 신청 ID 배열 반환
 function getSelectedApplications() {
     const checkboxes = document.querySelectorAll('.application-checkbox:checked');
@@ -809,6 +848,12 @@ function initShowPageHandlers() {
         if (btnGraduate) {
             e.preventDefault();
             batchGraduate();
+            return;
+        }
+        const btnSurveyComplete = e.target.closest('[data-action="batch-survey-complete"]');
+        if (btnSurveyComplete) {
+            e.preventDefault();
+            batchSurveyComplete();
             return;
         }
         const btnCert = e.target.closest('[data-action="issue-certificate"]');

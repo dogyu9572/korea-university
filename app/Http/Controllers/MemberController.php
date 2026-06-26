@@ -9,6 +9,7 @@ use App\Http\Requests\MemberJoinRequest;
 use App\Http\Requests\MemberLoginRequest;
 use App\Http\Requests\MemberSnsJoinRequest;
 use App\Models\Member;
+use App\Models\UserAccessLog;
 use Illuminate\Auth\Access\AuthorizationException;
 use App\Services\Backoffice\MemberService;
 use App\Services\Backoffice\SchoolService;
@@ -204,6 +205,19 @@ class MemberController extends Controller
         }
         Auth::guard('member')->login($member, false);
         $request->session()->regenerate();
+        try {
+            UserAccessLog::create([
+                // members.id 는 user_access_logs.user_id(users FK)와 스키마가 달라 null로 저장
+                'user_id' => null,
+                'name' => $member->name,
+                'ip_address' => $request->ip(),
+                'user_agent' => $request->userAgent(),
+                'referer' => $request->header('referer'),
+                'login_at' => now(),
+            ]);
+        } catch (\Throwable $e) {
+            Log::error('회원 로그인 로그 저장 실패', ['error' => $e->getMessage()]);
+        }
 
         $redirectUrl = route('mypage.application_status');
         if ($intendedUrl) {
@@ -258,6 +272,18 @@ class MemberController extends Controller
         if ($member) {
             Auth::guard('member')->login($member, false);
             request()->session()->regenerate();
+            try {
+                UserAccessLog::create([
+                    'user_id' => null,
+                    'name' => $member->name,
+                    'ip_address' => request()->ip(),
+                    'user_agent' => request()->userAgent(),
+                    'referer' => request()->header('referer'),
+                    'login_at' => now(),
+                ]);
+            } catch (\Throwable $e) {
+                Log::error('회원 SNS 로그인 로그 저장 실패(네이버)', ['error' => $e->getMessage()]);
+            }
             return redirect()->intended(route('mypage.application_status'));
         }
 
@@ -299,6 +325,18 @@ class MemberController extends Controller
         if ($member) {
             Auth::guard('member')->login($member, false);
             request()->session()->regenerate();
+            try {
+                UserAccessLog::create([
+                    'user_id' => null,
+                    'name' => $member->name,
+                    'ip_address' => request()->ip(),
+                    'user_agent' => request()->userAgent(),
+                    'referer' => request()->header('referer'),
+                    'login_at' => now(),
+                ]);
+            } catch (\Throwable $e) {
+                Log::error('회원 SNS 로그인 로그 저장 실패(카카오)', ['error' => $e->getMessage()]);
+            }
             return redirect()->intended(route('mypage.application_status'));
         }
 

@@ -95,10 +95,10 @@
                             @foreach($logs as $log)
                                 <tr>
                                     <td>{{ $logs->total() - ($logs->currentPage() - 1) * $logs->perPage() - $loop->index }}</td>
-                                    <td>{{ $log->user ? $log->user->name : '-' }}</td>
+                                    <td>{{ $log->name ?: '-' }}</td>
                                     <td>{{ $log->ip_address }}</td>
-                                    <td>{{ $log->user ? $log->user->created_at->format('Y-m-d H:i:s') : '-' }}</td>
-                                    <td>{{ $log->created_at->format('Y-m-d H:i:s') }}</td>
+                                    <td>-</td>
+                                    <td>{{ $log->login_at ? $log->login_at->format('Y-m-d H:i:s') : '-' }}</td>
                                     <td>{{ $log->referer ?: '-' }}</td>
                                 </tr>
                             @endforeach

@@ -109,46 +109,21 @@
 
             fetch(form.action, {
                 method: 'POST',
-                body: fd,
-                redirect: 'manual',
-                headers: {
-                    'X-Requested-With': 'XMLHttpRequest',
-                    'Accept': 'application/json'
-                }
+                body: fd
             }).then(function (res) {
-                if (res.type === 'redirect' || res.status === 302) {
-                    var loc = res.headers.get('Location');
-                    if (loc) {
-                        window.location.href = loc;
-                        return;
-                    }
+                // Laravel의 일반 폼 제출 응답(302 redirect)을 그대로 따른 뒤 최종 URL로 이동
+                if (res.redirected && res.url) {
+                    window.location.href = res.url;
+                    return;
                 }
-                if (res.status === 422) {
-                    if (submitBtn) submitBtn.disabled = false;
-                    return res.json().then(function (data) {
-                        if (data.errors) {
-                            var msg = Object.values(data.errors).flat().join('\n');
-                            alert(msg);
-                        } else {
-                            alert('입력 내용을 확인해주세요.');
-                        }
-                    }).catch(function () {
-                        alert('입력 내용을 확인해주세요.');
-                    });
+
+                // 리다이렉트가 아닌 비정상 응답일 때만 오류 처리
+                if (!res.ok) {
+                    throw new Error('submit failed');
                 }
-                if (res.ok) {
-                    return res.json().then(function (data) {
-                        if (data.redirect) {
-                            window.location.href = data.redirect;
-                        } else {
-                            window.location.href = form.action.replace('/store', '');
-                        }
-                    }).catch(function () {
-                        window.location.href = form.action.replace('/store', '');
-                    });
-                }
-                if (submitBtn) submitBtn.disabled = false;
-                alert('등록 중 오류가 발생했습니다.');
+
+                // 예외적인 성공 케이스(리다이렉트 없음)
+                window.location.href = form.action.replace('/store', '');
             }).catch(function () {
                 if (submitBtn) submitBtn.disabled = false;
                 alert('등록 중 오류가 발생했습니다.');

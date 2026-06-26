@@ -42,7 +42,7 @@
 						</div>
 						@endif
 
-						<form class="login-form" action="{{ url('/backoffice/login') }}" method="POST">
+						<form class="login-form" action="/backoffice/login" method="POST">
 							@csrf
 							
 							<div class="form-group">

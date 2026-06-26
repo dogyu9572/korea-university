@@ -178,6 +178,7 @@
                                 <option value="20" @selected(request('per_page', 20) == 20)>20개</option>
                                 <option value="50" @selected(request('per_page', 20) == 50)>50개</option>
                                 <option value="100" @selected(request('per_page', 20) == 100)>100개</option>
+                                <option value="500" @selected(request('per_page', 20) == 500)>500개</option>
                             </select>
                         </form>
                     </div>

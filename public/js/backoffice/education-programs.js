@@ -93,24 +93,20 @@
         const feeInputs = document.querySelectorAll('input[name^="fee_"], input[name^="refund_"][name$="_fee"]');
         feeInputs.forEach(function(input) {
             // 표시 시 정수로 변환
-            if (input.value && parseFloat(input.value) % 1 === 0) {
-                input.value = parseInt(input.value);
+            if (input.value !== '' && !isNaN(input.value) && parseFloat(input.value) % 1 === 0) {
+                input.value = String(parseInt(input.value, 10));
             }
             
             // 입력 시 정수로 변환
             input.addEventListener('input', function() {
                 const value = this.value.replace(/[^0-9]/g, '');
-                if (value !== '') {
-                    this.value = parseInt(value);
-                } else {
-                    this.value = '';
-                }
+                this.value = value !== '' ? String(parseInt(value, 10)) : '';
             });
             
             // 포커스 아웃 시 정수로 변환
             input.addEventListener('blur', function() {
-                if (this.value && !isNaN(this.value)) {
-                    this.value = parseInt(this.value) || '';
+                if (this.value !== '' && !isNaN(this.value)) {
+                    this.value = String(parseInt(this.value, 10));
                 }
             });
         });

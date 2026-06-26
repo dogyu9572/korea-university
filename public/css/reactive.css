@@ -865,7 +865,7 @@
 	.aside:before {display:none;}
 	.aside .inner dl {position:relative; overflow:visible; transform:translateY(-26px);}
 	.aside .inner dt {position:relative; display:block; font-size:14px; font-weight:500; line-height:52px; background:#fff; border-radius:26px; padding:0 24px; transition:.2s linear;}
-	.aside .inner dt button {font-weight:inherit;}
+	.aside .inner dt button {font-weight:inherit; color:#1e2124;}
 	.aside .inner dt:after {content:""; position:absolute; top:0; right:24px; width:18px; height:100%; background:url('/images/arrow_aside.svg') no-repeat 50% 50%; transition:.2s linear;}
 	.aside .inner dd {position:absolute; top:100%; left:0; width:100%; padding:10px 24px; border-top:#034DA2 2px solid; background:#fff; box-shadow:0 4px 20px 0 rgba(0, 0, 0, 0.08); border-radius:0 0 26px 26px; display:none;}
 	.aside .inner dd a {font-size:14px; display:block; line-height:38px; text-align:left;}

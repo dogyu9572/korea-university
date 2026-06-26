@@ -177,7 +177,7 @@
 		</dl>
 	</div>
 	
-	<h2 class="obtit">세금계산서 발행 정보</h2>
+	<h2 class="obtit">계산서 발행 정보</h2>
 	<div class="glbox dl_tbl dt_long">
 		<dl>
 			<dt>사업자등록번호</dt>

@@ -7,7 +7,10 @@
 /.fleet
 /.idea
 /.vscode
+/.vscode-server
 /.dbclient
+/.codex
+/.dotnet
 # 환경 설정 파일
 .env
 .env.backup

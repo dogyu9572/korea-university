@@ -108,6 +108,7 @@ class SubController extends Controller
             'branch' => $request->get('branch', ''),
             'is_member_school' => 'Y',
             'year' => (int) date('Y'),
+            'order_by_school_name' => true,
         ];
         $schools = $schoolService->getSchools($filters, 15);
         $branches = $schoolService->getBranches();

@@ -255,7 +255,7 @@ class MypageController extends Controller
         ];
         return collect($groups)
             ->map(function (array $group) {
-                $items = collect($group['items'])->filter(fn ($item) => $item['amount'] !== null)
+                $items = collect($group['items'])->filter(fn ($item) => $item['amount'] !== null && (float) $item['amount'] > 0)
                     ->map(function ($item) {
                         $item['display_amount'] = number_format((float) $item['amount']);
                         return $item;

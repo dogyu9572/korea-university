@@ -123,7 +123,7 @@
 			</dd>
 		</dl>
 		<dl>
-			<dt>여권 사본 첨부</dt>
+			<dt>여권 사본 첨부<strong class="c_blue_light">*</strong></dt>
 			<dd class="file_inputs" @if(!empty($tempFilePassportCopy ?? null)) data-temp-file="passport_copy" @endif @if(!empty($existingPassportCopy ?? null)) data-existing-file="passport_copy" @endif>
 				<label class="file">
 					<input type="file" name="passport_copy" accept=".pdf,.jpg,.jpeg,.png">

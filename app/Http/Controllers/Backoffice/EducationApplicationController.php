@@ -378,6 +378,24 @@ class EducationApplicationController extends BaseController
     }
 
     /**
+     * 일괄 설문완료 처리 (설문조사 여부 Y)
+     */
+    public function batchSurveyComplete(Request $request)
+    {
+        $request->validate([
+            'application_ids' => 'required|array',
+            'application_ids.*' => 'exists:education_applications,id',
+        ]);
+
+        $count = $this->educationApplicationService->batchSurveyComplete($request->application_ids);
+
+        return response()->json([
+            'success' => true,
+            'message' => $count . '건이 설문완료 처리되었습니다.',
+        ]);
+    }
+
+    /**
      * 신청별 결제상태 즉시 업데이트
      */
     public function updatePaymentStatus(EducationApplication $education_application, Request $request)
@@ -534,7 +552,7 @@ class EducationApplicationController extends BaseController
                     ->map(fn ($g) => $g->first()->branch);
 
                 fputcsv($file, [
-                    'No', '신청번호', '학교명', '지회', '신청자명', '신청자 ID', '휴대폰 번호', '이메일', '성별', '룸메이트', '숙박형태', '여행자 보험 가입 동의', '요청사항', '접수상태', '취소일시', '세금계산서', '현금영수증', '결제상태', '신청일시', '이수 여부', '설문조사 여부', '이수증/수료증 번호', '영수증 번호', '참가비', '입금일시'
+                    'No', '신청번호', '학교명', '지회', '신청자명', '영문 성', '영문 이름', '신청자 ID', '휴대폰 번호', '이메일', '성별', '룸메이트', '숙박형태', '여행자 보험 가입 동의', '요청사항', '접수상태', '취소일시', '세금계산서', '현금영수증', '결제상태', '신청일시', '이수 여부', '설문조사 여부', '이수증/수료증 번호', '영수증 번호', '참가비', '입금일시'
                 ]);
                 foreach ($applications as $index => $application) {
                     $roommateDisplay = $application->roommate_name ?? '';
@@ -551,6 +569,8 @@ class EducationApplicationController extends BaseController
                         $affiliation,
                         $branch,
                         $application->applicant_name ?? '',
+                        $application->english_last_name ?? '',
+                        $application->english_first_name ?? '',
                         $application->member->login_id ?? '',
                         $phoneForCsv($application->phone_number),
                         $application->email ?? '',

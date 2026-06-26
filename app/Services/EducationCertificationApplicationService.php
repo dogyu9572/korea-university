@@ -660,7 +660,7 @@ class EducationCertificationApplicationService
         $column = $mapping[$feeType];
         $amount = $program->{$column};
 
-        if ($amount === null) {
+        if ($amount === null || (float) $amount <= 0) {
             throw ValidationException::withMessages([
                 'fee_type' => '선택한 참가비 유형은 신청할 수 없습니다.',
             ]);

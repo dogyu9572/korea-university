@@ -149,7 +149,7 @@
 	.mtit i {width:6px; height:6px; background:#1E2124; border-radius:50%; margin:0 8px;}
 	.mtit:after {content:""; display:block; width:8px; aspect-ratio:1/1; background:#034DA2; border-radius:8px; margin-bottom:auto;}
 	.mcon .more {position:absolute; top:0; right:0; width:46px; height:46px; border:#CDD1D5 1px solid; border-radius:50%; font-size:0;}
-	.mcon .more:before {content:""; display:block; width:100%; height:100%; background:#1E2124; mask:url('http://kucra.or.kr/images/btn_more.svg') no-repeat 50% 50%; -webkit-mask:url('http://kucra.or.kr/images/btn_more.svg') no-repeat 50% 50%; transition:.2s linear;}
+	.mcon .more:before {content:""; display:block; width:100%; height:100%; background:#1E2124; mask:url('/images/btn_more.svg') no-repeat 50% 50%; -webkit-mask:url('/images/btn_more.svg') no-repeat 50% 50%; transition:.2s linear;}
 	.mcon p {font-size:20px; color:#464C53; line-height:1.6;}
 	.slick-track {min-width:100%;}
 	.mc01_slide {position:relative; margin:16px -15px 0;}
@@ -694,6 +694,12 @@
 /** 세미나 · 해외연수 (세미나 안내, 해외연수 안내 - 공통 사항으로 적용), (세미나ㆍ해외연수 신청 - 검색, 썸네일 게시판, 교육ㆍ자격증 신청과 동일) **/
 	.img_seminar_top {background-image:url('/images/img_seminar01.jpg');}
 	.img_overseas_training_top {background-image:url('/images/img_overseas_training01.jpg');}
+	.view_cont table {max-width:100%;}
+	.view_cont table th,
+	.view_cont table td {width:auto !important;}
+	.view_cont .gbox h2 {font-size: 1.2em !important; line-height: 1.2 !important;}
+	.view_cont .gbox p {margin-left: 0 !important; text-indent: 0 !important;}
+	.view_cont .gbox * {font-size:1rem !important;}
 
 /** 알림마당 **/
 /* 공지사항, 자료실,회원교 채용정보 - 게시판 */

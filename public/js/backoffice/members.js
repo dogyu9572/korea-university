@@ -2,26 +2,149 @@
  * 회원 관리 페이지 JavaScript
  */
 
-// DOMContentLoaded 이벤트로 초기화
-document.addEventListener('DOMContentLoaded', function() {
-    console.log('[DEBUG] members.js DOMContentLoaded 이벤트 발생');
-    
-    // jQuery 로드 확인
+/** 회원교 검색: 세미나 신청 등과 동일한 Bootstrap #schoolSearchModal (한 번만 바인딩) */
+var membersSchoolPopupBound = false;
+
+function escapeHtmlSchoolName(str) {
+    if (str == null) {
+        return '';
+    }
+    var el = document.createElement('textarea');
+    el.textContent = String(str);
+    return el.innerHTML;
+}
+
+function escapeAttrSchoolName(str) {
+    return String(str == null ? '' : str)
+        .replace(/&/g, '&amp;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#39;');
+}
+
+function applySelectedSchoolName(schoolName) {
+    var normalized = String(schoolName == null ? '' : schoolName).trim();
+    if (!normalized) {
+        return;
+    }
+    var $ = jQuery;
+    $('#school_name, input[name="school_name"]').val(normalized).trigger('input').trigger('change');
+    $('.input_school').val(normalized);
+    $('#school_name_direct').val('').prop('disabled', true);
+}
+
+// 테이블 행 버튼에서 직접 호출하는 전역 함수 (위임 이벤트/캐시 꼬임 회피)
+window.selectSchoolFromModal = function (el) {
+    if (!el || typeof jQuery === 'undefined') {
+        return;
+    }
+    var $el = jQuery(el);
+    var schoolName = $el.attr('data-school-name') || '';
+    applySelectedSchoolName(schoolName);
+    jQuery('#schoolSearchModal').modal('hide');
+};
+
+function bindSchoolSearchPopupIfPresent() {
+    if (membersSchoolPopupBound || typeof jQuery === 'undefined') {
+        return;
+    }
+    var $ = jQuery;
+    if (!$('#schoolSearchModal').length || !$('#btnSearchSchool').length) {
+        return;
+    }
+    membersSchoolPopupBound = true;
+
+    function loadSchoolList(keyword) {
+        var url = '/member/schools' + (keyword ? '?school_name=' + encodeURIComponent(keyword) : '');
+        var $tbody = $('#schoolSearchResults');
+        $tbody.html(
+            '<tr><td colspan="3" class="text-center">조회 중...</td></tr>'
+        );
+        fetch(url)
+            .then(function (res) {
+                return res.json();
+            })
+            .then(function (data) {
+                var schools = data.schools || [];
+                if (schools.length === 0) {
+                    $tbody.html(
+                        '<tr><td colspan="3" class="text-center">조회된 회원교가 없습니다.</td></tr>'
+                    );
+                    return;
+                }
+                var html = schools
+                    .map(function (s, index) {
+                        var name = s.school_name || '';
+                        return (
+                            '<tr>' +
+                            '<td>' +
+                            (index + 1) +
+                            '</td>' +
+                            '<td>' +
+                            escapeHtmlSchoolName(name) +
+                            '</td>' +
+                            '<td class="text-center">' +
+                            '<button type="button" class="btn btn-primary btn-sm btn-select-school" onclick="window.selectSchoolFromModal(this)" data-school-name="' +
+                            escapeAttrSchoolName(name) +
+                            '">선택</button>' +
+                            '</td>' +
+                            '</tr>'
+                        );
+                    })
+                    .join('');
+                $tbody.html(html);
+            })
+            .catch(function () {
+                $tbody.html(
+                    '<tr><td colspan="3" class="text-center text-danger">목록을 불러오는 중 오류가 발생했습니다.</td></tr>'
+                );
+            });
+    }
+
+    $('#schoolSearchModal').on('shown.bs.modal', function () {
+        // 모달을 열 때마다 검색/선택 상태 초기화
+        $('#popSchoolKeyword').val('');
+        $('#schoolSearchResults').html(
+            '<tr><td colspan="3" class="text-center">조회 중...</td></tr>'
+        );
+        loadSchoolList('');
+    });
+
+    $(document).on('click', '#popSchoolSearch', function () {
+        loadSchoolList($('#popSchoolKeyword').val().trim());
+    });
+    $(document).on('keypress', '#popSchoolKeyword', function (e) {
+        if (e.which === 13) {
+            e.preventDefault();
+            $('#popSchoolSearch').trigger('click');
+        }
+    });
+    $(document).on('input', '#school_name', function () {
+        if (!$(this).val().trim()) {
+            $('#school_name_direct').prop('disabled', false);
+        }
+    });
+}
+
+function bootBackofficeMembersScript() {
     function waitForJQuery() {
-        if (typeof jQuery !== 'undefined' && typeof $ !== 'undefined') {
-            console.log('[DEBUG] jQuery 로드 확인됨');
+        if (typeof window.jQuery !== 'undefined') {
+            if (typeof window.$ === 'undefined') {
+                window.$ = window.jQuery;
+            }
             initPage();
         } else {
-            console.log('[DEBUG] jQuery 대기 중...');
             setTimeout(waitForJQuery, 50);
         }
     }
-    
     waitForJQuery();
-    
-    // 바닐라 JS 이벤트 핸들러 (안전장치)
     initVanillaEventHandlers();
-});
+}
+
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', bootBackofficeMembersScript);
+} else {
+    bootBackofficeMembersScript();
+}
 
 // 페이지 초기화
 function initPage() {
@@ -37,6 +160,8 @@ function initEventHandlers() {
         console.error('[DEBUG] jQuery가 로드되지 않았습니다.');
         return;
     }
+
+    bindSchoolSearchPopupIfPresent();
 
     // edit 페이지인지 확인
     const isEditPage = $('#memberForm').attr('action') && $('#memberForm').attr('action').includes('/update');
@@ -127,11 +252,18 @@ function initEventHandlers() {
         }).open();
     });
 
-    // 학교명 검색
+    // 학교명 검색 (Bootstrap 모달 — 세미나 신청 회원 검색과 동일 패턴)
     $(document).on('click', '#btnSearchSchool', function() {
-        if (typeof layerShow === 'function') {
-            layerShow('searchSchool');
+        bindSchoolSearchPopupIfPresent();
+        var $modal = $('#schoolSearchModal');
+        if (!$modal.length) {
+            return;
         }
+        if (typeof $modal.modal !== 'function') {
+            alert('모달을 불러올 수 없습니다. 페이지를 새로고침 후 다시 시도해 주세요.');
+            return;
+        }
+        $modal.modal('show');
     });
 
     // 학교명 직접 입력
@@ -141,15 +273,6 @@ function initEventHandlers() {
             $('#school_name').val(value);
         }
     });
-
-    // 학교 검색 팝업에서 선택 (기존 로직 활용)
-    if (typeof $ !== 'undefined') {
-        $(document).on('click', '#searchSchool .search_list input[type="checkbox"]', function() {
-            const schoolName = $(this).siblings('span').text().trim();
-            $('#school_name').val(schoolName);
-            $('#school_name_direct').val('');
-        });
-    }
 
     // 생년월일 입력 제한 (숫자만, 8자리)
     $(document).on('input', '#birth_date', function() {

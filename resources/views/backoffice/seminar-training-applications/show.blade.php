@@ -191,6 +191,9 @@
                         <button type="button" class="btn btn-success btn-sm" data-action="batch-payment-complete">
                             <i class="fas fa-check"></i> 일괄 입금완료
                         </button>
+                        <button type="button" class="btn btn-warning btn-sm" data-action="batch-survey-complete">
+                            <i class="fas fa-poll"></i> 일괄 설문완료
+                        </button>
                         <button type="button" class="btn btn-info btn-sm" data-action="batch-graduate">
                             <i class="fas fa-check-circle"></i> 일괄 수료
                         </button>
@@ -215,6 +218,7 @@
                                 <option value="20" @selected(request('per_page', 20) == 20)>20개</option>
                                 <option value="50" @selected(request('per_page', 20) == 50)>50개</option>
                                 <option value="100" @selected(request('per_page', 20) == 100)>100개</option>
+                                <option value="500" @selected(request('per_page', 20) == 500)>500개</option>
                             </select>
                         </form>
                     </div>

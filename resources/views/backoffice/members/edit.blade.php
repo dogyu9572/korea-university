@@ -8,6 +8,7 @@
 
 @section('scripts')
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.0/dist/js/bootstrap.bundle.min.js"></script>
 <script src="https://t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js"></script>
 <script>
 // edit 페이지에서 비밀번호 필드 강제 표시 (즉시 실행)
@@ -49,7 +50,7 @@
     }
 })();
 </script>
-<script src="{{ asset('js/backoffice/members.js') }}"></script>
+<script src="{{ asset('js/backoffice/members.js') }}?v=20260416c"></script>
 <script>
 // 비밀번호 변경 검증
 document.addEventListener('DOMContentLoaded', function() {
@@ -431,5 +432,5 @@ document.addEventListener('DOMContentLoaded', function() {
     </div>
 </div>
 
-@include('member.pop_search_school')
+@include('backoffice.members._school_search_modal')
 @endsection
